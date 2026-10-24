@@ -228,10 +228,13 @@ def fetch(url, label, errors):
         errors.append(label+': '+type(exc).__name__)
         return None
 
-def choose(day,bez,koly,bude,old):
+def choose(day,bez,koly,bude,old,additional=None):
     votes=defaultdict(set)
     if koly is not None:votes[koly].add('КолиСвітло')
     if bude is not None:votes[bude].add('КолиБуде')
+    for source,intervals in (additional or {}).items():
+        if intervals is not None:
+            votes[intervals].add(source)
     for option in bez['candidates']: votes[option].add('БезСвітла')
     confirmed=sorted(((len(s),off,s) for off,s in votes.items() if len(s)>=2),key=lambda x:x[0],reverse=True)
     base={'date':day.isoformat(),'url':BEZ+day.isoformat(),'source_updated':bez['updated']}
@@ -357,10 +360,11 @@ def update_city_locations(now,today,old,errors):
             bude=parse_city_bude(city_bude,target,today,config['group']) if city_bude else None
             prev=old_loc.get('days',{}).get(target.isoformat(),{})
             # Uses same two-source quorum as the dacha, but the city sources are distinct.
-            entry=choose(target,bez,koly,bude,prev)
-            entry['url']=url
             alerts=parse_alerts(city_alerts,target,config['group'],'kyiv_oblenergo')
+            entry=choose(target,bez,koly,bude,prev,{'Alerts Energy':alerts})
+            entry['url']=url
             entry['source_reports']=city_sources(entry,bez,koly,bude,config['street'],prev,alerts)
+            print('CITY_DIAGNOSTIC',key,target.isoformat(),'bez',bez['candidates'],'koly',koly,'bude',bude,'alerts',alerts,'selected',entry['status'],entry['outages'])
             entry['group']=config['group']
             days[target.isoformat()]=entry
             msg=change(prev,entry)
@@ -392,9 +396,10 @@ def main():
         region=parse_kyivshchyna(region_html,target,today) if region_html else None
         live=None  # Svitlo.live is no longer treated as a current reference
         previous=old.get('days',{}).get(target.isoformat(),{})
-        entry=choose(target,bez,a,b,previous)
         alerts=parse_alerts(region_alerts,target,'3.1','kyivska_oblast_oblenergo')
+        entry=choose(target,bez,a,b,previous,{'Київщина.info':region,'Alerts Energy':alerts})
         entry['source_reports']=source_reports(entry,bez,a,b,region,live,previous,alerts)
+        print('QUEUE_3_1_DIAGNOSTIC',target.isoformat(),'bez_options',bez['candidates'],'bez_unpublished',bez['unpublished'],'koly',a,'bude',b,'kyivshchyna',region,'alerts',alerts,'selected',entry['status'],entry['outages'])
         days[target.isoformat()]=entry
         event=change(previous,entry)
         if event:logs.insert(0,{'at':now.isoformat(timespec='minutes'),'date':target.isoformat(),'message':event,'sources_confirmed':entry.get('sources',[])})
