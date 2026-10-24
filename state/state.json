@@ -142,8 +142,81 @@
             ]
           ],
           "partial": [],
-          "status": "match",
+          "status": "old",
           "url": "https://bezsvitla.com.ua/kyivska-oblast/pirnivska-hromada/visa-dubecna/grafik-na-2026-10-25"
+        },
+        "Київщина.info": {
+          "outages": [
+            [
+              "07:00",
+              "09:00"
+            ],
+            [
+              "16:00",
+              "19:30"
+            ]
+          ],
+          "partial": [],
+          "status": "match",
+          "url": "https://kyivshchyna.info/hrafik-vidkliuchen-svitla-kyivska-oblast/"
+        },
+        "КолиБуде": {
+          "outages": [
+            [
+              "07:00",
+              "09:00"
+            ],
+            [
+              "16:00",
+              "19:30"
+            ]
+          ],
+          "partial": [],
+          "status": "match",
+          "url": "https://kolybude.com/kyiv-oblast"
+        },
+        "КолиСвітло": {
+          "outages": [
+            [
+              "07:00",
+              "09:00"
+            ],
+            [
+              "16:00",
+              "19:30"
+            ]
+          ],
+          "partial": [],
+          "status": "match",
+          "url": "https://kolysvitlo.com/schedule/dtek_kyiv_oblast"
+        }
+      },
+      "source_updated": "",
+      "sources": [
+        "Alerts Energy",
+        "Київщина.info",
+        "КолиБуде",
+        "КолиСвітло"
+      ],
+      "status": "normal",
+      "url": "https://bezsvitla.com.ua/kyivska-oblast/pirnivska-hromada/visa-dubecna/grafik-na-2026-10-25"
+    },
+    "2026-10-26": {
+      "date": "2026-10-26",
+      "detail": "Немає підтверджених даних",
+      "outages": [],
+      "source_reports": {
+        "Alerts Energy": {
+          "outages": null,
+          "partial": [],
+          "status": "unavailable",
+          "url": "https://alerts.energy/kyivska-oblast"
+        },
+        "БезСвітла": {
+          "outages": null,
+          "partial": [],
+          "status": "unavailable",
+          "url": "https://bezsvitla.com.ua/kyivska-oblast/pirnivska-hromada/visa-dubecna/grafik-na-2026-10-26"
         },
         "Київщина.info": {
           "outages": null,
@@ -164,13 +237,10 @@
           "url": "https://kolysvitlo.com/schedule/dtek_kyiv_oblast"
         }
       },
-      "source_updated": "24.10.2026 20:03",
-      "sources": [
-        "Alerts Energy",
-        "БезСвітла"
-      ],
-      "status": "normal",
-      "url": "https://bezsvitla.com.ua/kyivska-oblast/pirnivska-hromada/visa-dubecna/grafik-na-2026-10-25"
+      "source_updated": "",
+      "sources": [],
+      "status": "unknown",
+      "url": "https://bezsvitla.com.ua/kyivska-oblast/pirnivska-hromada/visa-dubecna/grafik-na-2026-10-26"
     }
   },
   "last_heartbeat": "2026-10-24",
@@ -178,118 +248,6 @@
     "azov28b": {
       "address_verified": false,
       "days": {
-        "2026-10-24": {
-          "date": "2026-10-24",
-          "detail": "Зіставлено незалежні джерела",
-          "group": "10.1",
-          "outages": [
-            [
-              "00:00",
-              "03:30"
-            ],
-            [
-              "12:00",
-              "15:30"
-            ],
-            [
-              "22:00",
-              "24:00"
-            ]
-          ],
-          "source_reports": {
-            "Alerts Energy": {
-              "outages": [
-                [
-                  "00:00",
-                  "03:30"
-                ],
-                [
-                  "12:00",
-                  "15:30"
-                ],
-                [
-                  "22:00",
-                  "24:00"
-                ]
-              ],
-              "partial": [],
-              "status": "match",
-              "url": "https://alerts.energy/kyiv"
-            },
-            "БезСвітла": {
-              "outages": [
-                [
-                  "00:00",
-                  "03:30"
-                ],
-                [
-                  "12:00",
-                  "15:30"
-                ],
-                [
-                  "22:00",
-                  "24:00"
-                ]
-              ],
-              "partial": [],
-              "status": "match",
-              "url": "https://bezsvitla.com.ua/kyiv/vul-heroyiv-polku-azov"
-            },
-            "ДТЕК": {
-              "outages": null,
-              "partial": [],
-              "status": "unavailable",
-              "url": "https://www.dtek-kem.com.ua/ua/shutdowns"
-            },
-            "КолиБуде": {
-              "outages": [
-                [
-                  "00:00",
-                  "03:30"
-                ],
-                [
-                  "12:00",
-                  "15:30"
-                ],
-                [
-                  "22:00",
-                  "24:00"
-                ]
-              ],
-              "partial": [],
-              "status": "match",
-              "url": "https://kolybude.com/kyiv"
-            },
-            "КолиСвітло": {
-              "outages": [
-                [
-                  "00:00",
-                  "03:30"
-                ],
-                [
-                  "12:00",
-                  "15:30"
-                ],
-                [
-                  "22:00",
-                  "24:00"
-                ]
-              ],
-              "partial": [],
-              "status": "match",
-              "url": "https://kolysvitlo.com/schedule/dtek_kyiv"
-            }
-          },
-          "source_updated": "",
-          "sources": [
-            "Alerts Energy",
-            "БезСвітла",
-            "КолиБуде",
-            "КолиСвітло"
-          ],
-          "status": "normal",
-          "url": "https://bezsvitla.com.ua/kyiv/vul-heroyiv-polku-azov/grafik-na-2026-10-24"
-        },
         "2026-10-25": {
           "date": "2026-10-25",
           "detail": "Зіставлено незалежні джерела",
@@ -320,7 +278,63 @@
                 ]
               ],
               "partial": [],
+              "status": "old",
+              "url": "https://bezsvitla.com.ua/kyiv/vul-heroyiv-polku-azov"
+            },
+            "ДТЕК": {
+              "outages": null,
+              "partial": [],
+              "status": "unavailable",
+              "url": "https://www.dtek-kem.com.ua/ua/shutdowns"
+            },
+            "КолиБуде": {
+              "outages": [
+                [
+                  "15:00",
+                  "19:00"
+                ]
+              ],
+              "partial": [],
               "status": "match",
+              "url": "https://kolybude.com/kyiv"
+            },
+            "КолиСвітло": {
+              "outages": [
+                [
+                  "15:00",
+                  "19:00"
+                ]
+              ],
+              "partial": [],
+              "status": "match",
+              "url": "https://kolysvitlo.com/schedule/dtek_kyiv"
+            }
+          },
+          "source_updated": "",
+          "sources": [
+            "Alerts Energy",
+            "КолиБуде",
+            "КолиСвітло"
+          ],
+          "status": "normal",
+          "url": "https://bezsvitla.com.ua/kyiv/vul-heroyiv-polku-azov/grafik-na-2026-10-25"
+        },
+        "2026-10-26": {
+          "date": "2026-10-26",
+          "detail": "Немає підтверджених даних",
+          "group": "10.1",
+          "outages": [],
+          "source_reports": {
+            "Alerts Energy": {
+              "outages": null,
+              "partial": [],
+              "status": "unavailable",
+              "url": "https://alerts.energy/kyiv"
+            },
+            "БезСвітла": {
+              "outages": null,
+              "partial": [],
+              "status": "unavailable",
               "url": "https://bezsvitla.com.ua/kyiv/vul-heroyiv-polku-azov"
             },
             "ДТЕК": {
@@ -343,12 +357,9 @@
             }
           },
           "source_updated": "",
-          "sources": [
-            "Alerts Energy",
-            "БезСвітла"
-          ],
-          "status": "normal",
-          "url": "https://bezsvitla.com.ua/kyiv/vul-heroyiv-polku-azov/grafik-na-2026-10-25"
+          "sources": [],
+          "status": "unknown",
+          "url": "https://bezsvitla.com.ua/kyiv/vul-heroyiv-polku-azov/grafik-na-2026-10-26"
         }
       },
       "group": "10.1",
@@ -379,98 +390,6 @@
     "ivasiuka43": {
       "address_verified": false,
       "days": {
-        "2026-10-24": {
-          "date": "2026-10-24",
-          "detail": "Зіставлено незалежні джерела",
-          "group": "4.1",
-          "outages": [
-            [
-              "07:30",
-              "11:00"
-            ],
-            [
-              "16:30",
-              "20:00"
-            ]
-          ],
-          "source_reports": {
-            "Alerts Energy": {
-              "outages": [
-                [
-                  "07:30",
-                  "11:00"
-                ],
-                [
-                  "16:30",
-                  "20:00"
-                ]
-              ],
-              "partial": [],
-              "status": "match",
-              "url": "https://alerts.energy/kyiv"
-            },
-            "БезСвітла": {
-              "outages": [
-                [
-                  "07:30",
-                  "11:00"
-                ],
-                [
-                  "16:30",
-                  "20:00"
-                ]
-              ],
-              "partial": [],
-              "status": "match",
-              "url": "https://bezsvitla.com.ua/kyiv/prosp-ivasyuka-volodymyra"
-            },
-            "ДТЕК": {
-              "outages": null,
-              "partial": [],
-              "status": "unavailable",
-              "url": "https://www.dtek-kem.com.ua/ua/shutdowns"
-            },
-            "КолиБуде": {
-              "outages": [
-                [
-                  "07:30",
-                  "11:00"
-                ],
-                [
-                  "16:30",
-                  "20:00"
-                ]
-              ],
-              "partial": [],
-              "status": "match",
-              "url": "https://kolybude.com/kyiv"
-            },
-            "КолиСвітло": {
-              "outages": [
-                [
-                  "07:30",
-                  "11:00"
-                ],
-                [
-                  "16:30",
-                  "20:00"
-                ]
-              ],
-              "partial": [],
-              "status": "match",
-              "url": "https://kolysvitlo.com/schedule/dtek_kyiv"
-            }
-          },
-          "source_updated": "",
-          "sources": [
-            "Alerts Energy",
-            "БезСвітла",
-            "КолиБуде",
-            "КолиСвітло"
-          ],
-          "status": "normal",
-          "url": "https://bezsvitla.com.ua/kyiv/prosp-ivasyuka-volodymyra/grafik-na-2026-10-24"
-        },
         "2026-10-25": {
           "date": "2026-10-25",
           "detail": "Зіставлено незалежні джерела",
@@ -513,7 +432,71 @@
                 ]
               ],
               "partial": [],
+              "status": "old",
+              "url": "https://bezsvitla.com.ua/kyiv/prosp-ivasyuka-volodymyra"
+            },
+            "ДТЕК": {
+              "outages": null,
+              "partial": [],
+              "status": "unavailable",
+              "url": "https://www.dtek-kem.com.ua/ua/shutdowns"
+            },
+            "КолиБуде": {
+              "outages": [
+                [
+                  "09:00",
+                  "12:30"
+                ],
+                [
+                  "22:00",
+                  "24:00"
+                ]
+              ],
+              "partial": [],
               "status": "match",
+              "url": "https://kolybude.com/kyiv"
+            },
+            "КолиСвітло": {
+              "outages": [
+                [
+                  "09:00",
+                  "12:30"
+                ],
+                [
+                  "22:00",
+                  "24:00"
+                ]
+              ],
+              "partial": [],
+              "status": "match",
+              "url": "https://kolysvitlo.com/schedule/dtek_kyiv"
+            }
+          },
+          "source_updated": "",
+          "sources": [
+            "Alerts Energy",
+            "КолиБуде",
+            "КолиСвітло"
+          ],
+          "status": "normal",
+          "url": "https://bezsvitla.com.ua/kyiv/prosp-ivasyuka-volodymyra/grafik-na-2026-10-25"
+        },
+        "2026-10-26": {
+          "date": "2026-10-26",
+          "detail": "Немає підтверджених даних",
+          "group": "4.1",
+          "outages": [],
+          "source_reports": {
+            "Alerts Energy": {
+              "outages": null,
+              "partial": [],
+              "status": "unavailable",
+              "url": "https://alerts.energy/kyiv"
+            },
+            "БезСвітла": {
+              "outages": null,
+              "partial": [],
+              "status": "unavailable",
               "url": "https://bezsvitla.com.ua/kyiv/prosp-ivasyuka-volodymyra"
             },
             "ДТЕК": {
@@ -536,12 +519,9 @@
             }
           },
           "source_updated": "",
-          "sources": [
-            "Alerts Energy",
-            "БезСвітла"
-          ],
-          "status": "normal",
-          "url": "https://bezsvitla.com.ua/kyiv/prosp-ivasyuka-volodymyra/grafik-na-2026-10-25"
+          "sources": [],
+          "status": "unknown",
+          "url": "https://bezsvitla.com.ua/kyiv/prosp-ivasyuka-volodymyra/grafik-na-2026-10-26"
         }
       },
       "group": "4.1",
@@ -572,98 +552,6 @@
     "obolonskyi54": {
       "address_verified": false,
       "days": {
-        "2026-10-24": {
-          "date": "2026-10-24",
-          "detail": "Зіставлено незалежні джерела",
-          "group": "4.1",
-          "outages": [
-            [
-              "07:30",
-              "11:00"
-            ],
-            [
-              "16:30",
-              "20:00"
-            ]
-          ],
-          "source_reports": {
-            "Alerts Energy": {
-              "outages": [
-                [
-                  "07:30",
-                  "11:00"
-                ],
-                [
-                  "16:30",
-                  "20:00"
-                ]
-              ],
-              "partial": [],
-              "status": "match",
-              "url": "https://alerts.energy/kyiv"
-            },
-            "БезСвітла": {
-              "outages": [
-                [
-                  "07:30",
-                  "11:00"
-                ],
-                [
-                  "16:30",
-                  "20:00"
-                ]
-              ],
-              "partial": [],
-              "status": "match",
-              "url": "https://bezsvitla.com.ua/kyiv/prosp-obolonskyi"
-            },
-            "ДТЕК": {
-              "outages": null,
-              "partial": [],
-              "status": "unavailable",
-              "url": "https://www.dtek-kem.com.ua/ua/shutdowns"
-            },
-            "КолиБуде": {
-              "outages": [
-                [
-                  "07:30",
-                  "11:00"
-                ],
-                [
-                  "16:30",
-                  "20:00"
-                ]
-              ],
-              "partial": [],
-              "status": "match",
-              "url": "https://kolybude.com/kyiv"
-            },
-            "КолиСвітло": {
-              "outages": [
-                [
-                  "07:30",
-                  "11:00"
-                ],
-                [
-                  "16:30",
-                  "20:00"
-                ]
-              ],
-              "partial": [],
-              "status": "match",
-              "url": "https://kolysvitlo.com/schedule/dtek_kyiv"
-            }
-          },
-          "source_updated": "",
-          "sources": [
-            "Alerts Energy",
-            "БезСвітла",
-            "КолиБуде",
-            "КолиСвітло"
-          ],
-          "status": "normal",
-          "url": "https://bezsvitla.com.ua/kyiv/prosp-obolonskyi/grafik-na-2026-10-24"
-        },
         "2026-10-25": {
           "date": "2026-10-25",
           "detail": "Зіставлено незалежні джерела",
@@ -706,7 +594,71 @@
                 ]
               ],
               "partial": [],
+              "status": "old",
+              "url": "https://bezsvitla.com.ua/kyiv/prosp-obolonskyi"
+            },
+            "ДТЕК": {
+              "outages": null,
+              "partial": [],
+              "status": "unavailable",
+              "url": "https://www.dtek-kem.com.ua/ua/shutdowns"
+            },
+            "КолиБуде": {
+              "outages": [
+                [
+                  "09:00",
+                  "12:30"
+                ],
+                [
+                  "22:00",
+                  "24:00"
+                ]
+              ],
+              "partial": [],
               "status": "match",
+              "url": "https://kolybude.com/kyiv"
+            },
+            "КолиСвітло": {
+              "outages": [
+                [
+                  "09:00",
+                  "12:30"
+                ],
+                [
+                  "22:00",
+                  "24:00"
+                ]
+              ],
+              "partial": [],
+              "status": "match",
+              "url": "https://kolysvitlo.com/schedule/dtek_kyiv"
+            }
+          },
+          "source_updated": "",
+          "sources": [
+            "Alerts Energy",
+            "КолиБуде",
+            "КолиСвітло"
+          ],
+          "status": "normal",
+          "url": "https://bezsvitla.com.ua/kyiv/prosp-obolonskyi/grafik-na-2026-10-25"
+        },
+        "2026-10-26": {
+          "date": "2026-10-26",
+          "detail": "Немає підтверджених даних",
+          "group": "4.1",
+          "outages": [],
+          "source_reports": {
+            "Alerts Energy": {
+              "outages": null,
+              "partial": [],
+              "status": "unavailable",
+              "url": "https://alerts.energy/kyiv"
+            },
+            "БезСвітла": {
+              "outages": null,
+              "partial": [],
+              "status": "unavailable",
               "url": "https://bezsvitla.com.ua/kyiv/prosp-obolonskyi"
             },
             "ДТЕК": {
@@ -729,12 +681,9 @@
             }
           },
           "source_updated": "",
-          "sources": [
-            "Alerts Energy",
-            "БезСвітла"
-          ],
-          "status": "normal",
-          "url": "https://bezsvitla.com.ua/kyiv/prosp-obolonskyi/grafik-na-2026-10-25"
+          "sources": [],
+          "status": "unknown",
+          "url": "https://bezsvitla.com.ua/kyiv/prosp-obolonskyi/grafik-na-2026-10-26"
         }
       },
       "group": "4.1",
