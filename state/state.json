@@ -92,7 +92,9 @@
       },
       "source_updated": "24.10.2026 14:13",
       "sources": [
+        "Alerts Energy",
         "БезСвітла",
+        "Київщина.info",
         "КолиБуде",
         "КолиСвітло"
       ],
@@ -101,19 +103,46 @@
     },
     "2026-10-25": {
       "date": "2026-10-25",
-      "detail": "Немає підтверджених даних",
-      "outages": [],
+      "detail": "Зіставлено незалежні джерела",
+      "outages": [
+        [
+          "07:00",
+          "09:00"
+        ],
+        [
+          "16:00",
+          "19:30"
+        ]
+      ],
       "source_reports": {
         "Alerts Energy": {
-          "outages": null,
+          "outages": [
+            [
+              "07:00",
+              "09:00"
+            ],
+            [
+              "16:00",
+              "19:30"
+            ]
+          ],
           "partial": [],
-          "status": "unavailable",
+          "status": "match",
           "url": "https://alerts.energy/kyivska-oblast"
         },
         "БезСвітла": {
-          "outages": null,
+          "outages": [
+            [
+              "07:00",
+              "09:00"
+            ],
+            [
+              "16:00",
+              "19:30"
+            ]
+          ],
           "partial": [],
-          "status": "unavailable",
+          "status": "match",
           "url": "https://bezsvitla.com.ua/kyivska-oblast/pirnivska-hromada/visa-dubecna/grafik-na-2026-10-25"
         },
         "Київщина.info": {
@@ -135,9 +164,12 @@
           "url": "https://kolysvitlo.com/schedule/dtek_kyiv_oblast"
         }
       },
-      "source_updated": "",
-      "sources": [],
-      "status": "unknown",
+      "source_updated": "24.10.2026 20:03",
+      "sources": [
+        "Alerts Energy",
+        "БезСвітла"
+      ],
+      "status": "normal",
       "url": "https://bezsvitla.com.ua/kyivska-oblast/pirnivska-hromada/visa-dubecna/grafik-na-2026-10-25"
     }
   },
@@ -250,6 +282,7 @@
           },
           "source_updated": "",
           "sources": [
+            "Alerts Energy",
             "БезСвітла",
             "КолиБуде",
             "КолиСвітло"
@@ -403,6 +436,7 @@
           },
           "source_updated": "",
           "sources": [
+            "Alerts Energy",
             "БезСвітла",
             "КолиБуде",
             "КолиСвітло"
@@ -556,6 +590,7 @@
           },
           "source_updated": "",
           "sources": [
+            "Alerts Energy",
             "БезСвітла",
             "КолиБуде",
             "КолиСвітло"
@@ -623,5 +658,15 @@
       "operator": "ДТЕК Київські електромережі"
     }
   },
-  "logs": []
+  "logs": [
+    {
+      "at": "2026-10-24T20:24+03:00",
+      "date": "2026-10-25",
+      "message": "Опубліковано графік: 07:00–09:00, 16:00–19:30",
+      "sources_confirmed": [
+        "Alerts Energy",
+        "БезСвітла"
+      ]
+    }
+  ]
 }
