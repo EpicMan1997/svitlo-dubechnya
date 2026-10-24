@@ -77,7 +77,7 @@ def scoped(html, target, today):
         m = re.search(r'(?:Сьогодні|на сьогодні)[,\s]+(\d{1,2}\s+\w+)(?:\s+(\d{4}))?', s, re.I)
         if not m or m.group(1).lower()!=label or (m.group(2) and int(m.group(2))!=target.year): return None
         tail = s[m.end():]
-        end = re.search(r'(?:Завтра[,\s]+\d{1,2}\s+(?:'+'|'.concat(...['січня','лютого','березня','квітня','травня','червня','липня','серпня','вересня','жовтня','листопада','грудня'])+')|Графік на завтра)', tail, re.I)
+        end = re.search(r'(?:Завтра[,\s]+\d{1,2}\s+[А-Яа-яІіЇїЄєҐґ]{3,}|Графік на завтра)', tail, re.I)
         return tail[:end.start()] if end else tail
     m = re.search(r'(?:Завтра[,\s]+|на завтра[,\s]+)'+re.escape(f'{label} {target.year}'),s,re.I)
     if not m: return None
