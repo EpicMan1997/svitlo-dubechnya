@@ -223,6 +223,9 @@ def main():
         html=fetch(BEZ+target.isoformat(),'БезСвітла',errors)
         bez=parse_bez(html,target) if html else {'candidates':[],'updated':'','unpublished':False}
         a=parse_kolysvitlo(koly,target,today) if koly else None
+        if target==today and a is None:
+            sample=plain(koly)[:700] if koly else '<fetch failed>'
+            print('Diagnostic KolySvitlo: length=%s page_start=%r scoped_start=%r' % (len(koly) if koly else 0,sample,(scoped(koly,target,today) or '')[:600] if koly else ''),file=sys.stderr)
         b=parse_kolybude(bude,target,today) if bude else None
         region=parse_kyivshchyna(region_html,target,today) if region_html else None
         live=parse_svitlolive(live_html,target,today) if live_html else None
