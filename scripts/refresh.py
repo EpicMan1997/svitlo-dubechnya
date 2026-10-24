@@ -209,6 +209,125 @@ def change(old,new):
     if 'outages' not in old or old.get('status')=='unknown': return 'Опубліковано графік: '+fmt(new['outages'])
     return 'Змінено графік: '+fmt(old['outages'])+' → '+fmt(new['outages'])
 
+
+CITY_KOLY = 'https://kolysvitlo.com/schedule/dtek_kyiv'
+CITY_BUDE = 'https://kolybude.com/kyiv'
+CITY_DTEK = 'https://www.dtek-kem.com.ua/ua/shutdowns'
+CITY_LOCATIONS = {
+    'obolonskyi54': {'name':'Оболонський проспект, 54','group':'4.1','address_verified':False,
+                    'street':'https://bezsvitla.com.ua/kyiv/prosp-obolonskyi'},
+    'ivasiuka43': {'name':'Володимира Івасюка, 43','group':'4.1','address_verified':False,
+                  'street':'https://bezsvitla.com.ua/kyiv/prosp-ivasyuka-volodymyra'},
+    'azov28b': {'name':'Героїв полку Азов, 28Б','group':'10.1','address_verified':False,
+                'street':'https://bezsvitla.com.ua/kyiv/vul-heroyiv-polku-azov'}
+}
+
+def parse_city_bez(html, target, group):
+    """Adapt the alternating, full-day BeZ light/off block to any Kyiv queue."""
+    raw = plain(html)
+    if target.strftime('%d.%m.%Y') not in raw[:1300]:
+        return {'candidates':[], 'updated':'', 'unpublished':False}
+    if re.search(r'Графік відключень на\s*'+re.escape(target.strftime('%d.%m.%Y'))+r'\s+ще не опублікован',raw[:2000],re.I):
+        return {'candidates':[], 'updated':'', 'unpublished':True}
+    section=re.search(r'Графік\s+Черга\s+'+re.escape(group)+r'\b(.*?)(?:Зберегти підчергу|Історія змін|Графік\s+Черга\s+\d+\.\d+)',raw,re.I|re.S)
+    if not section:
+        return {'candidates':[], 'updated':'', 'unpublished':False}
+    blocks=pairs(section.group(1))
+    if not blocks or blocks[0][0]!='00:00' or blocks[-1][1]!='24:00' or any(blocks[i][1]!=blocks[i+1][0] for i in range(len(blocks)-1)):
+        return {'candidates':[],'updated':'','unpublished':False}
+    # Alternation direction is not documented; corroboration chooses between candidates.
+    options=list(dict.fromkeys([normalize(blocks[::2]),normalize(blocks[1::2])]))
+    return {'candidates':options,'updated':'','unpublished':False}
+
+def city_scope(html,target,today):
+    page=plain(html)
+    label=f'{target.day} {MONTHS[target.month]}'
+    if target==today:
+        match=re.search(r'Сьогодні[, ]+(\d{1,2}\s+[А-Яа-яІіЇїЄєҐґ]+)(?:\s+(\d{4}))?',page,re.I)
+        if not match or match.group(1).lower()!=label or (match.group(2) and int(match.group(2))!=target.year):return None
+        rest=page[match.end():]
+        # The tab label "Завтра" is NOT a date section boundary.
+        finish=re.search(r'Завтра[, ]+\d{1,2}\s+[А-Яа-яІіЇїЄєҐґ]+|Графік на завтра ще',rest,re.I)
+        return rest[:finish.start()] if finish else rest
+    match=re.search(r'Завтра[, ]+'+re.escape(label)+r'\s+'+str(target.year),page,re.I)
+    if not match:return None
+    rest=page[match.end():]
+    finish=re.search(r'Про графік|Часті запитання|Сьогодні[, ]+\d',rest,re.I)
+    return rest[:finish.start()] if finish else rest
+
+def parse_city_koly(html,target,today,group):
+    portion=city_scope(html,target,today)
+    if not portion:return None
+    row=re.search(r'(?<![\d.])'+re.escape(group)+r'\b(.*?)(?=\s+\d{1,2}\.\d\b|$)',portion,re.S)
+    if not row:return None
+    content=row.group(1)
+    if re.search('Без відключень|Відключень немає',content,re.I):return tuple()
+    part=re.search(r'Немає світла:\s*(.*)',content,re.I)
+    if not part:return None
+    found=pairs(part.group(1))
+    return normalize(found) if found else None
+
+def parse_city_bude(html,target,today,group):
+    page=plain(html)
+    heading=re.search(r'на сьогодні[, ]+(\d{1,2})\s+([А-Яа-яІіЇїЄєҐґ]+)',page,re.I)
+    if target!=today or not heading or int(heading.group(1))!=target.day or heading.group(2).lower()!=MONTHS[target.month]:
+        return None
+    row=re.search(r'Черга\s+'+re.escape(group)+r'\s*:\s*(.*?)(?=\s+Черга\s+\d{1,2}\.\d\b|$)',page,re.I|re.S)
+    if not row:return None
+    result=pairs(row.group(1))
+    return normalize(result) if result else None
+
+def city_sources(entry,bez,koly,bude,street,prev):
+    targets={'БезСвітла':street,'КолиСвітло':CITY_KOLY,'КолиБуде':CITY_BUDE,
+             'ДТЕК':CITY_DTEK}
+    data={'БезСвітла':next((x for x in bez['candidates'] if list(map(list,x))==entry['outages']),None) if entry['status']=='normal' else None,
+          'КолиСвітло':koly,'КолиБуде':bude,'ДТЕК':None}
+    previous=prev.get('source_reports',{})
+    compare=tuple(tuple(x) for x in entry.get('outages',[]))
+    out={}
+    for name,url in targets.items():
+        value=data[name]
+        if value is not None:
+            out[name]={'status':'match' if entry['status']=='normal' and value==compare else 'diff',
+                       'outages':[list(x) for x in value],'url':url,'partial':[]}
+        else:
+            older=previous.get(name,{})
+            out[name]={'status':'old' if older.get('outages') is not None else 'unavailable',
+                       'outages':older.get('outages'),'url':url,'partial':[]}
+    return out
+
+def update_city_locations(now,today,old,errors):
+    """Separate city operator, street address, queue, and history; never reuse dacha data."""
+    city_koly=fetch(CITY_KOLY,'КолиСвітло Київ',errors)
+    city_bude=fetch(CITY_BUDE,'КолиБуде Київ',errors)
+    city_dtek=fetch(CITY_DTEK,'ДТЕК Київ',errors)
+    result={}
+    old_locations=old.get('locations',{})
+    for key,config in CITY_LOCATIONS.items():
+        old_loc=old_locations.get(key,{})
+        days={}
+        logs=list(old_loc.get('logs',[]))
+        for target in (today,today+timedelta(days=1)):
+            url=config['street']+'/grafik-na-'+target.isoformat()
+            page=fetch(url,'БезСвітла '+key+' '+target.isoformat(),errors)
+            bez=parse_city_bez(page,target,config['group']) if page else {'candidates':[],'updated':'','unpublished':False}
+            koly=parse_city_koly(city_koly,target,today,config['group']) if city_koly else None
+            bude=parse_city_bude(city_bude,target,today,config['group']) if city_bude else None
+            prev=old_loc.get('days',{}).get(target.isoformat(),{})
+            # Uses same two-source quorum as the dacha, but the city sources are distinct.
+            entry=choose(target,bez,koly,bude,prev)
+            entry['url']=url
+            entry['source_reports']=city_sources(entry,bez,koly,bude,config['street'],prev)
+            entry['group']=config['group']
+            days[target.isoformat()]=entry
+            msg=change(prev,entry)
+            if msg:logs.insert(0,{'at':now.isoformat(timespec='minutes'),'date':target.isoformat(),
+                                   'message':msg,'sources_confirmed':entry['sources']})
+        logs=[x for x in logs if x.get('date','0000')>=(today-timedelta(days=6)).isoformat()][:60]
+        result[key]={'name':config['name'],'group':config['group'],'address_verified':config['address_verified'],
+                     'days':days,'logs':logs,'operator':'ДТЕК Київські електромережі'}
+    return result
+
 def main():
     now=datetime.now(KYIV);today=now.date();tomorrow=today+timedelta(days=1)
     try: old=json.loads(STATE.read_text(encoding='utf-8'))
@@ -220,6 +339,7 @@ def main():
     region_html=fetch(KYIVSHCHYNA,'Київщина.info',errors)
     live_html=fetch(SVITLOLIVE,'Svitlo.live Вища Дубечня',errors)
     if not live_html:live_html=fetch(SVITLOLIVE_FALLBACK,'Svitlo.live Пірнівська громада',errors)
+    city=update_city_locations(now,today,old,errors)
     days={};logs=list(old.get('logs',[]))
     for target in (today,tomorrow):
         html=fetch(BEZ+target.isoformat(),'БезСвітла',errors)
@@ -238,12 +358,13 @@ def main():
     logs=[x for x in logs if x.get('date','0000')>=(today-timedelta(days=6)).isoformat()][:60]
     save={'days':{k:v for k,v in old.get('days',{}).items() if k>=(today-timedelta(days=2)).isoformat()},'logs':logs}
     save['days'].update(days)
+    save['locations']=city
     hb=old.get('last_heartbeat','')
     save['last_heartbeat']=today.isoformat() if not hb or hb<=(today-timedelta(days=7)).isoformat() else hb
     STATE.parent.mkdir(exist_ok=True,parents=True)
     content=json.dumps(save,ensure_ascii=False,indent=2,sort_keys=True)+'\n'
     if not STATE.exists() or STATE.read_text(encoding='utf-8')!=content:STATE.write_text(content,encoding='utf-8')
-    payload={'updated_at':now.isoformat(timespec='seconds'),'today_date':today.isoformat(),'tomorrow_date':tomorrow.isoformat(),'days':days,'logs':logs,'source_health':{'dtek_reachable':official is not None,'issues':errors}}
+    payload={'updated_at':now.isoformat(timespec='seconds'),'today_date':today.isoformat(),'tomorrow_date':tomorrow.isoformat(),'days':days,'logs':logs,'locations':{'dacha':{'name':'Дача · Вища Дубечня','group':'3.1','address_verified':True,'days':days,'logs':logs,'operator':'ДТЕК Київські регіональні електромережі'},**city},'source_health':{'dtek_reachable':official is not None,'issues':errors}}
     OUTPUT.parent.mkdir(exist_ok=True,parents=True)
     OUTPUT.write_text(json.dumps(payload,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
     print('Checked:',now.isoformat(timespec='minutes'),[(d,e['status'],e['outages']) for d,e in days.items()])
