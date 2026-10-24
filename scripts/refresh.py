@@ -364,7 +364,6 @@ def update_city_locations(now,today,old,errors):
             entry=choose(target,bez,koly,bude,prev,{'Alerts Energy':alerts})
             entry['url']=url
             entry['source_reports']=city_sources(entry,bez,koly,bude,config['street'],prev,alerts)
-            print('CITY_DIAGNOSTIC',key,target.isoformat(),'bez',bez['candidates'],'koly',koly,'bude',bude,'alerts',alerts,'selected',entry['status'],entry['outages'])
             entry['group']=config['group']
             days[target.isoformat()]=entry
             msg=change(prev,entry)
@@ -399,7 +398,6 @@ def main():
         alerts=parse_alerts(region_alerts,target,'3.1','kyivska_oblast_oblenergo')
         entry=choose(target,bez,a,b,previous,{'Київщина.info':region,'Alerts Energy':alerts})
         entry['source_reports']=source_reports(entry,bez,a,b,region,live,previous,alerts)
-        print('QUEUE_3_1_DIAGNOSTIC',target.isoformat(),'bez_options',bez['candidates'],'bez_unpublished',bez['unpublished'],'koly',a,'bude',b,'kyivshchyna',region,'alerts',alerts,'selected',entry['status'],entry['outages'])
         days[target.isoformat()]=entry
         event=change(previous,entry)
         if event:logs.insert(0,{'at':now.isoformat(timespec='minutes'),'date':target.isoformat(),'message':event,'sources_confirmed':entry.get('sources',[])})
