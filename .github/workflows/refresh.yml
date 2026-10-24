@@ -4,7 +4,7 @@ on:
     branches: [main]
   schedule:
     # Best-effort GitHub schedule; queued jobs can be delayed or dropped.
-    - cron: '7,17,27,37,47,57 * * * *'
+    - cron: '7,22,37,52 * * * *'
   workflow_dispatch:
 permissions:
   contents: write
