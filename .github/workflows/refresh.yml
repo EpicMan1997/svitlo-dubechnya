@@ -11,8 +11,8 @@ permissions:
   pages: write
   id-token: write
 concurrency:
-  group: dubechnya-pages
-  cancel-in-progress: false
+  group: dubechnya-pages-v2
+  cancel-in-progress: true
 jobs:
   refresh:
     runs-on: ubuntu-latest
