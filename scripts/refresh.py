@@ -158,8 +158,6 @@ def source_reports(result,bez,koly,bude,region,live,old):
         'КолиСвітло':{'ranges':koly,'partial':[],'url':KOLY},
         'КолиБуде':{'ranges':bude,'partial':[],'url':KOLBUDE},
         'Київщина.info':{'ranges':region,'partial':[],'url':KYIVSHCHYNA},
-        'Svitlo.live':{'ranges':live['outages'] if live else None,
-                       'partial':live['partial'] if live else [],'url':SVITLOLIVE},
     }
     output={}
     old_reports=old.get('source_reports',{})
@@ -337,8 +335,6 @@ def main():
     bude=fetch(KOLBUDE,'КолиБуде',errors)
     official=fetch(DTEK,'ДТЕК',errors)
     region_html=fetch(KYIVSHCHYNA,'Київщина.info',errors)
-    live_html=fetch(SVITLOLIVE,'Svitlo.live Вища Дубечня',errors)
-    if not live_html:live_html=fetch(SVITLOLIVE_FALLBACK,'Svitlo.live Пірнівська громада',errors)
     city=update_city_locations(now,today,old,errors)
     days={};logs=list(old.get('logs',[]))
     for target in (today,tomorrow):
@@ -348,7 +344,7 @@ def main():
         
         b=parse_kolybude(bude,target,today) if bude else None
         region=parse_kyivshchyna(region_html,target,today) if region_html else None
-        live=parse_svitlolive(live_html,target,today) if live_html else None
+        live=None  # Svitlo.live is no longer treated as a current reference
         previous=old.get('days',{}).get(target.isoformat(),{})
         entry=choose(target,bez,a,b,previous)
         entry['source_reports']=source_reports(entry,bez,a,b,region,live,previous)
