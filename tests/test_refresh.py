@@ -44,10 +44,10 @@ class Tests(unittest.TestCase):
  def test_source_reports_not_faked(self):
   consensus={'date':D.isoformat(),'status':'normal','outages':[list(x) for x in E],'url':'https://example.com'}
   result=source_reports(consensus,{'candidates':[E],'updated':'','unpublished':False},E,E,(('08:00','12:00'),('18:30','22:00')),None,{})
-  self.assertEqual(len(result),5)
+  self.assertEqual(len(result),4)
   self.assertEqual(result['КолиСвітло']['status'],'match')
   self.assertEqual(result['Київщина.info']['status'],'diff')
-  self.assertEqual(result['Svitlo.live']['status'],'unavailable')
+  self.assertNotIn('Svitlo.live',result)
 
  def test_kyiv_address_groups(self):
   self.assertEqual(CITY_LOCATIONS['obolonskyi54']['group'],'4.1')
