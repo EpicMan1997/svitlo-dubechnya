@@ -1,0 +1,168 @@
+#!/usr/bin/env python3
+"""Conservative date-scoped power-outage schedule for Vyshcha Dubechnya group 3.1."""
+import json
+import re
+import sys
+from collections import defaultdict
+from datetime import date, datetime, timedelta
+from pathlib import Path
+from zoneinfo import ZoneInfo
+
+import requests
+from bs4 import BeautifulSoup
+
+ROOT = Path(__file__).resolve().parents[1]
+STATE = ROOT / 'state' / 'state.json'
+OUTPUT = ROOT / 'site' / 'data.json'
+KYIV = ZoneInfo('Europe/Kyiv')
+BEZ = 'https://bezsvitla.com.ua/kyivska-oblast/pirnivska-hromada/visa-dubecna/grafik-na-'
+KOLY = 'https://kolysvitlo.com/schedule/dtek_kyiv_oblast'
+KOLBUDE = 'https://kolybude.com/kyiv-oblast'
+DTEK = 'https://www.dtek-krem.com.ua/ua/shutdowns'
+MONTHS = ['', 'січня', 'лютого', 'березня', 'квітня', 'травня', 'червня',
+          'липня', 'серпня', 'вересня', 'жовтня', 'листопада', 'грудня']
+PAIR = re.compile(r'(?<!\d)([01]\d|2[0-4]):([0-5]\d)\s*[–—-]\s*([01]\d|2[0-4]):([0-5]\d)(?!\d)')
+
+def minutes(s):
+    h, m = map(int, s.split(':'))
+    if h > 24 or (h == 24 and m): raise ValueError('invalid time')
+    return h * 60 + m
+
+def pairs(s):
+    output = []
+    for a, b, c, d in PAIR.findall(s):
+        start, end = a+':'+b, c+':'+d
+        if minutes(start) < minutes(end): output.append([start, end])
+    return output
+
+def normalize(ranges):
+    merged = []
+    for a, b in sorted((minutes(a), minutes(b)) for a,b in ranges):
+        if not 0 <= a < b <= 1440: raise ValueError('bad time range')
+        if merged and a <= merged[-1][1]:
+            merged[-1][1] = max(b, merged[-1][1])
+        else:
+            merged.append([a,b])
+    return tuple((f'{a//60:02d}:{a%60:02d}', f'{b//60:02d}:{b%60:02d}') for a,b in merged)
+
+def plain(html):
+    soup = BeautifulSoup(html, 'html.parser')
+    for x in soup(['script', 'style', 'noscript']): x.decompose()
+    return re.sub(r'\s+', ' ', soup.get_text(' ',strip=True))
+
+def parse_bez(html, target):
+    s = plain(html)
+    label = target.strftime('%d.%m.%Y')
+    if label not in s[:1100]: return {'candidates':[], 'updated':'', 'unpublished':False}
+    if re.search(r'на\s*'+re.escape(label)+r'\s+ще\s+не\s+опублікован', s[:1100], re.I):
+        return {'candidates':[], 'updated':'', 'unpublished':True}
+    match = re.search(r'Графік\s+Черга\s+3\.1\b(.*?)(?:Зберегти підчергу|Історія змін|Графік\s+Черга\s+\d+\.\d+)', s, re.I|re.S)
+    if not match: return {'candidates':[], 'updated':'', 'unpublished':False}
+    blocks = pairs(match.group(1))
+    if not blocks or blocks[0][0]!='00:00' or blocks[-1][1]!='24:00' or any(blocks[i][1]!=blocks[i+1][0] for i in range(len(blocks)-1)):
+        return {'candidates':[], 'updated':'', 'unpublished':False}
+    options = list(dict.fromkeys([normalize(blocks[::2]), normalize(blocks[1::2])]))
+    after = s[match.end():match.end()+120]
+    history = re.search(r'Історія змін\s*(\d{2}\.\d{2}\.\d{4}\s+\d\d:\d\d)', after)
+    page_date = re.search(r'Оновлено:\s*(\d{2}\.\d{2}\.\d{4}\s+\d\d:\d\d)', s[:500])
+    return {'candidates':options, 'updated': history.group(1) if history else page_date.group(1) if page_date else '', 'unpublished':False}
+
+def scoped(html, target, today):
+    s = plain(html)
+    label = f'{target.day} {MONTHS[target.month]}'
+    if target == today:
+        m = re.search(r'(?:Сьогодні|на сьогодні)[,\s]+(\d{1,2}\s+\w+)(?:\s+(\d{4}))?', s, re.I)
+        if not m or m.group(1).lower()!=label or (m.group(2) and int(m.group(2))!=target.year): return None
+        tail = s[m.end():]
+        end = re.search(r'(?:Завтра[,\s]+\d{1,2}\s+\w+|Графік на завтра)', tail, re.I)
+        return tail[:end.start()] if end else tail
+    m = re.search(r'(?:Завтра[,\s]+|на завтра[,\s]+)'+re.escape(f'{label} {target.year}'),s,re.I)
+    if not m: return None
+    tail = s[m.end():]
+    end = re.search(r'(?:Сьогодні[,\s]+\d|Про графік|Часті запитання)',tail,re.I)
+    return tail[:end.start()] if end else tail
+
+def parse_kolysvitlo(html, target, today):
+    text = scoped(html,target,today)
+    if not text: return None
+    row = re.search(r'(?<!\d)3\.1\b(.*?)(?<!\d)3\.2\b', text, re.S)
+    if not row: return None
+    if re.search(r'Без відключень|Відключень немає',row.group(1),re.I): return tuple()
+    off = re.search(r'Немає світла:\s*(.*)', row.group(1), re.I)
+    if not off: return None
+    ranges = pairs(off.group(1))
+    return normalize(ranges) if ranges else None
+
+def parse_kolybude(html,target,today):
+    text=scoped(html,target,today)
+    if not text: return None
+    row=re.search(r'Черга\s*3\.1\b\s*:?\s*(.*?)(?:Черга\s*3\.2|Черга\s*4\.1|$)',text,re.I|re.S)
+    if not row: return None
+    if re.search(r'Без відключень|Відключень немає',row.group(1),re.I): return tuple()
+    ranges=pairs(row.group(1))
+    return normalize(ranges) if ranges else None
+
+def fetch(url, label, errors):
+    try:
+        r=requests.get(url,timeout=(8,15),headers={'User-Agent':'Mozilla/5.0 (compatible; SvitloDubechnya/1.0)','Accept-Language':'uk-UA,uk;q=0.9'})
+        r.raise_for_status()
+        return r.text
+    except requests.RequestException as exc:
+        errors.append(label+': '+type(exc).__name__)
+        return None
+
+def choose(day,bez,koly,bude,old):
+    votes=defaultdict(set)
+    if koly is not None:votes[koly].add('КолиСвітло')
+    if bude is not None:votes[bude].add('КолиБуде')
+    for option in bez['candidates']: votes[option].add('БезСвітла')
+    confirmed=sorted(((len(s),off,s) for off,s in votes.items() if len(s)>=2),key=lambda x:x[0],reverse=True)
+    base={'date':day.isoformat(),'url':BEZ+day.isoformat(),'source_updated':bez['updated']}
+    if confirmed and (len(confirmed)==1 or confirmed[0][0]>confirmed[1][0]):
+        _,ranges,sources=confirmed[0]
+        return {**base,'status':'normal','outages':[list(x) for x in ranges],'sources':sorted(sources),'detail':'Зіставлено незалежні джерела'}
+    why='Графік ще не опубліковано' if bez['unpublished'] else 'Суперечливі джерела' if confirmed else 'Очікуємо незалежне підтвердження' if votes else 'Немає підтверджених даних'
+    if old.get('date')==day.isoformat() and old.get('status') in ('normal','stale') and 'outages' in old:
+        return {**base,'status':'stale','outages':old['outages'],'sources':old.get('sources',[]),'detail':why}
+    return {**base,'status':'unknown','outages':[],'sources':[],'detail':why}
+
+def change(old,new):
+    if new['status']!='normal': return None
+    if old.get('status') in ('normal','stale') and old.get('outages')==new['outages']: return None
+    def fmt(r): return ', '.join(a+'–'+b for a,b in r) if r else 'відключень немає'
+    if 'outages' not in old or old.get('status')=='unknown': return 'Опубліковано графік: '+fmt(new['outages'])
+    return 'Змінено графік: '+fmt(old['outages'])+' → '+fmt(new['outages'])
+
+def main():
+    now=datetime.now(KYIV);today=now.date();tomorrow=today+timedelta(days=1)
+    try: old=json.loads(STATE.read_text(encoding='utf-8'))
+    except (FileNotFoundError,ValueError): old={'days':{},'logs':[]}
+    errors=[]
+    koly=fetch(KOLY,'КолиСвітло',errors)
+    bude=fetch(KOLBUDE,'КолиБуде',errors)
+    official=fetch(DTEK,'ДТЕК',errors)
+    days={};logs=list(old.get('logs',[]))
+    for target in (today,tomorrow):
+        html=fetch(BEZ+target.isoformat(),'БезСвітла',errors)
+        bez=parse_bez(html,target) if html else {'candidates':[],'updated':'','unpublished':False}
+        a=parse_kolysvitlo(koly,target,today) if koly else None
+        b=parse_kolybude(bude,target,today) if bude else None
+        previous=old.get('days',{}).get(target.isoformat(),{})
+        entry=choose(target,bez,a,b,previous)
+        days[target.isoformat()]=entry
+        event=change(previous,entry)
+        if event:logs.insert(0,{'at':now.isoformat(timespec='minutes'),'date':target.isoformat(),'message':event})
+    logs=[x for x in logs if x.get('date','0000')>=(today-timedelta(days=6)).isoformat()][:60]
+    save={'days':{k:v for k,v in old.get('days',{}).items() if k>=(today-timedelta(days=2)).isoformat()},'logs':logs}
+    save['days'].update(days)
+    hb=old.get('last_heartbeat','')
+    save['last_heartbeat']=today.isoformat() if not hb or hb<=(today-timedelta(days=7)).isoformat() else hb
+    STATE.parent.mkdir(exist_ok=True,parents=True)
+    content=json.dumps(save,ensure_ascii=False,indent=2,sort_keys=True)+'\n'
+    if not STATE.exists() or STATE.read_text(encoding='utf-8')!=content:STATE.write_text(content,encoding='utf-8')
+    payload={'updated_at':now.isoformat(timespec='seconds'),'today_date':today.isoformat(),'tomorrow_date':tomorrow.isoformat(),'days':days,'logs':logs,'source_health':{'dtek_reachable':official is not None,'issues':errors}}
+    OUTPUT.parent.mkdir(exist_ok=True,parents=True)
+    OUTPUT.write_text(json.dumps(payload,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+    print('Checked:',now.isoformat(timespec='minutes'),[(d,e['status'],e['outages']) for d,e in days.items()])
+    if errors:print('Warnings:',errors,file=sys.stderr)
+if __name__=='__main__':main()
