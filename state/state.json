@@ -14,12 +14,6 @@
         ]
       ],
       "source_reports": {
-        "Svitlo.live": {
-          "outages": null,
-          "partial": [],
-          "status": "unavailable",
-          "url": "https://svitlo.live/selo-vischa-dubechnya"
-        },
         "БезСвітла": {
           "outages": [
             [
@@ -95,12 +89,6 @@
       "detail": "Немає підтверджених даних",
       "outages": [],
       "source_reports": {
-        "Svitlo.live": {
-          "outages": null,
-          "partial": [],
-          "status": "unavailable",
-          "url": "https://svitlo.live/selo-vischa-dubechnya"
-        },
         "БезСвітла": {
           "outages": null,
           "partial": [],
