@@ -335,6 +335,21 @@ def main():
     bude=fetch(KOLBUDE,'КолиБуде',errors)
     official=fetch(DTEK,'ДТЕК',errors)
     region_html=fetch(KYIVSHCHYNA,'Київщина.info',errors)
+    # One-time diagnostic: check whether Alerts Energy exposes verifiable, queue-specific data to a plain HTTP client.
+    import os
+    if os.environ.get('ALERTS_PROBE')=='1':
+        for url in ('https://alerts.energy/kyivska-oblast','https://alerts.energy/kyiv'):
+            try:
+                resp=requests.get(url,headers={'User-Agent':'Mozilla/5.0'},timeout=15)
+                body=resp.text
+                print('ALERTS_DIAG',url,'status',resp.status_code,'length',len(body),
+                      'queue_refs_3.1',len(re.findall(r'3\.1',body)),'json_markers',body.count('__NEXT_DATA__'))
+                for term in ('3.1','18:30','08:00','__NEXT_DATA__','__next_f.push','_nuxt'):
+                    pos=body.find(term)
+                    if pos>=0:
+                        print('ALERTS_DIAG',url,term,re.sub(r'\s+',' ',body[max(0,pos-120):pos+560])[:650])
+            except requests.RequestException as exc:
+                print('ALERTS_DIAG',url,'error',type(exc).__name__,str(exc)[:120])
     city=update_city_locations(now,today,old,errors)
     days={};logs=list(old.get('logs',[]))
     for target in (today,tomorrow):
