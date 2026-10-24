@@ -212,11 +212,11 @@ CITY_KOLY = 'https://kolysvitlo.com/schedule/dtek_kyiv'
 CITY_BUDE = 'https://kolybude.com/kyiv'
 CITY_DTEK = 'https://www.dtek-kem.com.ua/ua/shutdowns'
 CITY_LOCATIONS = {
-    'obolonskyi54': {'name':'Оболонський проспект, 54','group':'4.1','address_verified':False,
+    'obolonskyi54': {'name':'Оболонський проспект 54','group':'4.1','address_verified':False,
                     'street':'https://bezsvitla.com.ua/kyiv/prosp-obolonskyi'},
-    'ivasiuka43': {'name':'Володимира Івасюка, 43','group':'4.1','address_verified':False,
+    'ivasiuka43': {'name':'Володимира Івасюка 43','group':'4.1','address_verified':False,
                   'street':'https://bezsvitla.com.ua/kyiv/prosp-ivasyuka-volodymyra'},
-    'azov28b': {'name':'Героїв полку Азов, 28Б','group':'10.1','address_verified':False,
+    'azov28b': {'name':'Героїв полку Азов 28Б','group':'10.1','address_verified':False,
                 'street':'https://bezsvitla.com.ua/kyiv/vul-heroyiv-polku-azov'}
 }
 
@@ -360,7 +360,7 @@ def main():
     STATE.parent.mkdir(exist_ok=True,parents=True)
     content=json.dumps(save,ensure_ascii=False,indent=2,sort_keys=True)+'\n'
     if not STATE.exists() or STATE.read_text(encoding='utf-8')!=content:STATE.write_text(content,encoding='utf-8')
-    payload={'updated_at':now.isoformat(timespec='seconds'),'today_date':today.isoformat(),'tomorrow_date':tomorrow.isoformat(),'days':days,'logs':logs,'locations':{'dacha':{'name':'Дача · Вища Дубечня','group':'3.1','address_verified':True,'days':days,'logs':logs,'operator':'ДТЕК Київські регіональні електромережі'},**city},'source_health':{'dtek_reachable':official is not None,'issues':errors}}
+    payload={'updated_at':now.isoformat(timespec='seconds'),'today_date':today.isoformat(),'tomorrow_date':tomorrow.isoformat(),'days':days,'logs':logs,'locations':{'dacha':{'name':'Квіткова 251 · Вища Дубечня','group':'3.1','address_verified':True,'days':days,'logs':logs,'operator':'ДТЕК Київські регіональні електромережі'},**city},'source_health':{'dtek_reachable':official is not None,'issues':errors}}
     OUTPUT.parent.mkdir(exist_ok=True,parents=True)
     OUTPUT.write_text(json.dumps(payload,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
     print('Checked:',now.isoformat(timespec='minutes'),[(d,e['status'],e['outages']) for d,e in days.items()])
