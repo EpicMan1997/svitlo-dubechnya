@@ -20,7 +20,8 @@ KOLY = 'https://kolysvitlo.com/schedule/dtek_kyiv_oblast'
 KOLBUDE = 'https://kolybude.com/kyiv-oblast'
 DTEK = 'https://www.dtek-krem.com.ua/ua/shutdowns'
 KYIVSHCHYNA = 'https://kyivshchyna.info/hrafik-vidkliuchen-svitla-kyivska-oblast/'
-SVITLOLIVE = 'https://svitlo.live/pirnivska-gromada'
+SVITLOLIVE = 'https://svitlo.live/selo-vischa-dubechnya'
+SVITLOLIVE_FALLBACK = 'https://svitlo.live/pirnivska-gromada'
 MONTHS = ['', 'січня', 'лютого', 'березня', 'квітня', 'травня', 'червня',
           'липня', 'серпня', 'вересня', 'жовтня', 'листопада', 'грудня']
 PAIR = re.compile(r'(?<!\d)([01]\d|2[0-4]):([0-5]\d)\s*[–—-]\s*([01]\d|2[0-4]):([0-5]\d)(?!\d)')
@@ -76,7 +77,7 @@ def scoped(html, target, today):
         m = re.search(r'(?:Сьогодні|на сьогодні)[,\s]+(\d{1,2}\s+\w+)(?:\s+(\d{4}))?', s, re.I)
         if not m or m.group(1).lower()!=label or (m.group(2) and int(m.group(2))!=target.year): return None
         tail = s[m.end():]
-        end = re.search(r'(?:Завтра[,\s]+\d{1,2}\s+\w+|Графік на завтра)', tail, re.I)
+        end = re.search(r'(?:Завтра[,\s]+\d{1,2}\s+(?:'+'|'.concat(...['січня','лютого','березня','квітня','травня','червня','липня','серпня','вересня','жовтня','листопада','грудня'])+')|Графік на завтра)', tail, re.I)
         return tail[:end.start()] if end else tail
     m = re.search(r'(?:Завтра[,\s]+|на завтра[,\s]+)'+re.escape(f'{label} {target.year}'),s,re.I)
     if not m: return None
@@ -217,15 +218,14 @@ def main():
     bude=fetch(KOLBUDE,'КолиБуде',errors)
     official=fetch(DTEK,'ДТЕК',errors)
     region_html=fetch(KYIVSHCHYNA,'Київщина.info',errors)
-    live_html=fetch(SVITLOLIVE,'Svitlo.live',errors)
+    live_html=fetch(SVITLOLIVE,'Svitlo.live Вища Дубечня',errors)
+    if not live_html:live_html=fetch(SVITLOLIVE_FALLBACK,'Svitlo.live Пірнівська громада',errors)
     days={};logs=list(old.get('logs',[]))
     for target in (today,tomorrow):
         html=fetch(BEZ+target.isoformat(),'БезСвітла',errors)
         bez=parse_bez(html,target) if html else {'candidates':[],'updated':'','unpublished':False}
         a=parse_kolysvitlo(koly,target,today) if koly else None
-        if target==today and a is None:
-            sample=plain(koly)[:700] if koly else '<fetch failed>'
-            print('Diagnostic KolySvitlo: length=%s page_start=%r scoped_start=%r' % (len(koly) if koly else 0,sample,(scoped(koly,target,today) or '')[:600] if koly else ''),file=sys.stderr)
+        
         b=parse_kolybude(bude,target,today) if bude else None
         region=parse_kyivshchyna(region_html,target,today) if region_html else None
         live=parse_svitlolive(live_html,target,today) if live_html else None
@@ -234,7 +234,7 @@ def main():
         entry['source_reports']=source_reports(entry,bez,a,b,region,live,previous)
         days[target.isoformat()]=entry
         event=change(previous,entry)
-        if event:logs.insert(0,{'at':now.isoformat(timespec='minutes'),'date':target.isoformat(),'message':event})
+        if event:logs.insert(0,{'at':now.isoformat(timespec='minutes'),'date':target.isoformat(),'message':event,'sources_confirmed':entry.get('sources',[])})
     logs=[x for x in logs if x.get('date','0000')>=(today-timedelta(days=6)).isoformat()][:60]
     save={'days':{k:v for k,v in old.get('days',{}).items() if k>=(today-timedelta(days=2)).isoformat()},'logs':logs}
     save['days'].update(days)
