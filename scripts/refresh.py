@@ -344,6 +344,13 @@ def main():
                 body=resp.text
                 print('ALERTS_DIAG',url,'status',resp.status_code,'length',len(body),
                       'queue_refs_3.1',len(re.findall(r'3\.1',body)),'json_markers',body.count('__NEXT_DATA__'))
+                soup=BeautifulSoup(body,'html.parser')
+                print('ALERTS_DIAG_SCRIPTS',url,[(tag.get('id'),tag.get('type'),len(tag.get_text())) for tag in soup.find_all('script') if tag.get_text()][:16])
+                for tag in soup.find_all('script'):
+                    blob=tag.get_text()
+                    if len(blob)>8000 and ('3.1' in blob or 'outage' in blob.lower()):
+                        at=blob.find('3.1') if '3.1' in blob else blob.lower().find('outage')
+                        print('ALERTS_DIAG_DATA',url,tag.get('id'),len(blob),re.sub(r'\\s+',' ',blob[max(0,at-200):at+650])[:880])
                 for term in ('3.1','18:30','08:00','__NEXT_DATA__','__next_f.push','_nuxt'):
                     pos=body.find(term)
                     if pos>=0:
