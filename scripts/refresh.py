@@ -19,6 +19,8 @@ BEZ = 'https://bezsvitla.com.ua/kyivska-oblast/pirnivska-hromada/visa-dubecna/gr
 KOLY = 'https://kolysvitlo.com/schedule/dtek_kyiv_oblast'
 KOLBUDE = 'https://kolybude.com/kyiv-oblast'
 DTEK = 'https://www.dtek-krem.com.ua/ua/shutdowns'
+ALERTS_REGION = 'https://alerts.energy/kyivska-oblast'
+ALERTS_CITY = 'https://alerts.energy/kyiv'
 KYIVSHCHYNA = 'https://kyivshchyna.info/hrafik-vidkliuchen-svitla-kyivska-oblast/'
 SVITLOLIVE = 'https://svitlo.live/selo-vischa-dubechnya'
 SVITLOLIVE_FALLBACK = 'https://svitlo.live/pirnivska-gromada'
@@ -146,7 +148,47 @@ def parse_svitlolive(html, target, today):
     if '-' in cells: return None
     return {'outages':normalize(ranges),'partial':partial,'hourly':True}
 
-def source_reports(result,bez,koly,bude,region,live,old):
+
+def parse_alerts(html, target, group, operator):
+    """Read only Angular SSR transfer-state rows for the exact DTEK queue and date.
+
+    Hour codes: 0=power, 1=full outage, 2=first 30m, 3=last 30m.
+    Do not infer values from summaries, change logs, other operators or stale dates.
+    """
+    if not html:
+        return None
+    tag=BeautifulSoup(html,'html.parser').find('script',id='ng-state')
+    if not tag:
+        return None
+    try: state=json.loads(tag.get_text())
+    except (ValueError, TypeError):return None
+    outcomes=set()
+    def scan(node):
+        if isinstance(node,dict):
+            if node.get('queue')==group and node.get('initiator')==operator:
+                for field in ('today','tomorrow'):
+                    if node.get(field+'Date')!=target.isoformat():continue
+                    if node.get(field+'Status')!='ScheduleApplies':continue
+                    slots=node.get(field)
+                    maybe=node.get(field+'Possible',[])
+                    if not isinstance(slots,list) or len(slots)!=24 or any(type(v) is not int or v not in (0,1,2,3) for v in slots):
+                        continue
+                    if isinstance(maybe,list) and any(v!=0 for v in maybe):
+                        continue # possible outages cannot be labeled firm
+                    ranges=[]
+                    for hour,code in enumerate(slots):
+                        a=f'{hour:02d}:00'; half=f'{hour:02d}:30'; b=f'{hour+1:02d}:00'
+                        if code==1:ranges.append((a,b))
+                        elif code==2:ranges.append((a,half))
+                        elif code==3:ranges.append((half,b))
+                    outcomes.add(normalize(ranges))
+            for value in node.values():scan(value)
+        elif isinstance(node,list):
+            for value in node:scan(value)
+    scan(state)
+    return next(iter(outcomes)) if len(outcomes)==1 else None
+
+def source_reports(result,bez,koly,bude,region,live,old,alerts=None):
     """Show what each distinct site actually reported, independently of consensus."""
     target = tuple(tuple(x) for x in result.get('outages',[]))
     raw = {
@@ -158,6 +200,7 @@ def source_reports(result,bez,koly,bude,region,live,old):
         'КолиСвітло':{'ranges':koly,'partial':[],'url':KOLY},
         'КолиБуде':{'ranges':bude,'partial':[],'url':KOLBUDE},
         'Київщина.info':{'ranges':region,'partial':[],'url':KYIVSHCHYNA},
+        'Alerts Energy':{'ranges':alerts,'partial':[],'url':ALERTS_REGION},
     }
     output={}
     old_reports=old.get('source_reports',{})
@@ -275,11 +318,11 @@ def parse_city_bude(html,target,today,group):
     result=pairs(row.group(1))
     return normalize(result) if result else None
 
-def city_sources(entry,bez,koly,bude,street,prev):
+def city_sources(entry,bez,koly,bude,street,prev,alerts=None):
     targets={'БезСвітла':street,'КолиСвітло':CITY_KOLY,'КолиБуде':CITY_BUDE,
-             'ДТЕК':CITY_DTEK}
+             'ДТЕК':CITY_DTEK,'Alerts Energy':ALERTS_CITY}
     data={'БезСвітла':next((x for x in bez['candidates'] if list(map(list,x))==entry['outages']),None) if entry['status']=='normal' else None,
-          'КолиСвітло':koly,'КолиБуде':bude,'ДТЕК':None}
+          'КолиСвітло':koly,'КолиБуде':bude,'ДТЕК':None,'Alerts Energy':alerts}
     previous=prev.get('source_reports',{})
     compare=tuple(tuple(x) for x in entry.get('outages',[]))
     out={}
@@ -299,6 +342,7 @@ def update_city_locations(now,today,old,errors):
     city_koly=fetch(CITY_KOLY,'КолиСвітло Київ',errors)
     city_bude=fetch(CITY_BUDE,'КолиБуде Київ',errors)
     city_dtek=fetch(CITY_DTEK,'ДТЕК Київ',errors)
+    city_alerts=fetch(ALERTS_CITY,'Alerts Energy Київ',errors)
     result={}
     old_locations=old.get('locations',{})
     for key,config in CITY_LOCATIONS.items():
@@ -315,7 +359,8 @@ def update_city_locations(now,today,old,errors):
             # Uses same two-source quorum as the dacha, but the city sources are distinct.
             entry=choose(target,bez,koly,bude,prev)
             entry['url']=url
-            entry['source_reports']=city_sources(entry,bez,koly,bude,config['street'],prev)
+            alerts=parse_alerts(city_alerts,target,config['group'],'kyiv_oblenergo')
+            entry['source_reports']=city_sources(entry,bez,koly,bude,config['street'],prev,alerts)
             entry['group']=config['group']
             days[target.isoformat()]=entry
             msg=change(prev,entry)
@@ -335,28 +380,7 @@ def main():
     bude=fetch(KOLBUDE,'КолиБуде',errors)
     official=fetch(DTEK,'ДТЕК',errors)
     region_html=fetch(KYIVSHCHYNA,'Київщина.info',errors)
-    # One-time diagnostic: check whether Alerts Energy exposes verifiable, queue-specific data to a plain HTTP client.
-    import os
-    if os.environ.get('ALERTS_PROBE')=='1':
-        for url in ('https://alerts.energy/kyivska-oblast','https://alerts.energy/kyiv'):
-            try:
-                resp=requests.get(url,headers={'User-Agent':'Mozilla/5.0'},timeout=15)
-                body=resp.text
-                print('ALERTS_DIAG',url,'status',resp.status_code,'length',len(body),
-                      'queue_refs_3.1',len(re.findall(r'3\.1',body)),'json_markers',body.count('__NEXT_DATA__'))
-                soup=BeautifulSoup(body,'html.parser')
-                print('ALERTS_DIAG_SCRIPTS',url,[(tag.get('id'),tag.get('type'),len(tag.get_text())) for tag in soup.find_all('script') if tag.get_text()][:16])
-                for tag in soup.find_all('script'):
-                    blob=tag.get_text()
-                    if len(blob)>8000 and ('3.1' in blob or 'outage' in blob.lower()):
-                        at=blob.find('3.1') if '3.1' in blob else blob.lower().find('outage')
-                        print('ALERTS_DIAG_DATA',url,tag.get('id'),len(blob),re.sub(r'\\s+',' ',blob[max(0,at-200):at+650])[:880])
-                for term in ('3.1','18:30','08:00','__NEXT_DATA__','__next_f.push','_nuxt'):
-                    pos=body.find(term)
-                    if pos>=0:
-                        print('ALERTS_DIAG',url,term,re.sub(r'\s+',' ',body[max(0,pos-120):pos+560])[:650])
-            except requests.RequestException as exc:
-                print('ALERTS_DIAG',url,'error',type(exc).__name__,str(exc)[:120])
+    region_alerts=fetch(ALERTS_REGION,'Alerts Energy Київська область',errors)
     city=update_city_locations(now,today,old,errors)
     days={};logs=list(old.get('logs',[]))
     for target in (today,tomorrow):
@@ -369,7 +393,8 @@ def main():
         live=None  # Svitlo.live is no longer treated as a current reference
         previous=old.get('days',{}).get(target.isoformat(),{})
         entry=choose(target,bez,a,b,previous)
-        entry['source_reports']=source_reports(entry,bez,a,b,region,live,previous)
+        alerts=parse_alerts(region_alerts,target,'3.1','kyivska_oblast_oblenergo')
+        entry['source_reports']=source_reports(entry,bez,a,b,region,live,previous,alerts)
         days[target.isoformat()]=entry
         event=change(previous,entry)
         if event:logs.insert(0,{'at':now.isoformat(timespec='minutes'),'date':target.isoformat(),'message':event,'sources_confirmed':entry.get('sources',[])})
