@@ -11,6 +11,12 @@ KB='Сьогодні, 24 жовтня 2026. Черга 3.1: 08:00–12:00, 18:30
 class Tests(unittest.TestCase):
  def test_bez(self):self.assertIn(E,parse_bez(B,D)['candidates'])
  def test_koly(self):self.assertEqual(parse_kolysvitlo(K,D,D),E)
+ def test_koly_real_navigation(self):
+  site='Графік відключень Київська область Сьогодні, 24 жовтня 2026 р. Моя черга Оберіть свою чергу Усі черги Сьогодні Завтра 0 6 12 18 24 1.1 6–8:30 Немає світла: 06:00–08:30 2.2 15–19 Немає світла: 15:00–19:00 3.1 8–12 18:30–22:30 Немає світла: 08:00–12:00, 18:30–22:30 3.2 8–12 Немає світла: 08:00–12:00 Графік на завтра ще не опубліковано'
+  self.assertEqual(parse_kolysvitlo(site,D,D),E)
+ def test_koly_tomorrow_if_date_published(self):
+  site='Сьогодні, 24 жовтня 2026 р. 3.1 Немає світла: 08:00–12:00 3.2 Завтра, 25 жовтня 2026 р. 3.1 Немає світла: 09:30–11:00 3.2'
+  self.assertEqual(parse_kolysvitlo(site,date(2026,10,25),D),(('09:30','11:00'),))
  def test_bude(self):self.assertEqual(parse_kolybude(KB,D,D),E)
  def test_concensus(self):self.assertEqual(choose(D,parse_bez(B,D),E,None,{})['status'],'normal')
  def test_conflict(self):self.assertEqual(choose(D,{'candidates':[E],'updated':'','unpublished':False},(('15:00','16:00'),),None,{})['status'],'unknown')
