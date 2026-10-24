@@ -14,6 +14,21 @@
         ]
       ],
       "source_reports": {
+        "Alerts Energy": {
+          "outages": [
+            [
+              "08:00",
+              "12:00"
+            ],
+            [
+              "18:30",
+              "22:30"
+            ]
+          ],
+          "partial": [],
+          "status": "match",
+          "url": "https://alerts.energy/kyivska-oblast"
+        },
         "БезСвітла": {
           "outages": [
             [
@@ -89,6 +104,12 @@
       "detail": "Немає підтверджених даних",
       "outages": [],
       "source_reports": {
+        "Alerts Energy": {
+          "outages": null,
+          "partial": [],
+          "status": "unavailable",
+          "url": "https://alerts.energy/kyivska-oblast"
+        },
         "БезСвітла": {
           "outages": null,
           "partial": [],
@@ -144,6 +165,25 @@
             ]
           ],
           "source_reports": {
+            "Alerts Energy": {
+              "outages": [
+                [
+                  "00:00",
+                  "03:30"
+                ],
+                [
+                  "12:00",
+                  "15:30"
+                ],
+                [
+                  "22:00",
+                  "24:00"
+                ]
+              ],
+              "partial": [],
+              "status": "match",
+              "url": "https://alerts.energy/kyiv"
+            },
             "БезСвітла": {
               "outages": [
                 [
@@ -223,6 +263,12 @@
           "group": "10.1",
           "outages": [],
           "source_reports": {
+            "Alerts Energy": {
+              "outages": null,
+              "partial": [],
+              "status": "unavailable",
+              "url": "https://alerts.energy/kyiv"
+            },
             "БезСвітла": {
               "outages": null,
               "partial": [],
@@ -288,6 +334,21 @@
             ]
           ],
           "source_reports": {
+            "Alerts Energy": {
+              "outages": [
+                [
+                  "07:30",
+                  "11:00"
+                ],
+                [
+                  "16:30",
+                  "20:00"
+                ]
+              ],
+              "partial": [],
+              "status": "match",
+              "url": "https://alerts.energy/kyiv"
+            },
             "БезСвітла": {
               "outages": [
                 [
@@ -355,6 +416,12 @@
           "group": "4.1",
           "outages": [],
           "source_reports": {
+            "Alerts Energy": {
+              "outages": null,
+              "partial": [],
+              "status": "unavailable",
+              "url": "https://alerts.energy/kyiv"
+            },
             "БезСвітла": {
               "outages": null,
               "partial": [],
@@ -420,6 +487,21 @@
             ]
           ],
           "source_reports": {
+            "Alerts Energy": {
+              "outages": [
+                [
+                  "07:30",
+                  "11:00"
+                ],
+                [
+                  "16:30",
+                  "20:00"
+                ]
+              ],
+              "partial": [],
+              "status": "match",
+              "url": "https://alerts.energy/kyiv"
+            },
             "БезСвітла": {
               "outages": [
                 [
@@ -487,6 +569,12 @@
           "group": "4.1",
           "outages": [],
           "source_reports": {
+            "Alerts Energy": {
+              "outages": null,
+              "partial": [],
+              "status": "unavailable",
+              "url": "https://alerts.energy/kyiv"
+            },
             "БезСвітла": {
               "outages": null,
               "partial": [],
