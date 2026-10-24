@@ -19,6 +19,8 @@ BEZ = 'https://bezsvitla.com.ua/kyivska-oblast/pirnivska-hromada/visa-dubecna/gr
 KOLY = 'https://kolysvitlo.com/schedule/dtek_kyiv_oblast'
 KOLBUDE = 'https://kolybude.com/kyiv-oblast'
 DTEK = 'https://www.dtek-krem.com.ua/ua/shutdowns'
+KYIVSHCHYNA = 'https://kyivshchyna.info/hrafik-vidkliuchen-svitla-kyivska-oblast/'
+SVITLOLIVE = 'https://svitlo.live/pirnivska-gromada'
 MONTHS = ['', 'січня', 'лютого', 'березня', 'квітня', 'травня', 'червня',
           'липня', 'серпня', 'вересня', 'жовтня', 'листопада', 'грудня']
 PAIR = re.compile(r'(?<!\d)([01]\d|2[0-4]):([0-5]\d)\s*[–—-]\s*([01]\d|2[0-4]):([0-5]\d)(?!\d)')
@@ -102,6 +104,79 @@ def parse_kolybude(html,target,today):
     ranges=pairs(row.group(1))
     return normalize(ranges) if ranges else None
 
+
+def parse_kyivshchyna(html, target, today):
+    """Only a date-verified queue 3.1 block. Do not infer tomorrow's rows."""
+    if target != today:
+        return None
+    page = plain(html)
+    # The site publishes the latest DTEK update and a local check timestamp.
+    # A previous-day source check is not sufficient evidence for today's graph.
+    if target.strftime('%d.%m.%Y') not in page and f'{target.day} {MONTHS[target.month]} {target.year}' not in page:
+        return None
+    row = re.search(r'Черга\s*3\.1\b(.*?)(?:Черга\s*3\.2\b|Черга\s*4\.1\b)',page,re.I|re.S)
+    if not row:
+        return None
+    cell = row.group(1)
+    if re.search(r'без відключень|відключень немає',cell,re.I):
+        return tuple()
+    off = re.search(r'без світла:\s*(.*)',cell,re.I)
+    if not off: return None
+    ranges = pairs(off.group(1))
+    return normalize(ranges) if ranges else None
+
+def parse_svitlolive(html, target, today):
+    """An hour-resolution reading only; half-hour cells are *not* guessed."""
+    page = plain(html)
+    heading = 'сьогодні' if target == today else 'завтра'
+    row = re.search(
+        r'Графік на '+heading+r'\s*[-–]\s*черга\s*3\.1\s*(.*?)'
+        r'(?=Графік на (?:сьогодні|завтра)\s*[-–]\s*черга\s*\d+\.\d+|Усі населені пункти|$)',
+        page,re.I|re.S)
+    if not row or target.strftime('%d.%m.%Y') not in row.group(1)[:110]:
+        return None
+    marks = re.search(r'Черга\s*3\.1\s*((?:[●✕×%±\-]\s*){24})',row.group(1))
+    if not marks: return None
+    cells = re.findall(r'[●✕×%±\-]',marks.group(1))
+    if len(cells)!=24 or all(x=='-' for x in cells):return None
+    if any(x not in {'●','✕','×','%','±','-'} for x in cells):return None
+    ranges = [(f'{i:02d}:00',f'{i+1:02d}:00') for i,c in enumerate(cells) if c in ('✕','×')]
+    partial = [f'{i:02d}:00–{i+1:02d}:00' for i,c in enumerate(cells) if c in ('%','±')]
+    if '-' in cells: return None
+    return {'outages':normalize(ranges),'partial':partial,'hourly':True}
+
+def source_reports(result,bez,koly,bude,region,live,old):
+    """Show what each distinct site actually reported, independently of consensus."""
+    target = tuple(tuple(x) for x in result.get('outages',[]))
+    raw = {
+        'БезСвітла': {
+            'ranges': next((v for v in bez['candidates'] if v==target),None)
+                      if result['status']=='normal'
+                      else (bez['candidates'][0] if len(bez['candidates'])==1 else None),
+            'partial':[], 'url':result['url']},
+        'КолиСвітло':{'ranges':koly,'partial':[],'url':KOLY},
+        'КолиБуде':{'ranges':bude,'partial':[],'url':KOLBUDE},
+        'Київщина.info':{'ranges':region,'partial':[],'url':KYIVSHCHYNA},
+        'Svitlo.live':{'ranges':live['outages'] if live else None,
+                       'partial':live['partial'] if live else [],'url':SVITLOLIVE},
+    }
+    output={}
+    old_reports=old.get('source_reports',{})
+    for name,entry in raw.items():
+        ranges=entry['ranges']
+        part=entry['partial']
+        prev=old_reports.get(name,{})
+        if ranges is None:
+            output[name]={'status':'old' if prev.get('outages') is not None else 'unavailable',
+                          'outages':prev.get('outages'), 'partial':prev.get('partial',[]),
+                          'url':entry['url']}
+        else:
+            outage_list=[list(x) for x in ranges]
+            matches=(result['status']=='normal' and target==ranges and not part)
+            output[name]={'status':'match' if matches else 'partial' if part else 'diff',
+                          'outages':outage_list,'partial':part,'url':entry['url']}
+    return output
+
 def fetch(url, label, errors):
     try:
         r=requests.get(url,timeout=(8,15),headers={'User-Agent':'Mozilla/5.0 (compatible; SvitloDubechnya/1.0)','Accept-Language':'uk-UA,uk;q=0.9'})
@@ -141,14 +216,19 @@ def main():
     koly=fetch(KOLY,'КолиСвітло',errors)
     bude=fetch(KOLBUDE,'КолиБуде',errors)
     official=fetch(DTEK,'ДТЕК',errors)
+    region_html=fetch(KYIVSHCHYNA,'Київщина.info',errors)
+    live_html=fetch(SVITLOLIVE,'Svitlo.live',errors)
     days={};logs=list(old.get('logs',[]))
     for target in (today,tomorrow):
         html=fetch(BEZ+target.isoformat(),'БезСвітла',errors)
         bez=parse_bez(html,target) if html else {'candidates':[],'updated':'','unpublished':False}
         a=parse_kolysvitlo(koly,target,today) if koly else None
         b=parse_kolybude(bude,target,today) if bude else None
+        region=parse_kyivshchyna(region_html,target,today) if region_html else None
+        live=parse_svitlolive(live_html,target,today) if live_html else None
         previous=old.get('days',{}).get(target.isoformat(),{})
         entry=choose(target,bez,a,b,previous)
+        entry['source_reports']=source_reports(entry,bez,a,b,region,live,previous)
         days[target.isoformat()]=entry
         event=change(previous,entry)
         if event:logs.insert(0,{'at':now.isoformat(timespec='minutes'),'date':target.isoformat(),'message':event})
