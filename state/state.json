@@ -2,7 +2,7 @@
   "days": {
     "2026-10-24": {
       "date": "2026-10-24",
-      "status": "normal",
+      "detail": "Зіставлено незалежні джерела",
       "outages": [
         [
           "08:00",
@@ -13,13 +13,24 @@
           "22:30"
         ]
       ],
+      "source_updated": "24.10.2026 14:13",
       "sources": [
         "БезСвітла",
-        "КолиСвітло",
         "КолиБуде"
-      ]
+      ],
+      "status": "normal",
+      "url": "https://bezsvitla.com.ua/kyivska-oblast/pirnivska-hromada/visa-dubecna/grafik-na-2026-10-24"
+    },
+    "2026-10-25": {
+      "date": "2026-10-25",
+      "detail": "Немає підтверджених даних",
+      "outages": [],
+      "source_updated": "",
+      "sources": [],
+      "status": "unknown",
+      "url": "https://bezsvitla.com.ua/kyivska-oblast/pirnivska-hromada/visa-dubecna/grafik-na-2026-10-25"
     }
   },
-  "logs": [],
-  "last_heartbeat": "2026-10-24"
+  "last_heartbeat": "2026-10-24",
+  "logs": []
 }
