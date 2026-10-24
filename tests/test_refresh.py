@@ -1,8 +1,8 @@
-import sys,unittest
+import sys,unittest,json
 from datetime import date
 from pathlib import Path
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'scripts'))
-from refresh import normalize,pairs,parse_bez,parse_kolysvitlo,parse_kolybude,parse_kyivshchyna,parse_svitlolive,source_reports,choose,change,parse_city_bez,parse_city_koly,parse_city_bude,city_sources,CITY_LOCATIONS
+from refresh import normalize,pairs,parse_bez,parse_kolysvitlo,parse_kolybude,parse_kyivshchyna,parse_svitlolive,source_reports,parse_alerts,choose,change,parse_city_bez,parse_city_koly,parse_city_bude,city_sources,CITY_LOCATIONS
 D=date(2026,10,24)
 E=(('08:00','12:00'),('18:30','22:30'))
 B='<h1>Вища Дубечня на 24.10.2026</h1><h3>Графік Черга 3.1</h3>00:00 – 08:00 08:00 – 12:00 12:00 – 18:30 18:30 – 22:30 22:30 – 24:00 Зберегти підчергу'
@@ -44,7 +44,7 @@ class Tests(unittest.TestCase):
  def test_source_reports_not_faked(self):
   consensus={'date':D.isoformat(),'status':'normal','outages':[list(x) for x in E],'url':'https://example.com'}
   result=source_reports(consensus,{'candidates':[E],'updated':'','unpublished':False},E,E,(('08:00','12:00'),('18:30','22:00')),None,{})
-  self.assertEqual(len(result),4)
+  self.assertEqual(len(result),5)
   self.assertEqual(result['КолиСвітло']['status'],'match')
   self.assertEqual(result['Київщина.info']['status'],'diff')
   self.assertNotIn('Svitlo.live',result)
@@ -69,4 +69,32 @@ class Tests(unittest.TestCase):
   result=city_sources(expected,{'candidates':[]},(('07:30','11:00'),),(('07:30','11:00'),),'https://example.com',{})
   self.assertEqual(result['ДТЕК']['status'],'unavailable')
   self.assertEqual(result['КолиСвітло']['status'],'match')
+ def test_alerts_region_half_hour_codes(self):
+  slots=[0]*24
+  for i in range(8,12):slots[i]=1
+  slots[18]=3
+  for i in range(19,22):slots[i]=1
+  slots[22]=2
+  payload={'someKey':{'rows':[{'queue':'3.1','initiator':'kyivska_oblast_oblenergo','todayDate':'2026-10-24','todayStatus':'ScheduleApplies','today':slots,'todayPossible':[0]*24}]}}
+  page='<html><script id="ng-state" type="application/json">'+json.dumps(payload)+'</script></html>'
+  self.assertEqual(parse_alerts(page,D,'3.1','kyivska_oblast_oblenergo'),E)
+  self.assertIsNone(parse_alerts(page,D,'3.1','kyiv_oblenergo'))
+  self.assertIsNone(parse_alerts(page,date(2026,10,25),'3.1','kyivska_oblast_oblenergo'))
+ def test_alerts_city_half_hours(self):
+  slots=[0]*24;slots[7]=3;slots[8:11]=[1,1,1];slots[16]=3;slots[17:20]=[1,1,1]
+  page='<script id="ng-state" type="application/json">'+json.dumps({'wrapper':[{'initiator':'kyiv_oblenergo','queue':'4.1','today':slots,'todayDate':'2026-10-24','todayStatus':'ScheduleApplies'}]})+'</script>'
+  self.assertEqual(parse_alerts(page,D,'4.1','kyiv_oblenergo'),(('07:30','11:00'),('16:30','20:00')))
+ def test_alerts_reject_ambiguous_and_possible(self):
+  slots=[0]*24;slots[8]=1
+  row={'initiator':'kyivska_oblast_oblenergo','queue':'3.1','today':slots,'todayDate':'2026-10-24','todayStatus':'ScheduleApplies','todayPossible':[0]*24}
+  ambiguous=dict(row,today=[0]*24)
+  page='<script id="ng-state" type="application/json">'+json.dumps({'rows':[row,ambiguous]})+'</script>'
+  self.assertIsNone(parse_alerts(page,D,'3.1','kyivska_oblast_oblenergo'))
+  row['todayPossible'][8]=1
+  page='<script id="ng-state" type="application/json">'+json.dumps([row])+'</script>'
+  self.assertIsNone(parse_alerts(page,D,'3.1','kyivska_oblast_oblenergo'))
+ def test_alerts_no_outage_is_valid(self):
+  row={'initiator':'kyiv_oblenergo','queue':'10.1','today':[0]*24,'todayDate':'2026-10-24','todayStatus':'ScheduleApplies'}
+  page='<script id="ng-state" type="application/json">'+json.dumps(row)+'</script>'
+  self.assertEqual(parse_alerts(page,D,'10.1','kyiv_oblenergo'),())
  def test_no_repeat(self):self.assertIsNone(change({'status':'normal','outages':[['08:00','12:00']]},{'status':'normal','outages':[['08:00','12:00']]}))
