@@ -13,6 +13,65 @@
           "22:30"
         ]
       ],
+      "source_reports": {
+        "Svitlo.live": {
+          "outages": null,
+          "partial": [],
+          "status": "unavailable",
+          "url": "https://svitlo.live/pirnivska-gromada"
+        },
+        "БезСвітла": {
+          "outages": [
+            [
+              "08:00",
+              "12:00"
+            ],
+            [
+              "18:30",
+              "22:30"
+            ]
+          ],
+          "partial": [],
+          "status": "match",
+          "url": "https://bezsvitla.com.ua/kyivska-oblast/pirnivska-hromada/visa-dubecna/grafik-na-2026-10-24"
+        },
+        "Київщина.info": {
+          "outages": [
+            [
+              "08:00",
+              "12:00"
+            ],
+            [
+              "18:30",
+              "22:30"
+            ]
+          ],
+          "partial": [],
+          "status": "match",
+          "url": "https://kyivshchyna.info/hrafik-vidkliuchen-svitla-kyivska-oblast/"
+        },
+        "КолиБуде": {
+          "outages": [
+            [
+              "08:00",
+              "12:00"
+            ],
+            [
+              "18:30",
+              "22:30"
+            ]
+          ],
+          "partial": [],
+          "status": "match",
+          "url": "https://kolybude.com/kyiv-oblast"
+        },
+        "КолиСвітло": {
+          "outages": null,
+          "partial": [],
+          "status": "unavailable",
+          "url": "https://kolysvitlo.com/schedule/dtek_kyiv_oblast"
+        }
+      },
       "source_updated": "24.10.2026 14:13",
       "sources": [
         "БезСвітла",
@@ -25,6 +84,38 @@
       "date": "2026-10-25",
       "detail": "Немає підтверджених даних",
       "outages": [],
+      "source_reports": {
+        "Svitlo.live": {
+          "outages": null,
+          "partial": [],
+          "status": "unavailable",
+          "url": "https://svitlo.live/pirnivska-gromada"
+        },
+        "БезСвітла": {
+          "outages": null,
+          "partial": [],
+          "status": "unavailable",
+          "url": "https://bezsvitla.com.ua/kyivska-oblast/pirnivska-hromada/visa-dubecna/grafik-na-2026-10-25"
+        },
+        "Київщина.info": {
+          "outages": null,
+          "partial": [],
+          "status": "unavailable",
+          "url": "https://kyivshchyna.info/hrafik-vidkliuchen-svitla-kyivska-oblast/"
+        },
+        "КолиБуде": {
+          "outages": null,
+          "partial": [],
+          "status": "unavailable",
+          "url": "https://kolybude.com/kyiv-oblast"
+        },
+        "КолиСвітло": {
+          "outages": null,
+          "partial": [],
+          "status": "unavailable",
+          "url": "https://kolysvitlo.com/schedule/dtek_kyiv_oblast"
+        }
+      },
       "source_updated": "",
       "sources": [],
       "status": "unknown",
