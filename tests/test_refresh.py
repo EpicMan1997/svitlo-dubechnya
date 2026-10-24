@@ -2,7 +2,7 @@ import sys,unittest
 from datetime import date
 from pathlib import Path
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'scripts'))
-from refresh import normalize,pairs,parse_bez,parse_kolysvitlo,parse_kolybude,choose,change
+from refresh import normalize,pairs,parse_bez,parse_kolysvitlo,parse_kolybude,parse_kyivshchyna,parse_svitlolive,source_reports,choose,change
 D=date(2026,10,24)
 E=(('08:00','12:00'),('18:30','22:30'))
 B='<h1>Вища Дубечня на 24.10.2026</h1><h3>Графік Черга 3.1</h3>00:00 – 08:00 08:00 – 12:00 12:00 – 18:30 18:30 – 22:30 22:30 – 24:00 Зберегти підчергу'
@@ -20,4 +20,26 @@ class Tests(unittest.TestCase):
  def test_merge(self):self.assertEqual(normalize([('12:00','13:00'),('13:00','14:00')]),(('12:00','14:00'),))
  def test_unpublished(self):self.assertTrue(parse_bez('На 25.10.2026 ще не опубліковано',date(2026,10,25))['unpublished'])
  def test_no_wrong_date(self):self.assertEqual(parse_bez(B,date(2026,10,25))['candidates'],[])
+ def test_region_dated(self):
+  page='Графік сьогодні 24.10.2026 Черга 3.1 8 год без світла без світла: 08:00–12:00 18:30–22:30 Черга 3.2'
+  self.assertEqual(parse_kyivshchyna(page,D,D),E)
+ def test_region_refuse_tomorrow(self):
+  page='24.10.2026 Черга 3.1 без світла: 08:00–12:00 Черга 3.2'
+  self.assertIsNone(parse_kyivshchyna(page,date(2026,10,25),D))
+ def test_svitlolive_partial_not_exact(self):
+  cells=['●']*24
+  for i in range(8,12):cells[i]='✕'
+  cells[18]='%'
+  for i in range(19,22):cells[i]='✕'
+  page='Графік на сьогодні - черга 3.1 24.10.2026 Черга 3.1 '+' '.join(cells)+' Графік на завтра - черга 3.1'
+  report=parse_svitlolive(page,D,D)
+  self.assertEqual(report['outages'],(('08:00','12:00'),('19:00','22:00')))
+  self.assertEqual(report['partial'],['18:00–19:00'])
+ def test_source_reports_not_faked(self):
+  consensus={'date':D.isoformat(),'status':'normal','outages':[list(x) for x in E],'url':'https://example.com'}
+  result=source_reports(consensus,{'candidates':[E],'updated':'','unpublished':False},E,E,(('08:00','12:00'),('18:30','22:00')),None,{})
+  self.assertEqual(len(result),5)
+  self.assertEqual(result['КолиСвітло']['status'],'match')
+  self.assertEqual(result['Київщина.info']['status'],'diff')
+  self.assertEqual(result['Svitlo.live']['status'],'unavailable')
  def test_no_repeat(self):self.assertIsNone(change({'status':'normal','outages':[['08:00','12:00']]},{'status':'normal','outages':[['08:00','12:00']]}))
