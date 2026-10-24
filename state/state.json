@@ -18,7 +18,7 @@
           "outages": null,
           "partial": [],
           "status": "unavailable",
-          "url": "https://svitlo.live/pirnivska-gromada"
+          "url": "https://svitlo.live/selo-vischa-dubechnya"
         },
         "БезСвітла": {
           "outages": [
@@ -66,16 +66,26 @@
           "url": "https://kolybude.com/kyiv-oblast"
         },
         "КолиСвітло": {
-          "outages": null,
+          "outages": [
+            [
+              "08:00",
+              "12:00"
+            ],
+            [
+              "18:30",
+              "22:30"
+            ]
+          ],
           "partial": [],
-          "status": "unavailable",
+          "status": "match",
           "url": "https://kolysvitlo.com/schedule/dtek_kyiv_oblast"
         }
       },
       "source_updated": "24.10.2026 14:13",
       "sources": [
         "БезСвітла",
-        "КолиБуде"
+        "КолиБуде",
+        "КолиСвітло"
       ],
       "status": "normal",
       "url": "https://bezsvitla.com.ua/kyivska-oblast/pirnivska-hromada/visa-dubecna/grafik-na-2026-10-24"
@@ -89,7 +99,7 @@
           "outages": null,
           "partial": [],
           "status": "unavailable",
-          "url": "https://svitlo.live/pirnivska-gromada"
+          "url": "https://svitlo.live/selo-vischa-dubechnya"
         },
         "БезСвітла": {
           "outages": null,
