@@ -292,20 +292,35 @@
         },
         "2026-10-25": {
           "date": "2026-10-25",
-          "detail": "Немає підтверджених даних",
+          "detail": "Зіставлено незалежні джерела",
           "group": "10.1",
-          "outages": [],
+          "outages": [
+            [
+              "15:00",
+              "19:00"
+            ]
+          ],
           "source_reports": {
             "Alerts Energy": {
-              "outages": null,
+              "outages": [
+                [
+                  "15:00",
+                  "19:00"
+                ]
+              ],
               "partial": [],
-              "status": "unavailable",
+              "status": "match",
               "url": "https://alerts.energy/kyiv"
             },
             "БезСвітла": {
-              "outages": null,
+              "outages": [
+                [
+                  "15:00",
+                  "19:00"
+                ]
+              ],
               "partial": [],
-              "status": "unavailable",
+              "status": "match",
               "url": "https://bezsvitla.com.ua/kyiv/vul-heroyiv-polku-azov"
             },
             "ДТЕК": {
@@ -328,13 +343,25 @@
             }
           },
           "source_updated": "",
-          "sources": [],
-          "status": "unknown",
+          "sources": [
+            "Alerts Energy",
+            "БезСвітла"
+          ],
+          "status": "normal",
           "url": "https://bezsvitla.com.ua/kyiv/vul-heroyiv-polku-azov/grafik-na-2026-10-25"
         }
       },
       "group": "10.1",
       "logs": [
+        {
+          "at": "2026-10-24T21:51+03:00",
+          "date": "2026-10-25",
+          "message": "Опубліковано графік: 15:00–19:00",
+          "sources_confirmed": [
+            "Alerts Energy",
+            "БезСвітла"
+          ]
+        },
         {
           "at": "2026-10-24T18:32+03:00",
           "date": "2026-10-24",
@@ -446,20 +473,47 @@
         },
         "2026-10-25": {
           "date": "2026-10-25",
-          "detail": "Немає підтверджених даних",
+          "detail": "Зіставлено незалежні джерела",
           "group": "4.1",
-          "outages": [],
+          "outages": [
+            [
+              "09:00",
+              "12:30"
+            ],
+            [
+              "22:00",
+              "24:00"
+            ]
+          ],
           "source_reports": {
             "Alerts Energy": {
-              "outages": null,
+              "outages": [
+                [
+                  "09:00",
+                  "12:30"
+                ],
+                [
+                  "22:00",
+                  "24:00"
+                ]
+              ],
               "partial": [],
-              "status": "unavailable",
+              "status": "match",
               "url": "https://alerts.energy/kyiv"
             },
             "БезСвітла": {
-              "outages": null,
+              "outages": [
+                [
+                  "09:00",
+                  "12:30"
+                ],
+                [
+                  "22:00",
+                  "24:00"
+                ]
+              ],
               "partial": [],
-              "status": "unavailable",
+              "status": "match",
               "url": "https://bezsvitla.com.ua/kyiv/prosp-ivasyuka-volodymyra"
             },
             "ДТЕК": {
@@ -482,13 +536,25 @@
             }
           },
           "source_updated": "",
-          "sources": [],
-          "status": "unknown",
+          "sources": [
+            "Alerts Energy",
+            "БезСвітла"
+          ],
+          "status": "normal",
           "url": "https://bezsvitla.com.ua/kyiv/prosp-ivasyuka-volodymyra/grafik-na-2026-10-25"
         }
       },
       "group": "4.1",
       "logs": [
+        {
+          "at": "2026-10-24T21:51+03:00",
+          "date": "2026-10-25",
+          "message": "Опубліковано графік: 09:00–12:30, 22:00–24:00",
+          "sources_confirmed": [
+            "Alerts Energy",
+            "БезСвітла"
+          ]
+        },
         {
           "at": "2026-10-24T18:32+03:00",
           "date": "2026-10-24",
@@ -600,20 +666,47 @@
         },
         "2026-10-25": {
           "date": "2026-10-25",
-          "detail": "Немає підтверджених даних",
+          "detail": "Зіставлено незалежні джерела",
           "group": "4.1",
-          "outages": [],
+          "outages": [
+            [
+              "09:00",
+              "12:30"
+            ],
+            [
+              "22:00",
+              "24:00"
+            ]
+          ],
           "source_reports": {
             "Alerts Energy": {
-              "outages": null,
+              "outages": [
+                [
+                  "09:00",
+                  "12:30"
+                ],
+                [
+                  "22:00",
+                  "24:00"
+                ]
+              ],
               "partial": [],
-              "status": "unavailable",
+              "status": "match",
               "url": "https://alerts.energy/kyiv"
             },
             "БезСвітла": {
-              "outages": null,
+              "outages": [
+                [
+                  "09:00",
+                  "12:30"
+                ],
+                [
+                  "22:00",
+                  "24:00"
+                ]
+              ],
               "partial": [],
-              "status": "unavailable",
+              "status": "match",
               "url": "https://bezsvitla.com.ua/kyiv/prosp-obolonskyi"
             },
             "ДТЕК": {
@@ -636,13 +729,25 @@
             }
           },
           "source_updated": "",
-          "sources": [],
-          "status": "unknown",
+          "sources": [
+            "Alerts Energy",
+            "БезСвітла"
+          ],
+          "status": "normal",
           "url": "https://bezsvitla.com.ua/kyiv/prosp-obolonskyi/grafik-na-2026-10-25"
         }
       },
       "group": "4.1",
       "logs": [
+        {
+          "at": "2026-10-24T21:51+03:00",
+          "date": "2026-10-25",
+          "message": "Опубліковано графік: 09:00–12:30, 22:00–24:00",
+          "sources_confirmed": [
+            "Alerts Energy",
+            "БезСвітла"
+          ]
+        },
         {
           "at": "2026-10-24T18:32+03:00",
           "date": "2026-10-24",
