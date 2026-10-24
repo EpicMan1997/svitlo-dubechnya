@@ -97,4 +97,22 @@ class Tests(unittest.TestCase):
   row={'initiator':'kyiv_oblenergo','queue':'10.1','today':[0]*24,'todayDate':'2026-10-24','todayStatus':'ScheduleApplies'}
   page='<script id="ng-state" type="application/json">'+json.dumps(row)+'</script>'
   self.assertEqual(parse_alerts(page,D,'10.1','kyiv_oblenergo'),())
+ def test_tomorrow_two_sources_including_alerts(self):
+  target=date(2026,10,25)
+  ranges=(('09:00','12:00'),('18:00','21:30'))
+  result=choose(target,{'candidates':[ranges,(('00:00','09:00'),('12:00','18:00'),('21:30','24:00'))],'unpublished':False,'updated':''},None,None,{}, {'Alerts Energy':ranges})
+  self.assertEqual(result['status'],'normal')
+  self.assertEqual(result['outages'],[list(x) for x in ranges])
+  self.assertEqual(set(result['sources']),{'БезСвітла','Alerts Energy'})
+ def test_tomorrow_two_fresh_aggregators_without_bez(self):
+  target=date(2026,10,25)
+  ranges=(('10:30','13:00'),)
+  result=choose(target,{'candidates':[],'unpublished':True,'updated':''},None,None,{}, {'Alerts Energy':ranges,'Київщина.info':ranges})
+  self.assertEqual(result['status'],'normal')
+  self.assertEqual(result['outages'],[list(x) for x in ranges])
+ def test_tomorrow_unverified_single_source_is_unknown(self):
+  target=date(2026,10,25)
+  ranges=(('10:30','13:00'),)
+  result=choose(target,{'candidates':[],'unpublished':True,'updated':''},None,None,{}, {'Alerts Energy':ranges})
+  self.assertEqual(result['status'],'unknown')
  def test_no_repeat(self):self.assertIsNone(change({'status':'normal','outages':[['08:00','12:00']]},{'status':'normal','outages':[['08:00','12:00']]}))
