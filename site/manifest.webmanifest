@@ -11,7 +11,7 @@
   "theme_color": "#0f172a",
   "icons": [
     {
-      "src": "./apple-touch-icon.png",
+      "src": "./touch-bulb-v2.png",
       "sizes": "180x180",
       "type": "image/png",
       "purpose": "any"

@@ -1,6 +1,6 @@
 /* Network-first shell, and NEVER cache outage data; stale forecasts are safety-sensitive. */
-const SHELL_CACHE = "nashe-svitlo-static-v1";
-const STATIC = ["./", "./favicon.svg", "./apple-touch-icon.png", "./manifest.webmanifest"];
+const SHELL_CACHE = "nashe-svitlo-static-v2";
+const STATIC = ["./", "./favicon.svg", "./touch-bulb-v2.png", "./manifest.webmanifest"];
 self.addEventListener("install", event => {
   event.waitUntil(caches.open(SHELL_CACHE).then(cache => cache.addAll(STATIC)).then(() => self.skipWaiting()));
 });
