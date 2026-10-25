@@ -51,7 +51,10 @@ class VisualStatusContract(unittest.TestCase):
         self.assertIn("'days':visible_days,'logs':logs,'operator':", refresh)
         self.assertIn("if k>=(today-timedelta(days=2)).isoformat()", refresh)
         self.assertIn("function changeComparison(parts){", HTML)
-        self.assertIn("hoursAndMinutes(yMinutes)+' / 24 год без світла'", HTML)
+        self.assertIn("hoursAndMinutes(yMinutes)+' без світла'", HTML)
+        self.assertIn("yesterday-count.zero", HTML)
+        self.assertIn("yesterday-count.few", HTML)
+        self.assertIn("yesterday-count.many", HTML)
         self.assertIn("item.date===yesterday&&eventKind(item)==='changed'", HTML)
 
     def test_historic_event_does_not_claim_unverified_first_signal(self):
