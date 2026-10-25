@@ -22,8 +22,14 @@ class VisualStatusContract(unittest.TestCase):
 
     def test_age_only_colours_freshness_ring(self):
         self.assertIn("function updateRefreshRing(){", HTML)
-        self.assertIn("ageLimit=45*60", HTML)
+        self.assertIn("ageLimit=10*60", HTML)
         self.assertNotIn("status==='delayed'", HTML)
+        self.assertIn("age>=15*60", HTML)
+
+    def test_github_status_does_not_confuse_development_push_with_scheduled_refresh(self):
+        self.assertIn("event=workflow_dispatch", HTML)
+        self.assertIn("function events(){", HTML)
+        self.assertIn("changeDailyCount", HTML)
 
 
 if __name__ == '__main__':
