@@ -2,7 +2,7 @@ import sys,unittest,json
 from datetime import date,datetime,timezone,timedelta
 from pathlib import Path
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'scripts'))
-from refresh import normalize,pairs,parse_bez,parse_kolysvitlo,parse_kolybude,parse_kyivshchyna,parse_svitlolive,source_reports,parse_alerts,choose,change,make_log_event,parse_city_bez,parse_city_koly,parse_city_bude,city_sources,CITY_LOCATIONS
+from refresh import normalize,pairs,parse_bez,parse_kolysvitlo,parse_kolybude,parse_kyivshchyna,parse_svitlolive,source_reports,parse_alerts,choose,change,make_log_event,record_source_observations,earliest_observed_source,parse_city_bez,parse_city_koly,parse_city_bude,city_sources,CITY_LOCATIONS
 D=date(2026,10,24)
 E=(('08:00','12:00'),('18:30','22:30'))
 B='<h1>Вища Дубечня на 24.10.2026</h1><h3>Графік Черга 3.1</h3>00:00 – 08:00 08:00 – 12:00 12:00 – 18:30 18:30 – 22:30 22:30 – 24:00 Зберегти підчергу'
@@ -132,4 +132,35 @@ class Tests(unittest.TestCase):
   self.assertEqual(event['kind'],'published')
   self.assertIsNone(event['before'])
   self.assertEqual(event['date'],'2026-10-25')
+ def test_bez_regional_fallback_parser(self):
+  page='<h1>Київська область на 25.10.2026</h1>Оновлено: 25.10.2026 13:48 Графік Черга 3.1 00:00 – 16:00 16:00 – 19:30 19:30 – 24:00 Зберегти підчергу Історія змін 25.10.2026 06:14'
+  parsed=parse_bez(page,date(2026,10,25))
+  self.assertIn((('16:00','19:30'),),parsed['candidates'])
+  self.assertTrue(parsed['updated'])
+ def test_first_observed_source_only_when_unique(self):
+  moment=datetime(2026,10,25,8,16,tzinfo=timezone(timedelta(hours=2)))
+  intervals=[['16:00','19:30']]
+  old={'source_observations':{'Alerts Energy':{'fingerprint':json.dumps(intervals,ensure_ascii=False,sort_keys=True),'first_seen':'2026-10-25T08:06+02:00'}}}
+  new={'outages':intervals,'sources':['Alerts Energy','КолиСвітло'],'source_reports':{
+   'Alerts Energy':{'status':'match','outages':intervals},
+   'КолиСвітло':{'status':'match','outages':intervals}}}
+  record_source_observations(moment,old,new)
+  self.assertEqual(earliest_observed_source(new),'Alerts Energy')
+  changed=make_log_event(moment,date(2026,10,25),{'status':'normal','outages':[['07:00','09:00']]},new,'Змінено графік')
+  self.assertEqual(changed['first_observed_source'],'Alerts Energy')
+ def test_first_observed_source_tie_is_not_guessed(self):
+  now=datetime(2026,10,25,8,16,tzinfo=timezone(timedelta(hours=2)))
+  new={'outages':[['16:00','19:30']],'sources':['Alerts Energy','КолиСвітло'],
+       'source_reports':{'Alerts Energy':{'outages':[['16:00','19:30']],'status':'match'},
+                         'КолиСвітло':{'outages':[['16:00','19:30']],'status':'match'}}}
+  record_source_observations(now,{},new)
+  self.assertIsNone(earliest_observed_source(new))
+ def test_stale_source_not_assumed_new_signal(self):
+  now=datetime(2026,10,25,8,16,tzinfo=timezone(timedelta(hours=2)))
+  new={'outages':[['16:00','19:30']],'sources':['КолиСвітло'],
+       'source_reports':{'БезСвітла':{'outages':[['16:00','19:30']],'status':'old'},
+                         'КолиСвітло':{'outages':[['16:00','19:30']],'status':'match'}}}
+  record_source_observations(now,{},new)
+  self.assertNotIn('БезСвітла',new['source_observations'])
+  self.assertEqual(earliest_observed_source(new),'КолиСвітло')
  def test_no_repeat(self):self.assertIsNone(change({'status':'normal','outages':[['08:00','12:00']]},{'status':'normal','outages':[['08:00','12:00']]}))
