@@ -475,4 +475,34 @@ def main():
     OUTPUT.write_text(json.dumps(payload,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
     print('Checked:',now.isoformat(timespec='minutes'),[(d,e['status'],e['outages']) for d,e in days.items()])
     if errors:print('Warnings:',errors,file=sys.stderr)
-if __name__=='__main__':main()
+def probe_map_sources():
+    urls=[
+      'https://mapasvitla.com.ua/kyivska-oblast/dtek-krem/3.1',
+      'https://mapasvitla.com.ua/kyivska-oblast',
+      'https://mapasvitla.com.ua/kyiv',
+      'https://kyiv.energy-ua.info/'
+    ]
+    for url in urls:
+        try:
+            res=requests.get(url,timeout=12,headers={'User-Agent':'Mozilla/5.0','Accept-Language':'uk-UA,uk;q=0.9'})
+            soup=BeautifulSoup(res.text,'html.parser')
+            text=soup.get_text(' ',strip=True)
+            print('MAP_PROBE_URL',url,'status',res.status_code,'size',len(res.content),'title',(soup.title.get_text(' ',strip=True) if soup.title else '')[:130],flush=True)
+            for token in ('3.1','25.10','16:00','26.10','__NEXT_DATA__','application/ld+json'):
+                i=res.text.find(token)
+                if i>=0:print('MAP_PROBE_RAW',token,res.text[max(0,i-75):i+225].replace('\\n',' ')[:340],flush=True)
+                j=text.find(token)
+                if j>=0:print('MAP_PROBE_TEXT',token,text[max(0,j-75):j+270],flush=True)
+            for tag in soup.find_all('script'):
+                v=tag.get_text()
+                if v and len(v)>250:
+                    print('MAP_PROBE_SCRIPT',tag.get('id'),tag.get('type'),len(v),v[:300],flush=True)
+                    if len(v)>5000:
+                        i=v.find('3.1')
+                        if i>=0:print('MAP_PROBE_SCRIPT3',v[max(0,i-125):i+370],flush=True)
+        except Exception as ex:print('MAP_PROBE_ERROR',url,str(ex)[:200],flush=True)
+
+if __name__=='__main__':
+    import os
+    if os.environ.get('SOURCE_PROBE')=='1':probe_map_sources()
+    main()
