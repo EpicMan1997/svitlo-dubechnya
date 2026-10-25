@@ -212,7 +212,7 @@ def source_reports(result,bez,koly,bude,region,live,old,alerts=None):
         if ranges is None:
             output[name]={'status':'old' if prev.get('outages') is not None else 'unavailable',
                           'outages':prev.get('outages'), 'partial':prev.get('partial',[]),
-                          'url':entry['url']}
+                          'url':entry['url'], 'fetch_failed': bool(bez.get('fetch_failed')) if name=='БезСвітла' else False}
         else:
             outage_list=[list(x) for x in ranges]
             matches=(result['status']=='normal' and target==ranges and not part)
@@ -226,7 +226,8 @@ def fetch(url, label, errors):
         r.raise_for_status()
         return r.text
     except requests.RequestException as exc:
-        errors.append(label+': '+type(exc).__name__)
+        code=exc.response.status_code if getattr(exc,'response',None) is not None else None
+        errors.append(label+': '+type(exc).__name__+(f' HTTP {code}' if code is not None else ''))
         return None
 
 def choose(day,bez,koly,bude,old,additional=None):
@@ -440,8 +441,12 @@ def main():
             region_page=fetch(region_url,'БезСвітла Київська область',errors)
             region_bez=parse_bez(region_page,target) if region_page else {'candidates':[],'updated':'','unpublished':False}
             if region_bez['candidates']:
-                bez,bez_url=region_bez,region_url
+                bez=region_bez
+            # Link to the regional page even when the GitHub runner cannot fetch it.
+            # It may be readable in a visitor's normal browser.
+            bez_url=region_url
         bez['url']=bez_url
+        bez['fetch_failed']=any(item.startswith('БезСвітла ') and 'HTTP ' in item for item in errors) and not bez['candidates']
         a=parse_kolysvitlo(koly,target,today) if koly else None
         
         b=parse_kolybude(bude,target,today) if bude else None
