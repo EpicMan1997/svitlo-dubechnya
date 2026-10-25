@@ -595,7 +595,7 @@ function events(){
  const yMinutes=yIntervals===null?null:historicOutageMinutes(yIntervals.map(([a,b])=>a+'–'+b).join(', ')||'Без відключень');
  const count=history.length;
  const yDate=yesterday.slice(8)+'.'+yesterday.slice(5,7);
- $('previousTitle').textContent='Зміни і графік вчора · '+yDate;
+ $('previousTitle').textContent='Зміни і графік '+yDate;
  const countLabel=$('yesterdayCount');
  countLabel.textContent=String(count);
  countLabel.classList.remove('zero','few','many');
