@@ -478,6 +478,8 @@ def main():
 def probe_map_sources():
     urls=[
       'https://mapasvitla.com.ua/kyivska-oblast/dtek-krem/3.1',
+      'https://mapasvitla.com.ua/kyiv/dtek-kem/4.1',
+      'https://mapasvitla.com.ua/kyiv/dtek-kem/10.1',
       'https://mapasvitla.com.ua/kyivska-oblast',
       'https://mapasvitla.com.ua/kyiv',
       'https://kyiv.energy-ua.info/'
@@ -487,6 +489,8 @@ def probe_map_sources():
             res=requests.get(url,timeout=12,headers={'User-Agent':'Mozilla/5.0','Accept-Language':'uk-UA,uk;q=0.9'})
             soup=BeautifulSoup(res.text,'html.parser')
             text=soup.get_text(' ',strip=True)
+            for node in soup.select('[data-day]'):
+                print('MAP_PROBE_DAY',url,node.get('data-day'),repr(node.get_text(' ',strip=True)[:650]),'children',len(node.find_all('li')),flush=True)
             print('MAP_PROBE_URL',url,'status',res.status_code,'size',len(res.content),'title',(soup.title.get_text(' ',strip=True) if soup.title else '')[:130],flush=True)
             for token in ('3.1','25.10','16:00','26.10','__NEXT_DATA__','application/ld+json'):
                 i=res.text.find(token)
