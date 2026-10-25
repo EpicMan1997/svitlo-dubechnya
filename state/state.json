@@ -151,16 +151,12 @@
         "КолиБуде": {
           "outages": [
             [
-              "07:00",
-              "09:00"
-            ],
-            [
               "16:00",
               "19:30"
             ]
           ],
           "partial": [],
-          "status": "diff",
+          "status": "match",
           "url": "https://kolybude.com/kyiv-oblast"
         },
         "КолиСвітло": {
@@ -179,6 +175,7 @@
       "sources": [
         "Alerts Energy",
         "Київщина.info",
+        "КолиБуде",
         "КолиСвітло"
       ],
       "status": "normal",
