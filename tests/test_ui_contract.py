@@ -38,7 +38,7 @@ class VisualStatusContract(unittest.TestCase):
 
     def test_five_current_source_colors_are_distinct(self):
         import re
-        palette = re.search(r"const sourcePalette=\\{(.*?)\\};", HTML, re.S)
+        palette = re.search(r"const sourcePalette=\{(.*?)\};", HTML, re.S)
         self.assertIsNotNone(palette)
         colors = dict(re.findall(r"'([^']+)':'(#[0-9a-fA-F]{6})'", palette.group(1)))
         names = ['Карта світла', 'КолиСвітло', 'КолиБуде', 'Київщина.info', 'Alerts Energy']
