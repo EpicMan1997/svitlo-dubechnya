@@ -2,7 +2,7 @@ import sys,unittest,json
 from datetime import date,datetime,timezone,timedelta
 from pathlib import Path
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'scripts'))
-from refresh import normalize,pairs,parse_bez,parse_kolysvitlo,parse_kolybude,parse_kyivshchyna,parse_svitlolive,source_reports,parse_alerts,choose,change,make_log_event,record_source_observations,earliest_observed_source,parse_city_bez,parse_city_koly,parse_city_bude,city_sources,CITY_LOCATIONS
+from refresh import normalize,pairs,parse_bez,parse_kolysvitlo,parse_kolybude,parse_kyivshchyna,parse_svitlolive,source_reports,parse_alerts,parse_mapasvitla,choose,change,make_log_event,record_source_observations,earliest_observed_source,parse_city_bez,parse_city_koly,parse_city_bude,city_sources,CITY_LOCATIONS
 D=date(2026,10,24)
 E=(('08:00','12:00'),('18:30','22:30'))
 B='<h1>Вища Дубечня на 24.10.2026</h1><h3>Графік Черга 3.1</h3>00:00 – 08:00 08:00 – 12:00 12:00 – 18:30 18:30 – 22:30 22:30 – 24:00 Зберегти підчергу'
@@ -163,4 +163,26 @@ class Tests(unittest.TestCase):
   record_source_observations(now,{},new)
   self.assertNotIn('БезСвітла',new['source_observations'])
   self.assertEqual(earliest_observed_source(new),'КолиСвітло')
+ def test_mapasvitla_today_and_tomorrow_scopes(self):
+  html='<title>Черга 3.1, ДТЕК Київські регіональні — графік</title><div data-day="today">План на сьогодні, нд 25.10 0 1 2 3 4 світло є немає світла 16:00 – 19:30 3,5 год Всього без світла 3,5 год</div><div data-day="tomorrow">Очікуємо графік Оператор ще не опублікував графік на завтра.</div>'
+  parsed=parse_mapasvitla(html,date(2026,10,25),date(2026,10,25),'3.1')
+  self.assertEqual(parsed['candidates'],[(('16:00','19:30'),)])
+  self.assertTrue(parse_mapasvitla(html,date(2026,10,26),date(2026,10,25),'3.1')['unpublished'])
+  self.assertFalse(parse_mapasvitla(html,date(2026,10,24),date(2026,10,25),'3.1')['candidates'])
+ def test_mapasvitla_city_exact_group_and_date(self):
+  html='<title>Черга 4.1, ДТЕК Київські електромережі — графік</title><div data-day="today">План на сьогодні, нд 25.10 09:00 – 12:30 22:00 – 24:00 Всього без світла 5,5 год</div>'
+  result=parse_mapasvitla(html,date(2026,10,25),date(2026,10,25),'4.1')
+  self.assertEqual(result['candidates'],[(('09:00','12:30'),('22:00','24:00'))])
+  self.assertFalse(parse_mapasvitla(html,date(2026,10,25),date(2026,10,25),'10.1')['candidates'])
+  self.assertFalse(parse_mapasvitla(html,date(2026,10,26),date(2026,10,26),'4.1')['candidates'])
+ def test_mapasvitla_no_outages_not_unknown(self):
+  html='<title>Черга 3.1</title><div data-day="today">План на сьогодні, нд 25.10 Світло весь день Всього без світла 0 год</div>'
+  result=parse_mapasvitla(html,date(2026,10,25),date(2026,10,25),'3.1')
+  self.assertEqual(result['candidates'],[()])
+ def test_consensus_map_source_label(self):
+  intervals=(('16:00','19:30'),)
+  primary={'candidates':[intervals],'unpublished':False,'updated':'','url':'https://mapasvitla.com.ua/kyivska-oblast/dtek-krem/3.1'}
+  result=choose(date(2026,10,25),primary,intervals,None,{},primary_source='Карта світла')
+  self.assertEqual(result['status'],'normal')
+  self.assertEqual(set(result['sources']),{'Карта світла','КолиСвітло'})
  def test_no_repeat(self):self.assertIsNone(change({'status':'normal','outages':[['08:00','12:00']]},{'status':'normal','outages':[['08:00','12:00']]}))

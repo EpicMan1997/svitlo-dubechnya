@@ -17,6 +17,8 @@ OUTPUT = ROOT / 'site' / 'data.json'
 KYIV = ZoneInfo('Europe/Kyiv')
 BEZ = 'https://bezsvitla.com.ua/kyivska-oblast/pirnivska-hromada/visa-dubecna/grafik-na-'
 BEZ_REGION = 'https://bezsvitla.com.ua/kyivska-oblast/grafik-na-'
+MAP_REGION = 'https://mapasvitla.com.ua/kyivska-oblast/dtek-krem/3.1'
+MAP_CITY_PREFIX = 'https://mapasvitla.com.ua/kyiv/dtek-kem/'
 KOLY = 'https://kolysvitlo.com/schedule/dtek_kyiv_oblast'
 KOLBUDE = 'https://kolybude.com/kyiv-oblast'
 DTEK = 'https://www.dtek-krem.com.ua/ua/shutdowns'
@@ -72,6 +74,39 @@ def parse_bez(html, target):
     history = re.search(r'Історія змін\s*(\d{2}\.\d{2}\.\d{4}\s+\d\d:\d\d)', after)
     page_date = re.search(r'Оновлено:\s*(\d{2}\.\d{2}\.\d{4}\s+\d\d:\d\d)', s[:500])
     return {'candidates':options, 'updated': history.group(1) if history else page_date.group(1) if page_date else '', 'unpublished':False}
+
+
+def parse_mapasvitla(html, target, today, group):
+    """Parse one operator-specific, day-scoped queue page (not the mixed-region grid).
+    Reject the wrong group/date, placeholders, and ambiguous intervals.
+    """
+    empty={'candidates':[],'updated':'','unpublished':False}
+    if not html: return empty
+    soup=BeautifulSoup(html,'html.parser')
+    title=soup.title.get_text(' ',strip=True) if soup.title else ''
+    if not re.search(r'Черга\s*'+re.escape(group)+r'(?!\d)',title):
+        return empty
+    scope='today' if target==today else 'tomorrow' if target==today+timedelta(days=1) else None
+    if not scope:return empty
+    section=soup.select_one('[data-day="'+scope+'"]')
+    if section is None:return empty
+    s=section.get_text(' ',strip=True)
+    if re.search(r'Очікуємо графік|ще не опублікован',s,re.I):
+        return {**empty,'unpublished':True}
+    day=re.search(r'План на\s+(?:сьогодні|завтра)[^0-9]{0,40}(\d{1,2})\.(\d{2})(?!\d)',s[:180],re.I)
+    if not day or int(day.group(1))!=target.day or int(day.group(2))!=target.month:return empty
+    # The outage list is before the total. Do not read periods from history or explanations.
+    if 'Всього без світла' not in s:return empty
+    before=s.split('Всього без світла',1)[0]
+    intervals=pairs(before)
+    if not intervals:
+        if re.search(r'Всього без світла\s*(?:0(?:[,.]0)?\s*год|0\s*хв)',s,re.I) or re.search(r'Без відключень|Світло весь день',s,re.I):
+            choices=[tuple()]
+        else:return empty
+    else:
+        # A valid summary is necessary to guard against fragments from other widgets.
+        choices=[normalize(intervals)]
+    return {'candidates':choices,'updated':'','unpublished':False}
 
 def scoped(html, target, today):
     s = plain(html)
@@ -193,11 +228,9 @@ def source_reports(result,bez,koly,bude,region,live,old,alerts=None):
     """Show what each distinct site actually reported, independently of consensus."""
     target = tuple(tuple(x) for x in result.get('outages',[]))
     raw = {
-        'БезСвітла': {
-            'ranges': next((v for v in bez['candidates'] if v==target),None)
-                      if result['status']=='normal'
-                      else (bez['candidates'][0] if len(bez['candidates'])==1 else None),
-            'partial':[], 'url':result['url']},
+        'Карта світла': {
+            'ranges':bez['candidates'][0] if len(bez['candidates'])==1 else None,
+            'partial':[], 'url':bez.get('url',MAP_REGION)},
         'КолиСвітло':{'ranges':koly,'partial':[],'url':KOLY},
         'КолиБуде':{'ranges':bude,'partial':[],'url':KOLBUDE},
         'Київщина.info':{'ranges':region,'partial':[],'url':KYIVSHCHYNA},
@@ -212,7 +245,7 @@ def source_reports(result,bez,koly,bude,region,live,old,alerts=None):
         if ranges is None:
             output[name]={'status':'old' if prev.get('outages') is not None else 'unavailable',
                           'outages':prev.get('outages'), 'partial':prev.get('partial',[]),
-                          'url':entry['url'], 'fetch_failed': bool(bez.get('fetch_failed')) if name=='БезСвітла' else False}
+                          'url':entry['url'], 'fetch_failed': False}
         else:
             outage_list=[list(x) for x in ranges]
             matches=(result['status']=='normal' and target==ranges and not part)
@@ -230,14 +263,14 @@ def fetch(url, label, errors):
         errors.append(label+': '+type(exc).__name__+(f' HTTP {code}' if code is not None else ''))
         return None
 
-def choose(day,bez,koly,bude,old,additional=None):
+def choose(day,bez,koly,bude,old,additional=None,primary_source='БезСвітла'):
     votes=defaultdict(set)
     if koly is not None:votes[koly].add('КолиСвітло')
     if bude is not None:votes[bude].add('КолиБуде')
     for source,intervals in (additional or {}).items():
         if intervals is not None:
             votes[intervals].add(source)
-    for option in bez['candidates']: votes[option].add('БезСвітла')
+    for option in bez['candidates']: votes[option].add(primary_source)
     confirmed=sorted(((len(s),off,s) for off,s in votes.items() if len(s)>=2),key=lambda x:x[0],reverse=True)
     base={'date':day.isoformat(),'url':bez.get('url',BEZ+day.isoformat()),'source_updated':bez['updated']}
     if confirmed and (len(confirmed)==1 or confirmed[0][0]>confirmed[1][0]):
@@ -366,9 +399,9 @@ def parse_city_bude(html,target,today,group):
     return normalize(result) if result else None
 
 def city_sources(entry,bez,koly,bude,street,prev,alerts=None):
-    targets={'БезСвітла':street,'КолиСвітло':CITY_KOLY,'КолиБуде':CITY_BUDE,
+    targets={'Карта світла':street,'КолиСвітло':CITY_KOLY,'КолиБуде':CITY_BUDE,
              'ДТЕК':CITY_DTEK,'Alerts Energy':ALERTS_CITY}
-    data={'БезСвітла':next((x for x in bez['candidates'] if list(map(list,x))==entry['outages']),None) if entry['status']=='normal' else None,
+    data={'Карта світла':bez['candidates'][0] if len(bez['candidates'])==1 else None,
           'КолиСвітло':koly,'КолиБуде':bude,'ДТЕК':None,'Alerts Energy':alerts}
     previous=prev.get('source_reports',{})
     compare=tuple(tuple(x) for x in entry.get('outages',[]))
@@ -390,6 +423,8 @@ def update_city_locations(now,today,old,errors):
     city_bude=fetch(CITY_BUDE,'КолиБуде Київ',errors)
     city_dtek=fetch(CITY_DTEK,'ДТЕК Київ',errors)
     city_alerts=fetch(ALERTS_CITY,'Alerts Energy Київ',errors)
+    city_map_pages={group:fetch(MAP_CITY_PREFIX+group,'Карта світла Київ '+group,errors)
+                    for group in {config['group'] for config in CITY_LOCATIONS.values()}}
     result={}
     old_locations=old.get('locations',{})
     for key,config in CITY_LOCATIONS.items():
@@ -397,17 +432,17 @@ def update_city_locations(now,today,old,errors):
         days={}
         logs=list(old_loc.get('logs',[]))
         for target in (today,today+timedelta(days=1)):
-            url=config['street']+'/grafik-na-'+target.isoformat()
-            page=fetch(url,'БезСвітла '+key+' '+target.isoformat(),errors)
-            bez=parse_city_bez(page,target,config['group']) if page else {'candidates':[],'updated':'','unpublished':False}
+            url=MAP_CITY_PREFIX+config['group']
+            bez=parse_mapasvitla(city_map_pages[config['group']],target,today,config['group'])
+            bez['url']=url
             koly=parse_city_koly(city_koly,target,today,config['group']) if city_koly else None
             bude=parse_city_bude(city_bude,target,today,config['group']) if city_bude else None
             prev=old_loc.get('days',{}).get(target.isoformat(),{})
             # Uses same two-source quorum as the dacha, but the city sources are distinct.
             alerts=parse_alerts(city_alerts,target,config['group'],'kyiv_oblenergo')
-            entry=choose(target,bez,koly,bude,prev,{'Alerts Energy':alerts})
+            entry=choose(target,bez,koly,bude,prev,{'Alerts Energy':alerts},primary_source='Карта світла')
             entry['url']=url
-            entry['source_reports']=city_sources(entry,bez,koly,bude,config['street'],prev,alerts)
+            entry['source_reports']=city_sources(entry,bez,koly,bude,url,prev,alerts)
             record_source_observations(now,prev,entry)
             entry['group']=config['group']
             days[target.isoformat()]=entry
@@ -428,26 +463,12 @@ def main():
     official=fetch(DTEK,'ДТЕК',errors)
     region_html=fetch(KYIVSHCHYNA,'Київщина.info',errors)
     region_alerts=fetch(ALERTS_REGION,'Alerts Energy Київська область',errors)
+    map_region_html=fetch(MAP_REGION,'Карта світла Київська область 3.1',errors)
     city=update_city_locations(now,today,old,errors)
     days={};logs=list(old.get('logs',[]))
     for target in (today,tomorrow):
-        bez_url=BEZ+target.isoformat()
-        dacha_fetch_error_start=len(errors)
-        html=fetch(bez_url,'БезСвітла Вища Дубечня',errors)
-        bez=parse_bez(html,target) if html else {'candidates':[],'updated':'','unpublished':False}
-        if not bez['candidates']:
-            # The village page can remain unpublished even while the oblast's queue 3.1 is current.
-            # This is the SAME source, not a sixth independent vote.
-            region_url=BEZ_REGION+target.isoformat()
-            region_page=fetch(region_url,'БезСвітла Київська область',errors)
-            region_bez=parse_bez(region_page,target) if region_page else {'candidates':[],'updated':'','unpublished':False}
-            if region_bez['candidates']:
-                bez=region_bez
-            # Link to the regional page even when the GitHub runner cannot fetch it.
-            # It may be readable in a visitor's normal browser.
-            bez_url=region_url
-        bez['url']=bez_url
-        bez['fetch_failed']=any(item.startswith('БезСвітла ') and 'HTTP ' in item for item in errors[dacha_fetch_error_start:]) and not bez['candidates']
+        bez=parse_mapasvitla(map_region_html,target,today,'3.1')
+        bez['url']=MAP_REGION
         a=parse_kolysvitlo(koly,target,today) if koly else None
         
         b=parse_kolybude(bude,target,today) if bude else None
@@ -455,7 +476,7 @@ def main():
         live=None  # Svitlo.live is no longer treated as a current reference
         previous=old.get('days',{}).get(target.isoformat(),{})
         alerts=parse_alerts(region_alerts,target,'3.1','kyivska_oblast_oblenergo')
-        entry=choose(target,bez,a,b,previous,{'Київщина.info':region,'Alerts Energy':alerts})
+        entry=choose(target,bez,a,b,previous,{'Київщина.info':region,'Alerts Energy':alerts},primary_source='Карта світла')
         entry['source_reports']=source_reports(entry,bez,a,b,region,live,previous,alerts)
         record_source_observations(now,previous,entry)
         days[target.isoformat()]=entry
@@ -475,38 +496,4 @@ def main():
     OUTPUT.write_text(json.dumps(payload,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
     print('Checked:',now.isoformat(timespec='minutes'),[(d,e['status'],e['outages']) for d,e in days.items()])
     if errors:print('Warnings:',errors,file=sys.stderr)
-def probe_map_sources():
-    urls=[
-      'https://mapasvitla.com.ua/kyivska-oblast/dtek-krem/3.1',
-      'https://mapasvitla.com.ua/kyiv/dtek-kem/4.1',
-      'https://mapasvitla.com.ua/kyiv/dtek-kem/10.1',
-      'https://mapasvitla.com.ua/kyivska-oblast',
-      'https://mapasvitla.com.ua/kyiv',
-      'https://kyiv.energy-ua.info/'
-    ]
-    for url in urls:
-        try:
-            res=requests.get(url,timeout=12,headers={'User-Agent':'Mozilla/5.0','Accept-Language':'uk-UA,uk;q=0.9'})
-            soup=BeautifulSoup(res.text,'html.parser')
-            text=soup.get_text(' ',strip=True)
-            for node in soup.select('[data-day]'):
-                print('MAP_PROBE_DAY',url,node.get('data-day'),repr(node.get_text(' ',strip=True)[:650]),'children',len(node.find_all('li')),flush=True)
-            print('MAP_PROBE_URL',url,'status',res.status_code,'size',len(res.content),'title',(soup.title.get_text(' ',strip=True) if soup.title else '')[:130],flush=True)
-            for token in ('3.1','25.10','16:00','26.10','__NEXT_DATA__','application/ld+json'):
-                i=res.text.find(token)
-                if i>=0:print('MAP_PROBE_RAW',token,res.text[max(0,i-75):i+225].replace('\\n',' ')[:340],flush=True)
-                j=text.find(token)
-                if j>=0:print('MAP_PROBE_TEXT',token,text[max(0,j-75):j+270],flush=True)
-            for tag in soup.find_all('script'):
-                v=tag.get_text()
-                if v and len(v)>250:
-                    print('MAP_PROBE_SCRIPT',tag.get('id'),tag.get('type'),len(v),v[:300],flush=True)
-                    if len(v)>5000:
-                        i=v.find('3.1')
-                        if i>=0:print('MAP_PROBE_SCRIPT3',v[max(0,i-125):i+370],flush=True)
-        except Exception as ex:print('MAP_PROBE_ERROR',url,str(ex)[:200],flush=True)
-
-if __name__=='__main__':
-    import os
-    if os.environ.get('SOURCE_PROBE')=='1':probe_map_sources()
-    main()
+if __name__=='__main__':main()
