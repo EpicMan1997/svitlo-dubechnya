@@ -1,8 +1,8 @@
 import sys,unittest,json
-from datetime import date
+from datetime import date,datetime,timezone,timedelta
 from pathlib import Path
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'scripts'))
-from refresh import normalize,pairs,parse_bez,parse_kolysvitlo,parse_kolybude,parse_kyivshchyna,parse_svitlolive,source_reports,parse_alerts,choose,change,parse_city_bez,parse_city_koly,parse_city_bude,city_sources,CITY_LOCATIONS
+from refresh import normalize,pairs,parse_bez,parse_kolysvitlo,parse_kolybude,parse_kyivshchyna,parse_svitlolive,source_reports,parse_alerts,choose,change,make_log_event,parse_city_bez,parse_city_koly,parse_city_bude,city_sources,CITY_LOCATIONS
 D=date(2026,10,24)
 E=(('08:00','12:00'),('18:30','22:30'))
 B='<h1>Вища Дубечня на 24.10.2026</h1><h3>Графік Черга 3.1</h3>00:00 – 08:00 08:00 – 12:00 12:00 – 18:30 18:30 – 22:30 22:30 – 24:00 Зберегти підчергу'
@@ -115,4 +115,21 @@ class Tests(unittest.TestCase):
   ranges=(('10:30','13:00'),)
   result=choose(target,{'candidates':[],'unpublished':True,'updated':''},None,None,{}, {'Alerts Energy':ranges})
   self.assertEqual(result['status'],'unknown')
+ def test_structured_change_event(self):
+  moment=datetime(2026,10,25,8,16,tzinfo=timezone(timedelta(hours=2)))
+  old={'status':'normal','outages':[['07:00','09:00'],['16:00','19:30']]}
+  new={'status':'normal','outages':[['16:00','19:30']],'sources':['Alerts Energy','КолиСвітло']}
+  event=make_log_event(moment,date(2026,10,25),old,new,'Змінено графік')
+  self.assertEqual(event['kind'],'changed')
+  self.assertEqual(event['before'],old['outages'])
+  self.assertEqual(event['after'],new['outages'])
+  self.assertEqual(event['at'],'2026-10-25T08:16+02:00')
+  self.assertEqual(event['sources_confirmed'],new['sources'])
+ def test_publication_does_not_count_as_change(self):
+  moment=datetime(2026,10,24,20,24,tzinfo=timezone(timedelta(hours=3)))
+  new={'status':'normal','outages':[['09:00','12:00']],'sources':['БезСвітла','Alerts Energy']}
+  event=make_log_event(moment,date(2026,10,25),{},new,'Опубліковано графік')
+  self.assertEqual(event['kind'],'published')
+  self.assertIsNone(event['before'])
+  self.assertEqual(event['date'],'2026-10-25')
  def test_no_repeat(self):self.assertIsNone(change({'status':'normal','outages':[['08:00','12:00']]},{'status':'normal','outages':[['08:00','12:00']]}))
