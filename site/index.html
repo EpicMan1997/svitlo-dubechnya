@@ -88,10 +88,10 @@ h1{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
   font:700 19px/18px system-ui!important;vertical-align:middle;
   transition:none!important;transform:none!important
 }
-.location-chevron::before,.schedule-details summary .chevron::before,.changes-arrow::before{content:"›";position:absolute;inset:0}
+.location-chevron::before,.schedule-details summary .chevron::before,.changes-arrow::before{content:"›";position:absolute;inset:0;transform:rotate(0deg);transform-origin:center;transition:none!important}
 .location-button[aria-expanded="true"] .location-chevron::before,
 .schedule-details[open] summary .chevron::before,
-.changes[open] .changes-arrow::before{content:"⌄"}
+.changes[open] .changes-arrow::before{transform:rotate(90deg)}
 
 
 /* Daily power budget, with concise labels and an optional explanation */
@@ -230,8 +230,40 @@ h1{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 
 /* Timeline labels change lanes instantly; no animation. */
 .axis.outage-boundary{transition:none!important}
+
+/* Same lower baseline for edges and an outage boundary temporarily moved below. */
+.graph .axis.start,.graph .axis.end,.graph .axis.down{top:94px;line-height:22px}
+
+/* Small info bubble: behaves like the edit-count tooltip on hover, tap or focus. */
+.metric-info-control{position:relative;align-self:center;margin-left:auto;z-index:18}
+.metric-info-trigger{display:grid;place-items:center;width:24px;height:24px;padding:0;
+  border:1px solid #53667e;border-radius:50%;color:#b9c9dd;background:#1a2b42;
+  font:700 13px/1 system-ui;cursor:help;touch-action:manipulation}
+.metric-info-trigger:hover,.metric-info-control.open .metric-info-trigger,
+.metric-info-trigger:focus-visible{background:#2c4260;color:#fff;border-color:#8da7c7}
+.metric-info-control .metric-info-tooltip{left:auto;right:0;bottom:calc(100% + 10px);
+  transform:none;z-index:120;width:min(305px,calc(100vw - 44px));max-width:calc(100vw - 44px)}
+.metric-info-tooltip b{display:block;margin-bottom:7px;font-size:13px}
+.metric-info-tooltip>span{display:block;margin-top:7px}
+.metric-info-tooltip strong{font-weight:730}
+
+/* A reliable iOS pull-to-refresh gesture with visible, non-blocking feedback. */
+.pull-refresh{display:flex;align-items:center;justify-content:center;gap:10px;
+  padding:12px 16px;min-width:165px;max-width:calc(100vw - 30px);width:max-content;
+  border-radius:0 0 16px 16px;
+  top:env(safe-area-inset-top, 0px);
+  transform:translate(-50%,-120%);transition:opacity .16s ease,transform .22s ease}
+.pull-refresh.pull-visible{transform:translate(-50%,max(8px,calc(var(--pulldown,0px) * .27)))}
+.pull-refresh.pull-ready{background:#1e3d39;border-color:#4ade80}
+.pull-refresh-icon{flex:none;display:block;width:17px;height:17px;border-radius:50%;
+  border:2px solid #8295ad;border-top-color:#4ade80;transform:rotate(var(--pull-angle,0deg));
+  transition:transform .08s linear}
+.pull-refresh.pull-working .pull-refresh-icon{animation:pull-rotate .8s linear infinite;border-top-color:#facc15}
+.pull-refresh.pull-working{transform:translate(-50%,12px);opacity:1;color:#fde68a}
+@keyframes pull-rotate{to{transform:rotate(360deg)}}
+
 </style>
-<div id="pullRefresh" class="pull-refresh" role="status" aria-live="polite"><span id="pullRefreshText">Потягни вниз для оновлення</span></div><main><header><div class="location-shell"><h1><img class="head-icon" src="./favicon.svg" alt="" aria-hidden="true"><button class="location-button" id="locationButton" type="button" aria-expanded="false"><span id="locationLabel">Квіткова 251</span><small id="locationGroup">3.1</small><span class="location-chevron" aria-hidden="true"></span></button></h1><div class="location-menu" id="locationMenu" hidden><button type="button" data-location="dacha">Квіткова 251 <small>Вища Дубечня · дача</small></button><button type="button" data-location="obolonskyi54">Оболонський проспект 54</button><button type="button" data-location="ivasiuka43">Володимира Івасюка 43</button><button type="button" data-location="azov28b">Героїв полку Азов 28Б</button></div></div><div class="header-time"><div id="clock">--:--:--</div></div></header><nav class="tabs"><button data-tab="today" aria-selected="true">Сьогодні</button><button data-tab="tomorrow" aria-selected="false" class="tomorrow-tab unavailable">Завтра<span class="new-dot" id="tomorrowUnread" hidden aria-label="Новий графік">●</span></button></nav><div class="layout"><section class="card"><div id="display"></div></section><aside class="card history"><details class="changes" id="changes"><summary><span class="changes-header"><strong>Зміни графіка <span class="count-control" id="changeCountControl"><span class="change-count" id="changeDailyCount" role="button" tabindex="0" aria-label="Кількість змін графіка за вибрану добу" aria-describedby="dailyCountTooltip">0</span><span class="count-tooltip" id="dailyCountTooltip" role="tooltip">Кількість змін графіка за вибрану добу (публікація першого графіка не враховується)</span></span></strong></span><span class="changes-arrow" aria-hidden="true"></span></summary><div class="changes-content"><div id="latest"></div><details id="more" class="older"><summary>Попередні події</summary><div id="older"></div></details></div></details></aside></div></main>
+<div id="pullRefresh" class="pull-refresh" role="status" aria-live="polite"><span class="pull-refresh-icon" aria-hidden="true"></span><span id="pullRefreshText">Потягни вниз для оновлення</span></div><main><header><div class="location-shell"><h1><img class="head-icon" src="./favicon.svg" alt="" aria-hidden="true"><button class="location-button" id="locationButton" type="button" aria-expanded="false"><span id="locationLabel">Квіткова 251</span><small id="locationGroup">3.1</small><span class="location-chevron" aria-hidden="true"></span></button></h1><div class="location-menu" id="locationMenu" hidden><button type="button" data-location="dacha">Квіткова 251 <small>Вища Дубечня · дача</small></button><button type="button" data-location="obolonskyi54">Оболонський проспект 54</button><button type="button" data-location="ivasiuka43">Володимира Івасюка 43</button><button type="button" data-location="azov28b">Героїв полку Азов 28Б</button></div></div><div class="header-time"><div id="clock">--:--:--</div></div></header><nav class="tabs"><button data-tab="today" aria-selected="true">Сьогодні</button><button data-tab="tomorrow" aria-selected="false" class="tomorrow-tab unavailable">Завтра<span class="new-dot" id="tomorrowUnread" hidden aria-label="Новий графік">●</span></button></nav><div class="layout"><section class="card"><div id="display"></div></section><aside class="card history"><details class="changes" id="changes"><summary><span class="changes-header"><strong>Зміни графіка <span class="count-control" id="changeCountControl"><span class="change-count" id="changeDailyCount" role="button" tabindex="0" aria-label="Кількість змін графіка за вибрану добу" aria-describedby="dailyCountTooltip">0</span><span class="count-tooltip" id="dailyCountTooltip" role="tooltip">Кількість змін графіка за вибрану добу (публікація першого графіка не враховується)</span></span></strong></span><span class="changes-arrow" aria-hidden="true"></span></summary><div class="changes-content"><div id="latest"></div><details id="more" class="older"><summary>Попередні події</summary><div id="older"></div></details></div></details></aside></div></main>
 <script>(function(){'use strict';let tab='today',data=null,dayShown='',modeShown='',locationId='dacha';const $=id=>document.getElementById(id),timeF=new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/Kyiv',hour:'2-digit',minute:'2-digit',second:'2-digit',hourCycle:'h23'}),dateF=new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/Kyiv',year:'numeric',month:'2-digit',day:'2-digit'}),human=new Intl.DateTimeFormat('uk-UA',{timeZone:'UTC',day:'numeric',month:'long'}),weekdayF=new Intl.DateTimeFormat('uk-UA',{timeZone:'UTC',weekday:'long'}),checkF=new Intl.DateTimeFormat('uk-UA',{timeZone:'Europe/Kyiv',day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit',hourCycle:'h23'});function formatChecked(x){if(!x)return 'немає даних';const d=new Date(x);if(!Number.isFinite(d.getTime()))return 'немає даних';return checkF.format(d).replace(/[,\s]+/g,' ').trim()}function now(){const t=Object.fromEntries(timeF.formatToParts(new Date()).filter(x=>x.type!=='literal').map(x=>[x.type,x.value])),d=Object.fromEntries(dateF.formatToParts(new Date()).filter(x=>x.type!=='literal').map(x=>[x.type,x.value]));return {iso:d.year+'-'+d.month+'-'+d.day,time:t.hour+':'+t.minute+':'+t.second,display:d.day+'.'+d.month+'.'+d.year,h:+t.hour,m:+t.minute,s:+t.second}}function tomorrow(s){const a=s.split('-').map(Number);return new Date(Date.UTC(a[0],a[1]-1,a[2]+1)).toISOString().slice(0,10)}function minute(s){const a=s.split(':').map(Number);return a[0]*60+a[1]}function pct(x){return x*100/1440}function esc(s){return String(s??'').replace(/[&<>"']/g,x=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[x]))}function activeLocation(){return data?.locations?.[locationId]||(locationId==='dacha'?{name:'Дача · Вища Дубечня',group:'3.1',days:data?.days||{},logs:data?.logs||[],address_verified:true}:null)}function selected(n){const iso=tab==='today'?n.iso:tomorrow(n.iso);return {iso,entry:activeLocation()?.days?.[iso]||{status:'unknown',outages:[],detail:locationId==='dacha'?'Очікуємо графіка':'Потрібне підтвердження міського графіка'}}}function currentStatus(e){return e?.status||'unknown'}function tomorrowFingerprint(n){n=n||now();const iso=tomorrow(n.iso),entry=activeLocation()?.days?.[iso];if(!entry||currentStatus(entry)!=='normal'||!Array.isArray(entry.outages))return null;return {iso,hash:JSON.stringify(entry.outages)}}function remembered(k){
   let value=null;
   try{value=localStorage.getItem(k)}catch(e){}
@@ -249,7 +281,7 @@ function remember(k,v){
   if(k==='dubechnya-selected-location'){
     try{document.cookie='svitlo_location='+encodeURIComponent(v)+'; Max-Age=31536000; Path=/svitlo-dubechnya/; SameSite=Lax; Secure'}catch(e){}
   }
-}function markTomorrowSeen(){const f=tomorrowFingerprint();if(f)remember('dubechnya-tomorrow-seen-'+locationId+'-'+f.iso,f.hash)}function updateTomorrowTab(){const f=tomorrowFingerprint(),button=document.querySelector('[data-tab="tomorrow"]');if(!button)return;const fresh=Boolean(f);button.classList.toggle('unavailable',!fresh);button.classList.toggle('available',fresh);const dot=$('tomorrowUnread');if(dot)dot.hidden=!fresh||remembered('dubechnya-tomorrow-seen-'+locationId+'-'+f.iso)===f.hash}function paint(n){n=n||now();updateLocationHeader();const wasExpanded=Boolean(document.querySelector('#display .schedule-details')?.open);const {iso,entry:e}=selected(n),status=currentStatus(e),out=Array.isArray(e.outages)?e.outages:[],known=status!=='unknown',duration=out.reduce((sum,x)=>sum+minute(x[1])-minute(x[0]),0),mins=duration%60?Math.floor(duration/60)+' год '+duration%60+' хв':Math.floor(duration/60)+' год',powered=1440-duration,lightMins=powered%60?Math.floor(powered/60)+' год '+powered%60+' хв':Math.floor(powered/60)+' год';let html='<div class="heading"><div class="day-wrap"><span class="weekday">'+esc(weekdayF.format(new Date(iso+'T12:00:00Z')).replace(/^./,c=>c.toUpperCase()))+'</span><b class="calendar-date">'+human.format(new Date(iso+'T12:00:00Z'))+'</b></div><span class="status '+status+'">'+({normal:'За графіком',stale:'Дані застаріли',unknown:'Графіка немає',suspended:'Графік не діє'}[status]||'Графіка немає')+'</span></div>';if(known)html+='<div class="metric-summary"><div class="metric-primary"><strong>'+mins+'</strong><span>Без світла</span></div><div class="metric-secondary"><strong>'+lightMins+'</strong><span>Зі світлом</span></div><details class="metric-help"><summary aria-label="Пояснення часу зі світлом і без світла" title="Як це розраховано">i</summary><div class="metric-help-content"><b>Що означають ці цифри?</b><p>Розрахунок за обрані 24 години — від 00:00 до 24:00.</p><p><strong>Без світла</strong> — сумарна тривалість запланованих відключень.</p><p><strong>Зі світлом</strong> — решта часу за графіком (24 години мінус відключення).</p></div></details></div>';if(locationId==='obolonskyi54')html+='<div class="address-note">Група 4.1 попередня — потрібна адресна перевірка ДТЕК</div>';else if(locationId!=='dacha'&&!activeLocation()?.address_verified)html+='<div class="address-note">Група з попереднього адресного довідника; потрібна перевірка ДТЕК</div>';if(status==='stale')html+='<div class="alert">Останній відомий графік. Нові джерела його не підтвердили.</div>';if(status==='suspended')html+='<div class="alert">Графік не діє. Показано заплановані раніше години.</div>';html+='<div class="graph"><div class="bar '+(!known?'unknown ':status==='stale'||status==='suspended'?'stale':'')+'">';if(known)out.forEach(x=>html+='<i class="off" style="left:'+pct(minute(x[0]))+'%;width:'+pct(minute(x[1])-minute(x[0]))+'%"></i>');html+='</div><span class="axis start">00:00</span><span class="axis end">24:00</span>';if(known){const boundaries=[...new Set(out.flatMap(x=>x).filter(t=>t!=='00:00'&&t!=='24:00'))];boundaries.forEach(t=>{html+='<span class="axis up outage-boundary" data-boundary-minute="'+minute(t)+'" style="left:'+pct(minute(t))+'%">'+esc(t)+'</span>'})}if(tab==='today')html+='<div class="marker" id="marker"><em id="markerLabel">--:--</em><i></i></div>';html+='<div class="inspector" id="inspector" hidden><em id="inspectLabel">00:00</em><i></i></div></div>';html+='<details class="schedule-details" '+(wasExpanded?'open':'')+'><summary>Інтервали та джерела <span class="chevron" aria-hidden="true"></span></summary><div class="schedule-body">';if(known)html+=out.length?'<div class="intervals">'+out.map(x=>{const palette=sourcePalette;const dots=Object.entries(e.source_reports||{}).filter(([name,r])=>r.status==='match'&&Array.isArray(r.outages)&&r.outages.some(v=>v[0]===x[0]&&v[1]===x[1])).map(([name])=>'<i class="interval-source-dot" style="background:'+palette[name]+'" title="'+esc(name)+'"></i>').join('');return '<span>'+esc(x[0])+'–'+esc(x[1])+'<span class="interval-confirmers">'+dots+'</span></span>'}).join('')+'</div>':'<div class="muted">Відключень немає</div>';else html+='<div class="muted">'+esc(e.detail||'Очікуємо підтвердження')+'</div>';html+='<div class="source-list" id="sources"></div><div id="truthOverall" class="source-overall"></div></div></details>';$('display').innerHTML=html;const city=locationId!=='dacha',urls=city?{'Карта світла':e.url||'https://mapasvitla.com.ua/kyiv','КолиСвітло':'https://kolysvitlo.com/schedule/dtek_kyiv','КолиБуде':'https://kolybude.com/kyiv','ДТЕК':'https://www.dtek-kem.com.ua/ua/shutdowns','Alerts Energy':'https://alerts.energy/kyiv'}:{'Карта світла':e.url||'https://mapasvitla.com.ua/kyivska-oblast/dtek-krem/3.1','КолиСвітло':'https://kolysvitlo.com/schedule/dtek_kyiv_oblast','КолиБуде':'https://kolybude.com/kyiv-oblast','Київщина.info':'https://kyivshchyna.info/hrafik-vidkliuchen-svitla-kyivska-oblast/','Alerts Energy':'https://alerts.energy/kyivska-oblast'},colors=sourcePalette,rows=e.source_reports||{},allMatch=Object.values(rows).filter(r=>r?.status==='match').length;const states={match:'Збігається',diff:'Інші години',partial:'Погодинний прогноз',old:'Не оновлено',unavailable:'Немає даних'};function fmtRanges(r){if(!Array.isArray(r?.outages))return 'Години не отримано';const periods=r.outages.map(x=>esc(x[0])+'–'+esc(x[1]));if(Array.isArray(r.partial)&&r.partial.length)periods.push('Частково: '+r.partial.map(esc).join(', '));return periods.length?periods.join(' · '):'Без планових відключень'}$('sources').innerHTML=Object.entries(urls).map(([name,url])=>{const r=rows[name]||{status:'unavailable',outages:null},type=r.status||'unavailable',sourceUrl=r.url||url;return '<div class="source-row"><span class="source-icon" style="background:'+colors[name]+'"></span><div class="source-main"><div class="source-head"><a href="'+esc(sourceUrl)+'" target="_blank" rel="noopener">'+esc(name)+'</a><span class="source-verdict '+(type==='match'?'source-good':'source-bad')+'"><i></i>'+esc(r.fetch_failed?'Недоступне серверу':states[type]||'Немає даних')+'</span></div><div class="source-times">'+(r.fetch_failed?'Попередні дані: ':'')+fmtRanges(r)+'</div></div></div>'}).join('')+'<div class="last-check"><span class="verified-time">Перевірено: '+esc(formatChecked(data?.updated_at))+'</span><span class="refresh-clock" title="Індикатор давності останнього фактичного збору. Натисни, щоб оновити сторінку"><svg class="refresh-ring" viewBox="0 0 24 24" aria-hidden="true"><circle class="ring-track" cx="12" cy="12" r="9"></circle><circle class="ring-progress" id="refreshArc" cx="12" cy="12" r="9"></circle></svg><span id="refreshCountdown">Перевіряємо стан</span></span></div>';const healthy=status==='normal'&&allMatch>=2;$('truthOverall').innerHTML='<span class="overall-state '+(healthy?'is-healthy':'is-unhealthy')+'"><i></i>'+(healthy?'Графік підтверджено':status==='unknown'?'Графік не підтверджено':'Останній графік не підтверджено')+'</span><span class="overall-count">'+allMatch+' із '+Object.keys(urls).length+' джерел збігаються</span>';document.querySelectorAll('[data-tab]').forEach(b=>b.setAttribute('aria-selected',String(b.dataset.tab===tab)));modeShown=status;updateTomorrowTab();bindInspector(out,known);move(n);updateRefreshRing()}function bindInspector(out,known){const graph=document.querySelector('#display .graph'),inspect=$('inspector'),label=$('inspectLabel');if(!graph||!inspect||!label)return;const show=e=>{const box=graph.getBoundingClientRect();if(!box.width)return;const p=Math.max(0,Math.min(1,(e.clientX-box.left)/box.width)),m=Math.min(1439,Math.floor(p*1440)),hh=String(Math.floor(m/60)).padStart(2,'0'),mm=String(m%60).padStart(2,'0'),isOff=out.some(a=>m>=minute(a[0])&&m<minute(a[1]));inspect.style.left=(p*100)+'%';inspect.hidden=false;label.textContent=hh+':'+mm+' · '+(!known?'невідомо':isOff?'немає світла':'світло');label.style.transform=p<0.17?'translateX(0)':p>0.83?'translateX(-100%)':'translateX(-50%)';label.style.left=p<0.17||p>0.83?'0':'50%';inspect.classList.toggle('during-outage',known&&isOff)};graph.addEventListener('pointerenter',show);graph.addEventListener('pointermove',show);graph.addEventListener('pointerdown',show);graph.addEventListener('pointerleave',()=>{inspect.hidden=true});graph.addEventListener('pointerup',e=>{if(e.pointerType==='touch'||e.pointerType==='pen')inspect.hidden=true});graph.addEventListener('pointercancel',()=>{inspect.hidden=true});graph.addEventListener('touchend',()=>{inspect.hidden=true},{passive:true});graph.addEventListener('touchcancel',()=>{inspect.hidden=true},{passive:true});document.addEventListener('pointerup',e=>{if(e.pointerType==='touch')inspect.hidden=true})}function move(n){
+}function markTomorrowSeen(){const f=tomorrowFingerprint();if(f)remember('dubechnya-tomorrow-seen-'+locationId+'-'+f.iso,f.hash)}function updateTomorrowTab(){const f=tomorrowFingerprint(),button=document.querySelector('[data-tab="tomorrow"]');if(!button)return;const fresh=Boolean(f);button.classList.toggle('unavailable',!fresh);button.classList.toggle('available',fresh);const dot=$('tomorrowUnread');if(dot)dot.hidden=!fresh||remembered('dubechnya-tomorrow-seen-'+locationId+'-'+f.iso)===f.hash}function paint(n){n=n||now();updateLocationHeader();const wasExpanded=Boolean(document.querySelector('#display .schedule-details')?.open);const {iso,entry:e}=selected(n),status=currentStatus(e),out=Array.isArray(e.outages)?e.outages:[],known=status!=='unknown',duration=out.reduce((sum,x)=>sum+minute(x[1])-minute(x[0]),0),mins=duration%60?Math.floor(duration/60)+' год '+duration%60+' хв':Math.floor(duration/60)+' год',powered=1440-duration,lightMins=powered%60?Math.floor(powered/60)+' год '+powered%60+' хв':Math.floor(powered/60)+' год';let html='<div class="heading"><div class="day-wrap"><span class="weekday">'+esc(weekdayF.format(new Date(iso+'T12:00:00Z')).replace(/^./,c=>c.toUpperCase()))+'</span><b class="calendar-date">'+human.format(new Date(iso+'T12:00:00Z'))+'</b></div><span class="status '+status+'">'+({normal:'За графіком',stale:'Дані застаріли',unknown:'Графіка немає',suspended:'Графік не діє'}[status]||'Графіка немає')+'</span></div>';if(known)html+='<div class="metric-summary"><div class="metric-primary"><strong>'+mins+'</strong><span>Без світла</span></div><div class="metric-secondary"><strong>'+lightMins+'</strong><span>Зі світлом</span></div><span class="metric-info-control count-control" id="metricInfoControl"><button type="button" class="metric-info-trigger" id="metricInfoTrigger" aria-label="Пояснення часу зі світлом і без світла" aria-describedby="metricInfoTooltip" aria-expanded="false">i</button><span class="count-tooltip metric-info-tooltip" id="metricInfoTooltip" role="tooltip"><b>Що означають ці цифри?</b><span>Підрахунок за добу: від 00:00 до 24:00.</span><span><strong>Без світла</strong> — сумарна тривалість запланованих відключень.</span><span><strong>Зі світлом</strong> — решта часу за графіком (24 години мінус відключення).</span></span></span></div>';if(locationId==='obolonskyi54')html+='<div class="address-note">Група 4.1 попередня — потрібна адресна перевірка ДТЕК</div>';else if(locationId!=='dacha'&&!activeLocation()?.address_verified)html+='<div class="address-note">Група з попереднього адресного довідника; потрібна перевірка ДТЕК</div>';if(status==='stale')html+='<div class="alert">Останній відомий графік. Нові джерела його не підтвердили.</div>';if(status==='suspended')html+='<div class="alert">Графік не діє. Показано заплановані раніше години.</div>';html+='<div class="graph"><div class="bar '+(!known?'unknown ':status==='stale'||status==='suspended'?'stale':'')+'">';if(known)out.forEach(x=>html+='<i class="off" style="left:'+pct(minute(x[0]))+'%;width:'+pct(minute(x[1])-minute(x[0]))+'%"></i>');html+='</div><span class="axis start">00:00</span><span class="axis end">24:00</span>';if(known){const boundaries=[...new Set(out.flatMap(x=>x).filter(t=>t!=='00:00'&&t!=='24:00'))];boundaries.forEach(t=>{html+='<span class="axis up outage-boundary" data-boundary-minute="'+minute(t)+'" style="left:'+pct(minute(t))+'%">'+esc(t)+'</span>'})}if(tab==='today')html+='<div class="marker" id="marker"><em id="markerLabel">--:--</em><i></i></div>';html+='<div class="inspector" id="inspector" hidden><em id="inspectLabel">00:00</em><i></i></div></div>';html+='<details class="schedule-details" '+(wasExpanded?'open':'')+'><summary>Інтервали та джерела <span class="chevron" aria-hidden="true"></span></summary><div class="schedule-body">';if(known)html+=out.length?'<div class="intervals">'+out.map(x=>{const palette=sourcePalette;const dots=Object.entries(e.source_reports||{}).filter(([name,r])=>r.status==='match'&&Array.isArray(r.outages)&&r.outages.some(v=>v[0]===x[0]&&v[1]===x[1])).map(([name])=>'<i class="interval-source-dot" style="background:'+palette[name]+'" title="'+esc(name)+'"></i>').join('');return '<span>'+esc(x[0])+'–'+esc(x[1])+'<span class="interval-confirmers">'+dots+'</span></span>'}).join('')+'</div>':'<div class="muted">Відключень немає</div>';else html+='<div class="muted">'+esc(e.detail||'Очікуємо підтвердження')+'</div>';html+='<div class="source-list" id="sources"></div><div id="truthOverall" class="source-overall"></div></div></details>';$('display').innerHTML=html;const city=locationId!=='dacha',urls=city?{'Карта світла':e.url||'https://mapasvitla.com.ua/kyiv','КолиСвітло':'https://kolysvitlo.com/schedule/dtek_kyiv','КолиБуде':'https://kolybude.com/kyiv','ДТЕК':'https://www.dtek-kem.com.ua/ua/shutdowns','Alerts Energy':'https://alerts.energy/kyiv'}:{'Карта світла':e.url||'https://mapasvitla.com.ua/kyivska-oblast/dtek-krem/3.1','КолиСвітло':'https://kolysvitlo.com/schedule/dtek_kyiv_oblast','КолиБуде':'https://kolybude.com/kyiv-oblast','Київщина.info':'https://kyivshchyna.info/hrafik-vidkliuchen-svitla-kyivska-oblast/','Alerts Energy':'https://alerts.energy/kyivska-oblast'},colors=sourcePalette,rows=e.source_reports||{},allMatch=Object.values(rows).filter(r=>r?.status==='match').length;const states={match:'Збігається',diff:'Інші години',partial:'Погодинний прогноз',old:'Не оновлено',unavailable:'Немає даних'};function fmtRanges(r){if(!Array.isArray(r?.outages))return 'Години не отримано';const periods=r.outages.map(x=>esc(x[0])+'–'+esc(x[1]));if(Array.isArray(r.partial)&&r.partial.length)periods.push('Частково: '+r.partial.map(esc).join(', '));return periods.length?periods.join(' · '):'Без планових відключень'}$('sources').innerHTML=Object.entries(urls).map(([name,url])=>{const r=rows[name]||{status:'unavailable',outages:null},type=r.status||'unavailable',sourceUrl=r.url||url;return '<div class="source-row"><span class="source-icon" style="background:'+colors[name]+'"></span><div class="source-main"><div class="source-head"><a href="'+esc(sourceUrl)+'" target="_blank" rel="noopener">'+esc(name)+'</a><span class="source-verdict '+(type==='match'?'source-good':'source-bad')+'"><i></i>'+esc(r.fetch_failed?'Недоступне серверу':states[type]||'Немає даних')+'</span></div><div class="source-times">'+(r.fetch_failed?'Попередні дані: ':'')+fmtRanges(r)+'</div></div></div>'}).join('')+'<div class="last-check"><span class="verified-time">Перевірено: '+esc(formatChecked(data?.updated_at))+'</span><span class="refresh-clock" title="Індикатор давності останнього фактичного збору. Натисни, щоб оновити сторінку"><svg class="refresh-ring" viewBox="0 0 24 24" aria-hidden="true"><circle class="ring-track" cx="12" cy="12" r="9"></circle><circle class="ring-progress" id="refreshArc" cx="12" cy="12" r="9"></circle></svg><span id="refreshCountdown">Перевіряємо стан</span></span></div>';const healthy=status==='normal'&&allMatch>=2;$('truthOverall').innerHTML='<span class="overall-state '+(healthy?'is-healthy':'is-unhealthy')+'"><i></i>'+(healthy?'Графік підтверджено':status==='unknown'?'Графік не підтверджено':'Останній графік не підтверджено')+'</span><span class="overall-count">'+allMatch+' із '+Object.keys(urls).length+' джерел збігаються</span>';document.querySelectorAll('[data-tab]').forEach(b=>b.setAttribute('aria-selected',String(b.dataset.tab===tab)));modeShown=status;updateTomorrowTab();bindInspector(out,known);move(n);updateRefreshRing()}function bindInspector(out,known){const graph=document.querySelector('#display .graph'),inspect=$('inspector'),label=$('inspectLabel');if(!graph||!inspect||!label)return;const show=e=>{const box=graph.getBoundingClientRect();if(!box.width)return;const p=Math.max(0,Math.min(1,(e.clientX-box.left)/box.width)),m=Math.min(1439,Math.floor(p*1440)),hh=String(Math.floor(m/60)).padStart(2,'0'),mm=String(m%60).padStart(2,'0'),isOff=out.some(a=>m>=minute(a[0])&&m<minute(a[1]));inspect.style.left=(p*100)+'%';inspect.hidden=false;label.textContent=hh+':'+mm+' · '+(!known?'невідомо':isOff?'немає світла':'світло');label.style.transform=p<0.17?'translateX(0)':p>0.83?'translateX(-100%)':'translateX(-50%)';label.style.left=p<0.17||p>0.83?'0':'50%';inspect.classList.toggle('during-outage',known&&isOff)};graph.addEventListener('pointerenter',show);graph.addEventListener('pointermove',show);graph.addEventListener('pointerdown',show);graph.addEventListener('pointerleave',()=>{inspect.hidden=true});graph.addEventListener('pointerup',e=>{if(e.pointerType==='touch'||e.pointerType==='pen')inspect.hidden=true});graph.addEventListener('pointercancel',()=>{inspect.hidden=true});graph.addEventListener('touchend',()=>{inspect.hidden=true},{passive:true});graph.addEventListener('touchcancel',()=>{inspect.hidden=true},{passive:true});document.addEventListener('pointerup',e=>{if(e.pointerType==='touch')inspect.hidden=true})}function move(n){
  const m=$('marker');
  if(m){
   m.style.left=pct(n.h*60+n.m+0.5)+'%';
@@ -408,53 +440,115 @@ function updateRefreshRing(){
  }
  label.textContent=message;
 }
+let refreshing=false;
 function forcePageRefresh(){
- const indicator=$('pullRefresh'),text=$('pullRefreshText');
- if(indicator){indicator.classList.add('pull-working');indicator.classList.remove('pull-ready')}
+ if(refreshing)return;
+ refreshing=true;
+ const badge=$('pullRefresh'),text=$('pullRefreshText');
+ if(badge){
+   badge.classList.add('pull-visible','pull-working');
+   badge.classList.remove('pull-ready');
+   badge.style.removeProperty('--pulldown');
+ }
  if(text)text.textContent='Оновлюємо…';
- window.setTimeout(()=>window.location.reload(),230);
+ // Leave a visible spin before a true full-page reload.
+ window.setTimeout(()=>window.location.reload(),550);
 }
 function installPullToRefresh(){
- let originY=null,originX=null,pulling=false,originTop=false,pointerId=null;
- const badge=$('pullRefresh');
- document.addEventListener('touchstart',event=>{
-   if(event.touches.length!==1)return;
-   const target=event.target;
-   // Gesture begins at the top; do not hijack graph inspection or expanded lists.
-   originTop=window.scrollY<=3&&!target.closest('.graph,.schedule-details,.history,button,details,summary');
-   if(!originTop){originY=null;return}
-   originY=event.touches[0].clientY;originX=event.touches[0].clientX;
-   pulling=false;
- },{passive:true});
- document.addEventListener('touchmove',event=>{
-   if(originY===null||event.touches.length!==1||!originTop)return;
-   const dy=event.touches[0].clientY-originY;
-   const dx=event.touches[0].clientX-originX;
-   if(dy<=5||Math.abs(dx)>dy*.7)return;
-   if(window.scrollY>3){originY=null;return}
-   pulling=true;
-   event.preventDefault();
-   badge?.classList.add('pull-visible');
-   badge?.classList.toggle('pull-ready',dy>=85);
-   if(badge)badge.style.setProperty('--pulldown',Math.min(100,Math.max(0,dy)).toFixed(0)+'px');
-   if($('pullRefreshText'))$('pullRefreshText').textContent=dy>=85?'Відпусти, щоб оновити':'Потягни, щоб оновити';
- },{passive:false});
- function finish(){
-   if(originY===null)return;
-   originY=null;originX=null;originTop=false;
-   if(pulling&&badge?.classList.contains('pull-ready')){pulling=false;forcePageRefresh();return}
-   pulling=false;
+ const badge=$('pullRefresh'),text=$('pullRefreshText');
+ let startedY=null,startedX=null,startedAtTop=false,pulling=false,ready=false;
+ function resetVisual(){
    badge?.classList.remove('pull-visible','pull-ready');
    badge?.style.removeProperty('--pulldown');
+   badge?.style.removeProperty('--pull-angle');
+   if(text)text.textContent='Потягни вниз для оновлення';
  }
- document.addEventListener('touchend',finish,{passive:true});
- document.addEventListener('touchcancel',finish,{passive:true});
+ function clearGesture(){startedY=null;startedX=null;startedAtTop=false;pulling=false;ready=false}
+ document.addEventListener('touchstart',event=>{
+   if(refreshing||event.touches.length!==1){clearGesture();return}
+   // The gesture works after any interaction, including taps within
+   // the graph, cards, popovers, and open source/history sections.
+   // Only activate when the page (or its internal scroller) is at the top.
+   const target=event.target;
+   let scrolling=target;
+   while(scrolling&&scrolling!==document.body){
+     if(scrolling.scrollHeight>scrolling.clientHeight+1 &&
+        scrolling.scrollTop>2){clearGesture();return}
+     scrolling=scrolling.parentElement;
+   }
+   if(window.scrollY>3){clearGesture();return}
+   startedY=event.touches[0].clientY;
+   startedX=event.touches[0].clientX;
+   startedAtTop=true;pulling=false;ready=false;
+ },{passive:true,capture:true});
+ document.addEventListener('touchmove',event=>{
+   if(!startedAtTop||startedY===null||event.touches.length!==1||refreshing)return;
+   const dy=event.touches[0].clientY-startedY;
+   const dx=event.touches[0].clientX-startedX;
+   if(Math.abs(dx)>Math.max(15,Math.abs(dy)*.85)){clearGesture();resetVisual();return}
+   if(dy<10||window.scrollY>3)return;
+   // Prevent native overscroll only when clearly pulling down.
+   if(event.cancelable)event.preventDefault();
+   pulling=true;ready=dy>=78;
+   badge?.classList.add('pull-visible');
+   badge?.classList.toggle('pull-ready',ready);
+   badge?.style.setProperty('--pulldown',Math.min(115,dy).toFixed(0)+'px');
+   badge?.style.setProperty('--pull-angle',Math.min(290,dy*2.4).toFixed(0)+'deg');
+   if(text)text.textContent=ready?'Відпусти для оновлення':'Потягни вниз';
+ },{passive:false,capture:true});
+ document.addEventListener('touchend',()=>{
+   const shouldReload=pulling&&ready;
+   clearGesture();
+   if(shouldReload)forcePageRefresh();
+   else if(!refreshing)resetVisual();
+ },{passive:true,capture:true});
+ document.addEventListener('touchcancel',()=>{clearGesture();if(!refreshing)resetVisual()},{passive:true,capture:true});
+ // Keep the same tap-to-refresh shortcut beside "Перевірено".
  document.addEventListener('click',event=>{
-   // The time/ring row also works as an explicit refresh action on iPhone.
    if(event.target.closest('.refresh-clock'))forcePageRefresh();
  });
 }
-function tick(){const n=now();$('clock').innerHTML=n.time+'<span>'+n.display+'</span>';updateRefreshRing();const s=currentStatus(selected(n).entry);if(n.iso!==dayShown||s!==modeShown){dayShown=n.iso;paint(n);events()}move(n)}async function reload(){try{const r=await fetch('./data.json?t='+Date.now(),{cache:'no-store'});if(!r.ok)throw Error(r.status);const j=await r.json();if(!j.days||!Array.isArray(j.logs))throw Error('payload');data=j;paint();events();if(tab==='tomorrow'&&tomorrowFingerprint()&&remembered('dubechnya-tomorrow-seen-'+locationId+'-'+tomorrowFingerprint().iso)===null){markTomorrowSeen();updateTomorrowTab()}}catch(e){if(!data)paint();console.warn(e)}}function updateLocationHeader(){const c=activeLocation();const names={dacha:'Квіткова 251',obolonskyi54:'Оболонський проспект 54',ivasiuka43:'Володимира Івасюка 43',azov28b:'Героїв полку Азов 28Б'};$('locationLabel').textContent=names[locationId]||'Дача';$('locationGroup').textContent=c?.group||'—';document.querySelectorAll('[data-location]').forEach(b=>b.classList.toggle('selected',b.dataset.location===locationId))}function closeLocationMenu(){const m=$('locationMenu');m.hidden=true;$('locationButton').setAttribute('aria-expanded','false')}function selectLocation(key){if(!['dacha','obolonskyi54','ivasiuka43','azov28b'].includes(key))return;locationId=key;remember('dubechnya-selected-location',key);closeLocationMenu();paint();events()}function installDailyCounterTooltip(){
+function tick(){const n=now();$('clock').innerHTML=n.time+'<span>'+n.display+'</span>';updateRefreshRing();const s=currentStatus(selected(n).entry);if(n.iso!==dayShown||s!==modeShown){dayShown=n.iso;paint(n);events()}move(n)}async function reload(){try{const r=await fetch('./data.json?t='+Date.now(),{cache:'no-store'});if(!r.ok)throw Error(r.status);const j=await r.json();if(!j.days||!Array.isArray(j.logs))throw Error('payload');data=j;paint();events();if(tab==='tomorrow'&&tomorrowFingerprint()&&remembered('dubechnya-tomorrow-seen-'+locationId+'-'+tomorrowFingerprint().iso)===null){markTomorrowSeen();updateTomorrowTab()}}catch(e){if(!data)paint();console.warn(e)}}function updateLocationHeader(){const c=activeLocation();const names={dacha:'Квіткова 251',obolonskyi54:'Оболонський проспект 54',ivasiuka43:'Володимира Івасюка 43',azov28b:'Героїв полку Азов 28Б'};$('locationLabel').textContent=names[locationId]||'Дача';$('locationGroup').textContent=c?.group||'—';document.querySelectorAll('[data-location]').forEach(b=>b.classList.toggle('selected',b.dataset.location===locationId))}function closeLocationMenu(){const m=$('locationMenu');m.hidden=true;$('locationButton').setAttribute('aria-expanded','false')}function selectLocation(key){if(!['dacha','obolonskyi54','ivasiuka43','azov28b'].includes(key))return;locationId=key;remember('dubechnya-selected-location',key);closeLocationMenu();paint();events()}function installMetricInfoTooltip(){
+ let pressTimer=null,fromLongPress=false;
+ const control=()=>document.getElementById('metricInfoControl');
+ const button=()=>document.getElementById('metricInfoTrigger');
+ const close=()=>{
+   const parent=control(),trigger=button();
+   parent?.classList.remove('open');
+   trigger?.setAttribute('aria-expanded','false');
+ };
+ const toggle=()=>{
+   const parent=control(),trigger=button();
+   if(!parent||!trigger)return;
+   const open=!parent.classList.contains('open');
+   parent.classList.toggle('open',open);
+   trigger.setAttribute('aria-expanded',String(open));
+ };
+ document.addEventListener('pointerdown',event=>{
+   if(!event.target.closest('#metricInfoTrigger'))return;
+   if(event.pointerType==='touch'){
+     fromLongPress=false;
+     pressTimer=window.setTimeout(()=>{
+       const parent=control(),trigger=button();
+       parent?.classList.add('open');
+       trigger?.setAttribute('aria-expanded','true');
+       fromLongPress=true;
+     },450);
+   }
+ });
+ ['pointerup','pointercancel'].forEach(type=>document.addEventListener(type,()=>{
+   if(pressTimer!==null){clearTimeout(pressTimer);pressTimer=null}
+ }));
+ document.addEventListener('click',event=>{
+   if(event.target.closest('#metricInfoTrigger')){
+     event.preventDefault();event.stopPropagation();
+     if(!fromLongPress)toggle();
+     fromLongPress=false;
+   }else if(!event.target.closest('#metricInfoControl'))close();
+ });
+ document.addEventListener('keydown',event=>{if(event.key==='Escape')close()});
+}
+function installDailyCounterTooltip(){
  const control=$('changeCountControl'),count=$('changeDailyCount');
  if(!control||!count)return;
  let hold=null;
@@ -482,4 +576,4 @@ function tick(){const n=now();$('clock').innerHTML=n.time+'<span>'+n.display+'</
    if(!control.contains(event.target))control.classList.remove('open');
  });
 }
-$('locationButton').onclick=()=>{const menu=$('locationMenu');menu.hidden=!menu.hidden;$('locationButton').setAttribute('aria-expanded',String(!menu.hidden))};document.querySelectorAll('[data-location]').forEach(b=>b.onclick=()=>selectLocation(b.dataset.location));document.addEventListener('click',e=>{if(!e.target.closest('.location-shell'))closeLocationMenu()});document.addEventListener('keydown',e=>{if(e.key==='Escape')closeLocationMenu()});const restored=remembered('dubechnya-selected-location');if(['dacha','obolonskyi54','ivasiuka43','azov28b'].includes(restored))locationId=restored;document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{tab=b.dataset.tab;if(tab==='tomorrow')markTomorrowSeen();paint();events()});dayShown=now().iso;tick();reload();checkGithubRuns();installPullToRefresh();installDailyCounterTooltip();setInterval(tick,1000);setInterval(reload,60000);setInterval(checkGithubRuns,6*60000);document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'){reload();if(Date.now()-githubCheckedAt>3*60000)checkGithubRuns()}else{remember('dubechnya-selected-location',locationId)}});window.addEventListener('pagehide',()=>remember('dubechnya-selected-location',locationId));if('serviceWorker' in navigator){navigator.serviceWorker.register('./sw.js').catch(e=>console.warn('Offline shell unavailable',e))}})();</script></html>
+$('locationButton').onclick=()=>{const menu=$('locationMenu');menu.hidden=!menu.hidden;$('locationButton').setAttribute('aria-expanded',String(!menu.hidden))};document.querySelectorAll('[data-location]').forEach(b=>b.onclick=()=>selectLocation(b.dataset.location));document.addEventListener('click',e=>{if(!e.target.closest('.location-shell'))closeLocationMenu()});document.addEventListener('keydown',e=>{if(e.key==='Escape')closeLocationMenu()});const restored=remembered('dubechnya-selected-location');if(['dacha','obolonskyi54','ivasiuka43','azov28b'].includes(restored))locationId=restored;document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{tab=b.dataset.tab;if(tab==='tomorrow')markTomorrowSeen();paint();events()});dayShown=now().iso;tick();reload();checkGithubRuns();installPullToRefresh();installDailyCounterTooltip();installMetricInfoTooltip();setInterval(tick,1000);setInterval(reload,60000);setInterval(checkGithubRuns,6*60000);document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'){reload();if(Date.now()-githubCheckedAt>3*60000)checkGithubRuns()}else{remember('dubechnya-selected-location',locationId)}});window.addEventListener('pagehide',()=>remember('dubechnya-selected-location',locationId));if('serviceWorker' in navigator){navigator.serviceWorker.register('./sw.js').catch(e=>console.warn('Offline shell unavailable',e))}})();</script></html>
