@@ -110,6 +110,24 @@
           "19:30"
         ]
       ],
+      "source_observations": {
+        "Alerts Energy": {
+          "fingerprint": "[[\"16:00\", \"19:30\"]]",
+          "first_seen": "2026-10-25T14:53+02:00"
+        },
+        "Київщина.info": {
+          "fingerprint": "[[\"16:00\", \"19:30\"]]",
+          "first_seen": "2026-10-25T14:53+02:00"
+        },
+        "КолиБуде": {
+          "fingerprint": "[[\"16:00\", \"19:30\"]]",
+          "first_seen": "2026-10-25T14:53+02:00"
+        },
+        "КолиСвітло": {
+          "fingerprint": "[[\"16:00\", \"19:30\"]]",
+          "first_seen": "2026-10-25T14:53+02:00"
+        }
+      },
       "source_reports": {
         "Alerts Energy": {
           "outages": [
@@ -185,6 +203,7 @@
       "date": "2026-10-26",
       "detail": "Немає підтверджених даних",
       "outages": [],
+      "source_observations": {},
       "source_reports": {
         "Alerts Energy": {
           "outages": null,
@@ -238,6 +257,20 @@
               "19:00"
             ]
           ],
+          "source_observations": {
+            "Alerts Energy": {
+              "fingerprint": "[[\"15:00\", \"19:00\"]]",
+              "first_seen": "2026-10-25T14:53+02:00"
+            },
+            "КолиБуде": {
+              "fingerprint": "[[\"15:00\", \"19:00\"]]",
+              "first_seen": "2026-10-25T14:53+02:00"
+            },
+            "КолиСвітло": {
+              "fingerprint": "[[\"15:00\", \"19:00\"]]",
+              "first_seen": "2026-10-25T14:53+02:00"
+            }
+          },
           "source_reports": {
             "Alerts Energy": {
               "outages": [
@@ -304,6 +337,7 @@
           "detail": "Немає підтверджених даних",
           "group": "10.1",
           "outages": [],
+          "source_observations": {},
           "source_reports": {
             "Alerts Energy": {
               "outages": null,
@@ -384,6 +418,20 @@
               "24:00"
             ]
           ],
+          "source_observations": {
+            "Alerts Energy": {
+              "fingerprint": "[[\"09:00\", \"12:30\"], [\"22:00\", \"24:00\"]]",
+              "first_seen": "2026-10-25T14:53+02:00"
+            },
+            "КолиБуде": {
+              "fingerprint": "[[\"09:00\", \"12:30\"], [\"22:00\", \"24:00\"]]",
+              "first_seen": "2026-10-25T14:53+02:00"
+            },
+            "КолиСвітло": {
+              "fingerprint": "[[\"09:00\", \"12:30\"], [\"22:00\", \"24:00\"]]",
+              "first_seen": "2026-10-25T14:53+02:00"
+            }
+          },
           "source_reports": {
             "Alerts Energy": {
               "outages": [
@@ -466,6 +514,7 @@
           "detail": "Немає підтверджених даних",
           "group": "4.1",
           "outages": [],
+          "source_observations": {},
           "source_reports": {
             "Alerts Energy": {
               "outages": null,
@@ -546,6 +595,20 @@
               "24:00"
             ]
           ],
+          "source_observations": {
+            "Alerts Energy": {
+              "fingerprint": "[[\"09:00\", \"12:30\"], [\"22:00\", \"24:00\"]]",
+              "first_seen": "2026-10-25T14:53+02:00"
+            },
+            "КолиБуде": {
+              "fingerprint": "[[\"09:00\", \"12:30\"], [\"22:00\", \"24:00\"]]",
+              "first_seen": "2026-10-25T14:53+02:00"
+            },
+            "КолиСвітло": {
+              "fingerprint": "[[\"09:00\", \"12:30\"], [\"22:00\", \"24:00\"]]",
+              "first_seen": "2026-10-25T14:53+02:00"
+            }
+          },
           "source_reports": {
             "Alerts Energy": {
               "outages": [
@@ -628,6 +691,7 @@
           "detail": "Немає підтверджених даних",
           "group": "4.1",
           "outages": [],
+          "source_observations": {},
           "source_reports": {
             "Alerts Energy": {
               "outages": null,
