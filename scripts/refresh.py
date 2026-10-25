@@ -254,6 +254,21 @@ def change(old,new):
     return 'Змінено графік: '+fmt(old['outages'])+' → '+fmt(new['outages'])
 
 
+def make_log_event(now,target,old,new,message):
+    """Log the time this checker DETECTED a change, not an inferred source publish time."""
+    changed=(old.get('status') in ('normal','stale') and 'outages' in old
+             and old.get('outages') != new.get('outages'))
+    return {
+        'at':now.isoformat(timespec='minutes'),
+        'date':target.isoformat(),
+        'kind':'changed' if changed else 'published',
+        'before':old.get('outages') if changed else None,
+        'after':new.get('outages',[]),
+        'message':message,
+        'sources_confirmed':new.get('sources',[])
+    }
+
+
 CITY_KOLY = 'https://kolysvitlo.com/schedule/dtek_kyiv'
 CITY_BUDE = 'https://kolybude.com/kyiv'
 CITY_DTEK = 'https://www.dtek-kem.com.ua/ua/shutdowns'
@@ -367,8 +382,7 @@ def update_city_locations(now,today,old,errors):
             entry['group']=config['group']
             days[target.isoformat()]=entry
             msg=change(prev,entry)
-            if msg:logs.insert(0,{'at':now.isoformat(timespec='minutes'),'date':target.isoformat(),
-                                   'message':msg,'sources_confirmed':entry['sources']})
+            if msg:logs.insert(0,make_log_event(now,target,prev,entry,msg))
         logs=[x for x in logs if x.get('date','0000')>=(today-timedelta(days=6)).isoformat()][:60]
         result[key]={'name':config['name'],'group':config['group'],'address_verified':config['address_verified'],
                      'days':days,'logs':logs,'operator':'ДТЕК Київські електромережі'}
@@ -400,7 +414,7 @@ def main():
         entry['source_reports']=source_reports(entry,bez,a,b,region,live,previous,alerts)
         days[target.isoformat()]=entry
         event=change(previous,entry)
-        if event:logs.insert(0,{'at':now.isoformat(timespec='minutes'),'date':target.isoformat(),'message':event,'sources_confirmed':entry.get('sources',[])})
+        if event:logs.insert(0,make_log_event(now,target,previous,entry,event))
     logs=[x for x in logs if x.get('date','0000')>=(today-timedelta(days=6)).isoformat()][:60]
     save={'days':{k:v for k,v in old.get('days',{}).items() if k>=(today-timedelta(days=2)).isoformat()},'logs':logs}
     save['days'].update(days)
