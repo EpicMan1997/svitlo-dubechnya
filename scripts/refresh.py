@@ -432,6 +432,7 @@ def main():
     days={};logs=list(old.get('logs',[]))
     for target in (today,tomorrow):
         bez_url=BEZ+target.isoformat()
+        dacha_fetch_error_start=len(errors)
         html=fetch(bez_url,'БезСвітла Вища Дубечня',errors)
         bez=parse_bez(html,target) if html else {'candidates':[],'updated':'','unpublished':False}
         if not bez['candidates']:
@@ -446,7 +447,7 @@ def main():
             # It may be readable in a visitor's normal browser.
             bez_url=region_url
         bez['url']=bez_url
-        bez['fetch_failed']=any(item.startswith('БезСвітла ') and 'HTTP ' in item for item in errors) and not bez['candidates']
+        bez['fetch_failed']=any(item.startswith('БезСвітла ') and 'HTTP ' in item for item in errors[dacha_fetch_error_start:]) and not bez['candidates']
         a=parse_kolysvitlo(koly,target,today) if koly else None
         
         b=parse_kolybude(bude,target,today) if bude else None
