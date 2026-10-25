@@ -16,6 +16,7 @@ STATE = ROOT / 'state' / 'state.json'
 OUTPUT = ROOT / 'site' / 'data.json'
 KYIV = ZoneInfo('Europe/Kyiv')
 BEZ = 'https://bezsvitla.com.ua/kyivska-oblast/pirnivska-hromada/visa-dubecna/grafik-na-'
+BEZ_REGION = 'https://bezsvitla.com.ua/kyivska-oblast/grafik-na-'
 KOLY = 'https://kolysvitlo.com/schedule/dtek_kyiv_oblast'
 KOLBUDE = 'https://kolybude.com/kyiv-oblast'
 DTEK = 'https://www.dtek-krem.com.ua/ua/shutdowns'
@@ -237,7 +238,7 @@ def choose(day,bez,koly,bude,old,additional=None):
             votes[intervals].add(source)
     for option in bez['candidates']: votes[option].add('БезСвітла')
     confirmed=sorted(((len(s),off,s) for off,s in votes.items() if len(s)>=2),key=lambda x:x[0],reverse=True)
-    base={'date':day.isoformat(),'url':BEZ+day.isoformat(),'source_updated':bez['updated']}
+    base={'date':day.isoformat(),'url':bez.get('url',BEZ+day.isoformat()),'source_updated':bez['updated']}
     if confirmed and (len(confirmed)==1 or confirmed[0][0]>confirmed[1][0]):
         _,ranges,sources=confirmed[0]
         return {**base,'status':'normal','outages':[list(x) for x in ranges],'sources':sorted(sources),'detail':'Зіставлено незалежні джерела'}
@@ -254,6 +255,32 @@ def change(old,new):
     return 'Змінено графік: '+fmt(old['outages'])+' → '+fmt(new['outages'])
 
 
+def record_source_observations(now, previous, entry):
+    """Persist first observation of each source's currently published interval set."""
+    seen=previous.get('source_observations',{})
+    observed={}
+    stamp=now.isoformat(timespec='minutes')
+    for name,report in entry.get('source_reports',{}).items():
+        # A carried-over 'old' value is NOT a newly checked source report.
+        if report.get('status') in ('old','unavailable') or not isinstance(report.get('outages'),list):
+            continue
+        fingerprint=json.dumps(report['outages'],ensure_ascii=False,sort_keys=True)
+        prior=seen.get(name,{})
+        observed[name]={'fingerprint':fingerprint,
+                         'first_seen':prior['first_seen'] if prior.get('fingerprint')==fingerprint and prior.get('first_seen') else stamp}
+    entry['source_observations']=observed
+    return entry
+
+def earliest_observed_source(entry):
+    """A single first observed signal, only if there was no timestamp tie."""
+    target=json.dumps(entry.get('outages',[]),ensure_ascii=False,sort_keys=True)
+    candidates=[(x['first_seen'],name) for name,x in entry.get('source_observations',{}).items()
+                if x.get('fingerprint')==target and name in entry.get('sources',[])]
+    if not candidates:return None
+    best=min(t for t,_ in candidates)
+    leaders=[name for stamp,name in candidates if stamp==best]
+    return leaders[0] if len(leaders)==1 else None
+
 def make_log_event(now,target,old,new,message):
     """Log the time this checker DETECTED a change, not an inferred source publish time."""
     changed=(old.get('status') in ('normal','stale') and 'outages' in old
@@ -265,7 +292,8 @@ def make_log_event(now,target,old,new,message):
         'before':old.get('outages') if changed else None,
         'after':new.get('outages',[]),
         'message':message,
-        'sources_confirmed':new.get('sources',[])
+        'sources_confirmed':new.get('sources',[]),
+        'first_observed_source':earliest_observed_source(new)
     }
 
 
@@ -379,6 +407,7 @@ def update_city_locations(now,today,old,errors):
             entry=choose(target,bez,koly,bude,prev,{'Alerts Energy':alerts})
             entry['url']=url
             entry['source_reports']=city_sources(entry,bez,koly,bude,config['street'],prev,alerts)
+            record_source_observations(now,prev,entry)
             entry['group']=config['group']
             days[target.isoformat()]=entry
             msg=change(prev,entry)
@@ -401,8 +430,18 @@ def main():
     city=update_city_locations(now,today,old,errors)
     days={};logs=list(old.get('logs',[]))
     for target in (today,tomorrow):
-        html=fetch(BEZ+target.isoformat(),'БезСвітла',errors)
+        bez_url=BEZ+target.isoformat()
+        html=fetch(bez_url,'БезСвітла Вища Дубечня',errors)
         bez=parse_bez(html,target) if html else {'candidates':[],'updated':'','unpublished':False}
+        if not bez['candidates']:
+            # The village page can remain unpublished even while the oblast's queue 3.1 is current.
+            # This is the SAME source, not a sixth independent vote.
+            region_url=BEZ_REGION+target.isoformat()
+            region_page=fetch(region_url,'БезСвітла Київська область',errors)
+            region_bez=parse_bez(region_page,target) if region_page else {'candidates':[],'updated':'','unpublished':False}
+            if region_bez['candidates']:
+                bez,bez_url=region_bez,region_url
+        bez['url']=bez_url
         a=parse_kolysvitlo(koly,target,today) if koly else None
         
         b=parse_kolybude(bude,target,today) if bude else None
@@ -412,6 +451,7 @@ def main():
         alerts=parse_alerts(region_alerts,target,'3.1','kyivska_oblast_oblenergo')
         entry=choose(target,bez,a,b,previous,{'Київщина.info':region,'Alerts Energy':alerts})
         entry['source_reports']=source_reports(entry,bez,a,b,region,live,previous,alerts)
+        record_source_observations(now,previous,entry)
         days[target.isoformat()]=entry
         event=change(previous,entry)
         if event:logs.insert(0,make_log_event(now,target,previous,entry,event))
