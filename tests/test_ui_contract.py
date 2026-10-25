@@ -47,8 +47,10 @@ class VisualStatusContract(unittest.TestCase):
 
     def test_historic_event_does_not_claim_unverified_first_signal(self):
         self.assertIn("Одне з джерел, що підтвердили зміну:", HTML)
-        self.assertIn("knownFirst?'Перший сигнал':'Підтвердив'", HTML)
-        self.assertIn("item.sources_confirmed.find(n=>sourcePalette[n])", HTML)
+        self.assertIn("const name=first||confirmed;", HTML)
+        self.assertIn("item.sources_confirmed.find(x=>sourcePalette[x])", HTML)
+        self.assertIn("info.first?'Перший сигнал':'Підтвердив'", HTML)
+        self.assertIn("change-source-name", HTML)
 
 
 if __name__ == '__main__':
