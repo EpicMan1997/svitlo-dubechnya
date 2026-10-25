@@ -57,6 +57,18 @@ class VisualStatusContract(unittest.TestCase):
         self.assertIn("yesterday-count.many", HTML)
         self.assertIn("item.date===yesterday&&eventKind(item)==='changed'", HTML)
 
+    def test_yesterday_compact_and_unknown_archive(self):
+        self.assertIn("'Зміни і графік '+yDate", HTML)
+        self.assertIn("hoursAndMinutes(yMinutes)+' без світла'", HTML)
+        self.assertIn(".yesterday-count.zero{color:#94a3b8}", HTML)
+        self.assertIn("['normal','stale','suspended'].includes(saved.status)", HTML)
+        self.assertNotIn("Графік за цей день не збережений", HTML)
+        self.assertNotIn("Зміни графіка: '+count", HTML)
+
+    def test_open_tomorrow_tab_marks_every_new_version_as_seen(self):
+        self.assertIn("if(tab==='tomorrow'&&tomorrowFingerprint()){markTomorrowSeen();updateTomorrowTab()}", HTML)
+        self.assertIn("setInterval(reload,30000)", HTML)
+
     def test_historic_event_does_not_claim_unverified_first_signal(self):
         self.assertIn("Одне з джерел, що підтвердили зміну:", HTML)
         self.assertIn("const name=first||confirmed;", HTML)
