@@ -185,6 +185,49 @@ h1{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .first-source i{width:13px;height:13px;border:1px solid #ffffff4d}
 .change-source-label{color:#9cb0c7;font-size:12px}
 
+
+/* Timeline labels: same text baseline for white labels and yellow current time.
+   The yellow line stops above the lower labels and uses the real time-coordinate.
+   No transitions, so boundaries switch rows instantly. */
+.graph .axis.up { top:16px; line-height:22px; }
+.graph .axis.down { top:94px; line-height:22px; }
+.graph .marker {
+  top:0;
+  width:0;
+  height:115px;
+  transform:none;
+  pointer-events:none;
+}
+.graph .marker em {
+  position:absolute;
+  top:15px;
+  left:0;
+  display:block;
+  margin:0;
+  padding:2px 7px;
+  border:1px solid #98741b;
+  border-radius:7px;
+  background:#302a20;
+  color:#facc15;
+  font:700 12px/18px system-ui,-apple-system,"Segoe UI",sans-serif;
+  white-space:nowrap;
+  transform:translateX(-50%);
+}
+.graph .marker i {
+  position:absolute;
+  top:39px;
+  left:-1px;
+  width:2px;
+  height:49px;
+  margin:0;
+  display:block;
+  background:#facc15;
+}
+.graph .axis.outage-boundary,
+.graph .marker,
+.graph .marker em,
+.graph .marker i {transition:none!important;}
+
 /* Timeline labels change lanes instantly; no animation. */
 .axis.outage-boundary{transition:none!important}
 </style>
@@ -215,30 +258,25 @@ function remember(k,v){
  updateBoundaryLanes(n);
 }
 function updateBoundaryLanes(n){
- // 00:00 and 24:00 remain below the timeline at all times.
- // All other blackout boundaries normally remain above.
+ // 00:00 and 24:00 stay below. Every outage start/end is usually above.
+ // During the 30-minute window on either side (or an actual pixel collision),
+ // the respective white label moves below, without animation.
  const graph=document.querySelector('#display .graph');
  if(!graph)return;
- const labels=graph.querySelectorAll('.axis.outage-boundary');
  const marker=$('marker');
- const markerBadge=marker?.querySelector('em');
- const markerBounds=markerBadge?.getBoundingClientRect();
- const graphBounds=graph.getBoundingClientRect();
- const minuteNow=n.h*60+n.m+n.s/60;
- labels.forEach(label=>{
+ const badge=marker?.querySelector('em');
+ const badgeRect=badge?.getBoundingClientRect();
+ const currentMinute=n.h*60+n.m+n.s/60;
+ graph.querySelectorAll('.axis.outage-boundary').forEach(label=>{
   const boundary=Number(label.dataset.boundaryMinute);
-  // Move each start/end boundary below for 30 minutes before and after.
-  let moveBelow=Boolean(marker)&&Math.abs(boundary-minuteNow)<=30;
-  // Narrow iPhone screens can collide even outside ±30 min.
-  // Check the badge's real pixel width so no visible labels overlap.
-  if(!moveBelow&&markerBounds?.width>0&&graphBounds.width>0){
-   const labelCenter=graphBounds.left+graphBounds.width*boundary/1440;
-   const labelHalfWidth=label.getBoundingClientRect().width/2;
-   moveBelow=markerBounds.left<=labelCenter+labelHalfWidth+5&&
-             markerBounds.right>=labelCenter-labelHalfWidth-5;
+  let below=Boolean(marker)&&Math.abs(boundary-currentMinute)<=30;
+  if(!below&&badgeRect?.width>0){
+   // True rendered geometry; includes iPhone viewport width and text scaling.
+   const r=label.getBoundingClientRect();
+   below=badgeRect.left<=r.right+5&&badgeRect.right>=r.left-5;
   }
-  label.classList.toggle('down',moveBelow);
-  label.classList.toggle('up',!moveBelow);
+  label.classList.toggle('down',below);
+  label.classList.toggle('up',!below);
  });
 }
 const sourcePalette={
