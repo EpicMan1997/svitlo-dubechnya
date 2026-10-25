@@ -45,6 +45,15 @@ class VisualStatusContract(unittest.TestCase):
         self.assertEqual(len(set(colors[name] for name in names)), 5)
         self.assertEqual(colors['ДТЕК'], colors['Київщина.info'])
 
+    def test_yesterday_archive_and_comparison(self):
+        refresh = ROOT.joinpath("scripts/refresh.py").read_text(encoding="utf-8")
+        self.assertIn("'days':visible_days", refresh)
+        self.assertIn("'days':visible_days,'logs':logs,'operator':", refresh)
+        self.assertIn("if k>=(today-timedelta(days=2)).isoformat()", refresh)
+        self.assertIn("function changeComparison(parts){", HTML)
+        self.assertIn("hoursAndMinutes(yMinutes)+' / 24 год без світла'", HTML)
+        self.assertIn("item.date===yesterday&&eventKind(item)==='changed'", HTML)
+
     def test_historic_event_does_not_claim_unverified_first_signal(self):
         self.assertIn("Одне з джерел, що підтвердили зміну:", HTML)
         self.assertIn("const name=first||confirmed;", HTML)

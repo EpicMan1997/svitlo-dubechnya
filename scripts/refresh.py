@@ -429,7 +429,8 @@ def update_city_locations(now,today,old,errors):
     old_locations=old.get('locations',{})
     for key,config in CITY_LOCATIONS.items():
         old_loc=old_locations.get(key,{})
-        days={}
+        days={k:v for k,v in old_loc.get('days',{}).items()
+              if k>=(today-timedelta(days=2)).isoformat()}
         logs=list(old_loc.get('logs',[]))
         for target in (today,today+timedelta(days=1)):
             url=MAP_CITY_PREFIX+config['group']
@@ -491,7 +492,12 @@ def main():
     STATE.parent.mkdir(exist_ok=True,parents=True)
     content=json.dumps(save,ensure_ascii=False,indent=2,sort_keys=True)+'\n'
     if not STATE.exists() or STATE.read_text(encoding='utf-8')!=content:STATE.write_text(content,encoding='utf-8')
-    payload={'updated_at':now.isoformat(timespec='seconds'),'today_date':today.isoformat(),'tomorrow_date':tomorrow.isoformat(),'days':days,'logs':logs,'locations':{'dacha':{'name':'Квіткова 251 · Вища Дубечня','group':'3.1','address_verified':True,'days':days,'logs':logs,'operator':'ДТЕК Київські регіональні електромережі'},**city},'source_health':{'dtek_reachable':official is not None,'issues':errors}}
+    # Publish an archived yesterday snapshot for the historic summary card.
+    # The front end never treats yesterday's stored prediction as a live sensor.
+    visible_days={k:v for k,v in old.get('days',{}).items()
+                  if k==(today-timedelta(days=1)).isoformat()}
+    visible_days.update(days)
+    payload={'updated_at':now.isoformat(timespec='seconds'),'today_date':today.isoformat(),'tomorrow_date':tomorrow.isoformat(),'days':visible_days,'logs':logs,'locations':{'dacha':{'name':'Квіткова 251 · Вища Дубечня','group':'3.1','address_verified':True,'days':visible_days,'logs':logs,'operator':'ДТЕК Київські регіональні електромережі'},**city},'source_health':{'dtek_reachable':official is not None,'issues':errors}}
     OUTPUT.parent.mkdir(exist_ok=True,parents=True)
     OUTPUT.write_text(json.dumps(payload,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
     print('Checked:',now.isoformat(timespec='minutes'),[(d,e['status'],e['outages']) for d,e in days.items()])
