@@ -167,8 +167,19 @@ h1{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .event-source-dots i{display:inline-block;width:9px;height:9px;border-radius:99px;flex:none}
 .older{margin-top:12px}
 .older>summary{font-size:12px;font-weight:650;color:#bcd0e8}
+
+/* A count, not an expandable preview. Info appears on hover, keyboard focus or long press. */
+.count-control{position:relative;display:inline-flex;vertical-align:middle}
+.count-control .change-count{cursor:help;touch-action:manipulation}
+.count-control .count-tooltip{display:none;position:absolute;left:50%;bottom:calc(100% + 10px);
+ transform:translateX(-50%);z-index:100;width:245px;max-width:calc(100vw - 55px);
+ background:#243c57;color:#e1eaf7;border:1px solid #65809f;border-radius:10px;
+ padding:11px 12px;font:500 12px/1.45 system-ui;white-space:normal;box-shadow:0 10px 20px #0007}
+.count-control:hover .count-tooltip,.count-control:focus-within .count-tooltip,.count-control.open .count-tooltip{display:block}
+.first-source{display:inline-flex;vertical-align:middle;align-items:center;min-width:14px;height:16px}
+.first-source i{display:block;width:11px;height:11px;border-radius:50%}
 </style>
-<div id="pullRefresh" class="pull-refresh" role="status" aria-live="polite"><span id="pullRefreshText">Потягни вниз для оновлення</span></div><main><header><div class="location-shell"><h1><img class="head-icon" src="./favicon.svg" alt="" aria-hidden="true"><button class="location-button" id="locationButton" type="button" aria-expanded="false"><span id="locationLabel">Квіткова 251</span><small id="locationGroup">3.1</small><span class="location-chevron" aria-hidden="true"></span></button></h1><div class="location-menu" id="locationMenu" hidden><button type="button" data-location="dacha">Квіткова 251 <small>Вища Дубечня · дача</small></button><button type="button" data-location="obolonskyi54">Оболонський проспект 54</button><button type="button" data-location="ivasiuka43">Володимира Івасюка 43</button><button type="button" data-location="azov28b">Героїв полку Азов 28Б</button></div></div><div class="header-time"><div id="clock">--:--:--</div></div></header><nav class="tabs"><button data-tab="today" aria-selected="true">Сьогодні</button><button data-tab="tomorrow" aria-selected="false" class="tomorrow-tab unavailable">Завтра<span class="new-dot" id="tomorrowUnread" hidden aria-label="Новий графік">●</span></button></nav><div class="layout"><section class="card"><div id="display"></div></section><aside class="card history"><details class="changes" id="changes"><summary><span class="changes-header"><strong>Зміни графіка <span class="change-count" id="changeDailyCount">0</span></strong><span id="latestBrief" class="changes-brief">Немає змін</span></span><span class="changes-arrow" aria-hidden="true"></span></summary><div class="changes-content"><div id="latest"></div><details id="more" class="older"><summary>Попередні події</summary><div id="older"></div></details></div></details></aside></div></main>
+<div id="pullRefresh" class="pull-refresh" role="status" aria-live="polite"><span id="pullRefreshText">Потягни вниз для оновлення</span></div><main><header><div class="location-shell"><h1><img class="head-icon" src="./favicon.svg" alt="" aria-hidden="true"><button class="location-button" id="locationButton" type="button" aria-expanded="false"><span id="locationLabel">Квіткова 251</span><small id="locationGroup">3.1</small><span class="location-chevron" aria-hidden="true"></span></button></h1><div class="location-menu" id="locationMenu" hidden><button type="button" data-location="dacha">Квіткова 251 <small>Вища Дубечня · дача</small></button><button type="button" data-location="obolonskyi54">Оболонський проспект 54</button><button type="button" data-location="ivasiuka43">Володимира Івасюка 43</button><button type="button" data-location="azov28b">Героїв полку Азов 28Б</button></div></div><div class="header-time"><div id="clock">--:--:--</div></div></header><nav class="tabs"><button data-tab="today" aria-selected="true">Сьогодні</button><button data-tab="tomorrow" aria-selected="false" class="tomorrow-tab unavailable">Завтра<span class="new-dot" id="tomorrowUnread" hidden aria-label="Новий графік">●</span></button></nav><div class="layout"><section class="card"><div id="display"></div></section><aside class="card history"><details class="changes" id="changes"><summary><span class="changes-header"><strong>Зміни графіка <span class="count-control" id="changeCountControl"><span class="change-count" id="changeDailyCount" role="button" tabindex="0" aria-label="Кількість змін графіка за вибрану добу" aria-describedby="dailyCountTooltip">0</span><span class="count-tooltip" id="dailyCountTooltip" role="tooltip">Кількість змін графіка за вибрану добу (публікація першого графіка не враховується)</span></span></strong></span><span class="changes-arrow" aria-hidden="true"></span></summary><div class="changes-content"><div id="latest"></div><details id="more" class="older"><summary>Попередні події</summary><div id="older"></div></details></div></details></aside></div></main>
 <script>(function(){'use strict';let tab='today',data=null,dayShown='',modeShown='',locationId='dacha';const $=id=>document.getElementById(id),timeF=new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/Kyiv',hour:'2-digit',minute:'2-digit',second:'2-digit',hourCycle:'h23'}),dateF=new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/Kyiv',year:'numeric',month:'2-digit',day:'2-digit'}),human=new Intl.DateTimeFormat('uk-UA',{timeZone:'UTC',day:'numeric',month:'long'}),weekdayF=new Intl.DateTimeFormat('uk-UA',{timeZone:'UTC',weekday:'long'}),checkF=new Intl.DateTimeFormat('uk-UA',{timeZone:'Europe/Kyiv',day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit',hourCycle:'h23'});function formatChecked(x){if(!x)return 'немає даних';const d=new Date(x);if(!Number.isFinite(d.getTime()))return 'немає даних';return checkF.format(d).replace(/[,\s]+/g,' ').trim()}function now(){const t=Object.fromEntries(timeF.formatToParts(new Date()).filter(x=>x.type!=='literal').map(x=>[x.type,x.value])),d=Object.fromEntries(dateF.formatToParts(new Date()).filter(x=>x.type!=='literal').map(x=>[x.type,x.value]));return {iso:d.year+'-'+d.month+'-'+d.day,time:t.hour+':'+t.minute+':'+t.second,display:d.day+'.'+d.month+'.'+d.year,h:+t.hour,m:+t.minute,s:+t.second}}function tomorrow(s){const a=s.split('-').map(Number);return new Date(Date.UTC(a[0],a[1]-1,a[2]+1)).toISOString().slice(0,10)}function minute(s){const a=s.split(':').map(Number);return a[0]*60+a[1]}function pct(x){return x*100/1440}function esc(s){return String(s??'').replace(/[&<>"']/g,x=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[x]))}function activeLocation(){return data?.locations?.[locationId]||(locationId==='dacha'?{name:'Дача · Вища Дубечня',group:'3.1',days:data?.days||{},logs:data?.logs||[],address_verified:true}:null)}function selected(n){const iso=tab==='today'?n.iso:tomorrow(n.iso);return {iso,entry:activeLocation()?.days?.[iso]||{status:'unknown',outages:[],detail:locationId==='dacha'?'Очікуємо графіка':'Потрібне підтвердження міського графіка'}}}function currentStatus(e){return e?.status||'unknown'}function tomorrowFingerprint(n){n=n||now();const iso=tomorrow(n.iso),entry=activeLocation()?.days?.[iso];if(!entry||currentStatus(entry)!=='normal'||!Array.isArray(entry.outages))return null;return {iso,hash:JSON.stringify(entry.outages)}}function remembered(k){
   let value=null;
   try{value=localStorage.getItem(k)}catch(e){}
@@ -213,10 +224,11 @@ function eventTime(item){
  const t=Date.parse(item.at||'');
  return Number.isFinite(t)?eventClock.format(new Date(t)):null;
 }
-function eventDots(item){
- const names=Array.isArray(item.sources_confirmed)?item.sources_confirmed.filter(n=>sourcePalette[n]):[];
- if(!names.length)return '';
- return '<span class="event-source-dots" aria-label="Підтвердили: '+esc(names.join(', '))+'">'+names.map(n=>'<i title="'+esc(n)+'" aria-label="'+esc(n)+'" style="background:'+sourcePalette[n]+'"></i>').join('')+'</span>';
+function firstSourceDot(item){
+ const name=item.first_observed_source;
+ const color=sourcePalette[name];
+ const explanation=color?'Перше джерело, де ми виявили цей варіант: '+name:'Перше джерело визначити неможливо: під час перевірки кілька сайтів уже показували однакові години';
+ return '<span class="first-source" title="'+esc(explanation)+'"><i style="background:'+(color||'#64748b')+'"></i></span>';
 }
 function eventCard(item){
  const kind=eventKind(item),changed=kind==='changed',parts=eventParts(item),t=eventTime(item);
@@ -225,20 +237,8 @@ function eventCard(item){
      '<span class="change-type">'+(changed?'Зміна':'Публікація')+'</span></div>'+
    (changed?'<div class="change-diff"><div class="change-before"><span>Було</span><b>'+esc(parts.before||'немає даних')+'</b></div><div class="change-after"><span>Стало</span><b>'+esc(parts.after)+'</b></div></div>':
      '<div class="change-initial">'+esc(parts.after)+'</div>')+
-   (eventDots(item)?'<div class="change-sources"><span>Підтвердили</span>'+eventDots(item)+'</div>':'')+
+   '<div class="change-sources"><span>Перший сигнал</span>'+firstSourceDot(item)+'</div>'+
  '</div>';
-}
-function eventBrief(item){
- if(!item)return 'За цю дату подій немає';
- const parts=eventParts(item),when=eventTime(item)||'—';
- if(eventKind(item)==='published')return when+' · графік опубліковано';
- const orig=parts.before||'',next=parts.after||'';
- const oldIntervals=orig.split(', ').filter(Boolean),newIntervals=next.split(', ').filter(Boolean);
- const removed=oldIntervals.filter(t=>!newIntervals.includes(t));
- const added=newIntervals.filter(t=>!oldIntervals.includes(t));
- if(removed.length&&added.length===0)return when+' · − '+removed.join(', ');
- if(added.length&&removed.length===0)return when+' · + '+added.join(', ');
- return when+' · графік змінено';
 }
 function events(){
  const day=tab==='today'?now().iso:tomorrow(now().iso);
@@ -246,7 +246,7 @@ function events(){
  const edits=logs.filter(item=>eventKind(item)==='changed').length;
  $('changeDailyCount').textContent=String(edits);
  $('changeDailyCount').title=edits+' змін у графіку на '+day;
- $('latestBrief').textContent=logs.length?eventBrief(logs[0]):'За цю дату змін немає';
+ $('dailyCountTooltip').textContent=edits+' змін графіка на '+day.split('-').reverse().join('.')+'. Враховуються лише зміни годин, а не перша публікація.';
  $('latest').innerHTML=logs.length?eventCard(logs[0]):'<p class="changes-none">За цю дату подій немає</p>';
  $('older').innerHTML=logs.slice(1).map(eventCard).join('');
  $('more').hidden=logs.length<=1;
@@ -357,4 +357,32 @@ function installPullToRefresh(){
    if(event.target.closest('.refresh-clock'))forcePageRefresh();
  });
 }
-function tick(){const n=now();$('clock').innerHTML=n.time+'<span>'+n.display+'</span>';updateRefreshRing();const s=currentStatus(selected(n).entry);if(n.iso!==dayShown||s!==modeShown){dayShown=n.iso;paint(n);events()}move(n)}async function reload(){try{const r=await fetch('./data.json?t='+Date.now(),{cache:'no-store'});if(!r.ok)throw Error(r.status);const j=await r.json();if(!j.days||!Array.isArray(j.logs))throw Error('payload');data=j;paint();events();if(tab==='tomorrow'&&tomorrowFingerprint()&&remembered('dubechnya-tomorrow-seen-'+locationId+'-'+tomorrowFingerprint().iso)===null){markTomorrowSeen();updateTomorrowTab()}}catch(e){if(!data)paint();console.warn(e)}}function updateLocationHeader(){const c=activeLocation();const names={dacha:'Квіткова 251',obolonskyi54:'Оболонський проспект 54',ivasiuka43:'Володимира Івасюка 43',azov28b:'Героїв полку Азов 28Б'};$('locationLabel').textContent=names[locationId]||'Дача';$('locationGroup').textContent=c?.group||'—';document.querySelectorAll('[data-location]').forEach(b=>b.classList.toggle('selected',b.dataset.location===locationId))}function closeLocationMenu(){const m=$('locationMenu');m.hidden=true;$('locationButton').setAttribute('aria-expanded','false')}function selectLocation(key){if(!['dacha','obolonskyi54','ivasiuka43','azov28b'].includes(key))return;locationId=key;remember('dubechnya-selected-location',key);closeLocationMenu();paint();events()}$('locationButton').onclick=()=>{const menu=$('locationMenu');menu.hidden=!menu.hidden;$('locationButton').setAttribute('aria-expanded',String(!menu.hidden))};document.querySelectorAll('[data-location]').forEach(b=>b.onclick=()=>selectLocation(b.dataset.location));document.addEventListener('click',e=>{if(!e.target.closest('.location-shell'))closeLocationMenu()});document.addEventListener('keydown',e=>{if(e.key==='Escape')closeLocationMenu()});const restored=remembered('dubechnya-selected-location');if(['dacha','obolonskyi54','ivasiuka43','azov28b'].includes(restored))locationId=restored;document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{tab=b.dataset.tab;if(tab==='tomorrow')markTomorrowSeen();paint();events()});dayShown=now().iso;tick();reload();checkGithubRuns();installPullToRefresh();setInterval(tick,1000);setInterval(reload,60000);setInterval(checkGithubRuns,6*60000);document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'){reload();if(Date.now()-githubCheckedAt>3*60000)checkGithubRuns()}else{remember('dubechnya-selected-location',locationId)}});window.addEventListener('pagehide',()=>remember('dubechnya-selected-location',locationId));if('serviceWorker' in navigator){navigator.serviceWorker.register('./sw.js').catch(e=>console.warn('Offline shell unavailable',e))}})();</script></html>
+function tick(){const n=now();$('clock').innerHTML=n.time+'<span>'+n.display+'</span>';updateRefreshRing();const s=currentStatus(selected(n).entry);if(n.iso!==dayShown||s!==modeShown){dayShown=n.iso;paint(n);events()}move(n)}async function reload(){try{const r=await fetch('./data.json?t='+Date.now(),{cache:'no-store'});if(!r.ok)throw Error(r.status);const j=await r.json();if(!j.days||!Array.isArray(j.logs))throw Error('payload');data=j;paint();events();if(tab==='tomorrow'&&tomorrowFingerprint()&&remembered('dubechnya-tomorrow-seen-'+locationId+'-'+tomorrowFingerprint().iso)===null){markTomorrowSeen();updateTomorrowTab()}}catch(e){if(!data)paint();console.warn(e)}}function updateLocationHeader(){const c=activeLocation();const names={dacha:'Квіткова 251',obolonskyi54:'Оболонський проспект 54',ivasiuka43:'Володимира Івасюка 43',azov28b:'Героїв полку Азов 28Б'};$('locationLabel').textContent=names[locationId]||'Дача';$('locationGroup').textContent=c?.group||'—';document.querySelectorAll('[data-location]').forEach(b=>b.classList.toggle('selected',b.dataset.location===locationId))}function closeLocationMenu(){const m=$('locationMenu');m.hidden=true;$('locationButton').setAttribute('aria-expanded','false')}function selectLocation(key){if(!['dacha','obolonskyi54','ivasiuka43','azov28b'].includes(key))return;locationId=key;remember('dubechnya-selected-location',key);closeLocationMenu();paint();events()}function installDailyCounterTooltip(){
+ const control=$('changeCountControl'),count=$('changeDailyCount');
+ if(!control||!count)return;
+ let hold=null;
+ count.addEventListener('pointerdown',event=>{
+   if(event.pointerType==='touch'){
+     hold=setTimeout(()=>{control.classList.add('open')},450);
+   }
+ });
+ ['pointerup','pointercancel','pointerleave'].forEach(type=>count.addEventListener(type,()=>{
+   if(hold!==null){clearTimeout(hold);hold=null}
+   if(type!=='pointerup')control.classList.remove('open');
+   else setTimeout(()=>control.classList.remove('open'),1600);
+ }));
+ count.addEventListener('click',event=>{
+   event.stopPropagation();
+   event.preventDefault();
+   control.classList.toggle('open');
+ });
+ count.addEventListener('keydown',event=>{
+   if(event.key==='Enter'||event.key===' '){
+     event.stopPropagation();event.preventDefault();control.classList.toggle('open');
+   }
+ });
+ document.addEventListener('click',event=>{
+   if(!control.contains(event.target))control.classList.remove('open');
+ });
+}
+$('locationButton').onclick=()=>{const menu=$('locationMenu');menu.hidden=!menu.hidden;$('locationButton').setAttribute('aria-expanded',String(!menu.hidden))};document.querySelectorAll('[data-location]').forEach(b=>b.onclick=()=>selectLocation(b.dataset.location));document.addEventListener('click',e=>{if(!e.target.closest('.location-shell'))closeLocationMenu()});document.addEventListener('keydown',e=>{if(e.key==='Escape')closeLocationMenu()});const restored=remembered('dubechnya-selected-location');if(['dacha','obolonskyi54','ivasiuka43','azov28b'].includes(restored))locationId=restored;document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{tab=b.dataset.tab;if(tab==='tomorrow')markTomorrowSeen();paint();events()});dayShown=now().iso;tick();reload();checkGithubRuns();installPullToRefresh();installDailyCounterTooltip();setInterval(tick,1000);setInterval(reload,60000);setInterval(checkGithubRuns,6*60000);document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'){reload();if(Date.now()-githubCheckedAt>3*60000)checkGithubRuns()}else{remember('dubechnya-selected-location',locationId)}});window.addEventListener('pagehide',()=>remember('dubechnya-selected-location',locationId));if('serviceWorker' in navigator){navigator.serviceWorker.register('./sw.js').catch(e=>console.warn('Offline shell unavailable',e))}})();</script></html>
