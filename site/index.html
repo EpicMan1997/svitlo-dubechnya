@@ -480,7 +480,7 @@ function events(){
  $('changeDailyCount').textContent=String(edits);
  $('changeDailyCount').title=edits+' змін у графіку на '+day;
  $('dailyCountTooltip').textContent=edits+' змін графіка на '+day.split('-').reverse().join('.')+'. Враховуються лише зміни годин, а не перша публікація.';
- $('latest').innerHTML=logs.length?logs.map(eventCard).join(''):'<p class="changes-none">За цю дату подій немає</p>';
+ $('latest').innerHTML=logs.length?eventCard(logs[0]):'<p class="changes-none">За цю дату подій немає</p>';
  // "Yesterday" is about when the update was observed (Kyiv time), not
  // the date of the schedule it affected. A Sunday discovery may change Monday.
  const d=new Date(current.iso+'T12:00:00Z');
