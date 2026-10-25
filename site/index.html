@@ -314,8 +314,32 @@ h1{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
  .status-stack>.status{font-size:11px;padding:8px 11px}
  .status-stack>.power-now{font-size:12px;padding:9px 11px}
 }
+
+/* Read outage changes as red start -> green restoration time. */
+.change-before b,.change-after b,.change-initial,.yesterday-content{font-variant-numeric:tabular-nums}
+.outage-start{color:#fda4af;font-weight:800}
+.outage-end{color:#86efac;font-weight:800}
+.outage-separator{color:#b1c1d5;padding:0 3px;font-weight:600}
+.change-sources{flex-wrap:wrap;gap:7px}
+.first-source{width:auto;height:auto;gap:7px;align-items:center;display:inline-flex}
+.first-source i{display:inline-block;flex:none;width:11px;height:11px;border-radius:50%}
+.change-source-name{color:#dbeafe!important;font-size:12px!important;font-weight:750}
+.older{margin-top:15px;padding-top:12px;border-top:1px solid #2d4059}
+.older>summary{font-size:12px;line-height:1.5;font-weight:750;color:#cbdcf0}
+.yesterday-list{display:grid;gap:0;margin-top:7px}
+.yesterday-item{display:grid;grid-template-columns:42px minmax(0,1fr);gap:8px;
+  padding:10px 0;border-top:1px solid #2d3e55;font-size:12px;line-height:1.55}
+.yesterday-item:first-child{border-top:none}
+.yesterday-clock{color:#cbdcf0;font-weight:780;white-space:nowrap;font-variant-numeric:tabular-nums}
+.yesterday-content{min-width:0;display:grid;gap:3px;overflow-wrap:anywhere}
+.yesterday-before{color:#9eb0c6}
+.yesterday-after{color:#e3edfc;font-weight:650}
+.yesterday-before>span:first-child,.yesterday-after>span:first-child{
+  display:inline-block;width:40px;font-size:11px;font-weight:750}
+.yesterday-source{display:flex;align-items:center;gap:6px;color:#9fb5d1;font-size:11px}
+.yesterday-source i{width:8px;height:8px;flex:none;border-radius:50%}
 </style>
-<div id="pullRefresh" class="pull-refresh" role="status" aria-live="polite"><span class="pull-refresh-icon" aria-hidden="true"></span><span id="pullRefreshText">Потягни вниз для оновлення</span></div><main><header><div class="location-shell"><h1><img class="head-icon" src="./favicon.svg" alt="" aria-hidden="true"><button class="location-button" id="locationButton" type="button" aria-expanded="false"><span id="locationLabel">Квіткова 251</span><small id="locationGroup">3.1</small><span class="location-chevron" aria-hidden="true"></span></button></h1><div class="location-menu" id="locationMenu" hidden><button type="button" data-location="dacha">Квіткова 251 <small>Вища Дубечня · дача</small></button><button type="button" data-location="obolonskyi54">Оболонський проспект 54</button><button type="button" data-location="ivasiuka43">Володимира Івасюка 43</button><button type="button" data-location="azov28b">Героїв полку Азов 28Б</button></div></div><div class="header-time"><div id="clock">--:--:--</div></div></header><nav class="tabs"><button data-tab="today" aria-selected="true">Сьогодні</button><button data-tab="tomorrow" aria-selected="false" class="tomorrow-tab unavailable">Завтра<span class="new-dot" id="tomorrowUnread" hidden aria-label="Новий графік">●</span></button></nav><div class="layout"><section class="card"><div id="display"></div></section><aside class="card history"><details class="changes" id="changes"><summary><span class="changes-header"><strong>Зміни графіка <span class="count-control" id="changeCountControl"><span class="change-count" id="changeDailyCount" role="button" tabindex="0" aria-label="Кількість змін графіка за вибрану добу" aria-describedby="dailyCountTooltip">0</span><span class="count-tooltip" id="dailyCountTooltip" role="tooltip">Кількість змін графіка за вибрану добу (публікація першого графіка не враховується)</span></span></strong></span><span class="changes-arrow" aria-hidden="true"></span></summary><div class="changes-content"><div id="latest"></div><details id="more" class="older"><summary>Попередні події</summary><div id="older"></div></details></div></details></aside></div></main>
+<div id="pullRefresh" class="pull-refresh" role="status" aria-live="polite"><span class="pull-refresh-icon" aria-hidden="true"></span><span id="pullRefreshText">Потягни вниз для оновлення</span></div><main><header><div class="location-shell"><h1><img class="head-icon" src="./favicon.svg" alt="" aria-hidden="true"><button class="location-button" id="locationButton" type="button" aria-expanded="false"><span id="locationLabel">Квіткова 251</span><small id="locationGroup">3.1</small><span class="location-chevron" aria-hidden="true"></span></button></h1><div class="location-menu" id="locationMenu" hidden><button type="button" data-location="dacha">Квіткова 251 <small>Вища Дубечня</small></button><button type="button" data-location="obolonskyi54">Оболонський проспект 54</button><button type="button" data-location="ivasiuka43">Володимира Івасюка 43</button><button type="button" data-location="azov28b">Героїв полку Азов 28Б</button></div></div><div class="header-time"><div id="clock">--:--:--</div></div></header><nav class="tabs"><button data-tab="today" aria-selected="true">Сьогодні</button><button data-tab="tomorrow" aria-selected="false" class="tomorrow-tab unavailable">Завтра<span class="new-dot" id="tomorrowUnread" hidden aria-label="Новий графік">●</span></button></nav><div class="layout"><section class="card"><div id="display"></div></section><aside class="card history"><details class="changes" id="changes"><summary><span class="changes-header"><strong>Зміни графіка <span class="count-control" id="changeCountControl"><span class="change-count" id="changeDailyCount" role="button" tabindex="0" aria-label="Кількість змін графіка за вибрану добу" aria-describedby="dailyCountTooltip">0</span><span class="count-tooltip" id="dailyCountTooltip" role="tooltip">Кількість змін графіка за вибрану добу (публікація першого графіка не враховується)</span></span></strong></span><span class="changes-arrow" aria-hidden="true"></span></summary><div class="changes-content"><div id="latest"></div><details id="more" class="older"><summary><span id="previousTitle">Попередні події</span></summary><div id="older"></div></details></div></details></aside></div></main>
 <script>(function(){'use strict';let tab='today',data=null,dayShown='',modeShown='',locationId='dacha';const $=id=>document.getElementById(id),timeF=new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/Kyiv',hour:'2-digit',minute:'2-digit',second:'2-digit',hourCycle:'h23'}),dateF=new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/Kyiv',year:'numeric',month:'2-digit',day:'2-digit'}),human=new Intl.DateTimeFormat('uk-UA',{timeZone:'UTC',day:'numeric',month:'long'}),weekdayF=new Intl.DateTimeFormat('uk-UA',{timeZone:'UTC',weekday:'long'}),checkF=new Intl.DateTimeFormat('uk-UA',{timeZone:'Europe/Kyiv',day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit',hourCycle:'h23'});function formatChecked(x){if(!x)return 'немає даних';const d=new Date(x);if(!Number.isFinite(d.getTime()))return 'немає даних';return checkF.format(d).replace(/[,\s]+/g,' ').trim()}function now(){const t=Object.fromEntries(timeF.formatToParts(new Date()).filter(x=>x.type!=='literal').map(x=>[x.type,x.value])),d=Object.fromEntries(dateF.formatToParts(new Date()).filter(x=>x.type!=='literal').map(x=>[x.type,x.value]));return {iso:d.year+'-'+d.month+'-'+d.day,time:t.hour+':'+t.minute+':'+t.second,display:d.day+'.'+d.month+'.'+d.year,h:+t.hour,m:+t.minute,s:+t.second}}function tomorrow(s){const a=s.split('-').map(Number);return new Date(Date.UTC(a[0],a[1]-1,a[2]+1)).toISOString().slice(0,10)}function minute(s){const a=s.split(':').map(Number);return a[0]*60+a[1]}function pct(x){return x*100/1440}function esc(s){return String(s??'').replace(/[&<>"']/g,x=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[x]))}function activeLocation(){return data?.locations?.[locationId]||(locationId==='dacha'?{name:'Дача · Вища Дубечня',group:'3.1',days:data?.days||{},logs:data?.logs||[],address_verified:true}:null)}function selected(n){const iso=tab==='today'?n.iso:tomorrow(n.iso);return {iso,entry:activeLocation()?.days?.[iso]||{status:'unknown',outages:[],detail:locationId==='dacha'?'Очікуємо графіка':'Потрібне підтвердження міського графіка'}}}function currentStatus(e){return e?.status||'unknown'}function tomorrowFingerprint(n){n=n||now();const iso=tomorrow(n.iso),entry=activeLocation()?.days?.[iso];if(!entry||currentStatus(entry)!=='normal'||!Array.isArray(entry.outages))return null;return {iso,hash:JSON.stringify(entry.outages)}}function remembered(k){
   let value=null;
   try{value=localStorage.getItem(k)}catch(e){}
@@ -397,40 +421,76 @@ function eventTime(item){
  const t=Date.parse(item.at||'');
  return Number.isFinite(t)?eventClock.format(new Date(t)):null;
 }
+function sourceInfo(item){
+ // A first observation and a generic confirming source are different evidence.
+ const first=item.first_observed_source&&sourcePalette[item.first_observed_source]?item.first_observed_source:null;
+ const confirmed=Array.isArray(item.sources_confirmed)?item.sources_confirmed.find(x=>sourcePalette[x]):null;
+ const name=first||confirmed;
+ if(!name)return null;
+ return {name,first:Boolean(first),explanation:first
+  ?'Перше джерело, де виявлено зміну: '+name
+  :'Одне з джерел, що підтвердили зміну: '+name+'. Яке було першим, невідомо.'};
+}
 function firstSourceDot(item){
- // Older history predates source-observation timestamps. Do not invent which
- // source was first; instead identify one that actually confirmed the change.
- const knownFirst=item.first_observed_source&&sourcePalette[item.first_observed_source] ? item.first_observed_source : null;
- const confirmed=Array.isArray(item.sources_confirmed)?item.sources_confirmed.find(n=>sourcePalette[n]):null;
- const name=knownFirst||confirmed;
- if(!name)return '';
- const explanation=knownFirst
-   ?'Перше джерело, де зафіксовано зміну під час перевірок: '+name
-   :'Одне з джерел, що підтвердили зміну: '+name+'. Яке було першим, невідомо.';
- return '<span class="change-source-label">'+(knownFirst?'Перший сигнал':'Підтвердив')+'</span>'+
-   '<span class="first-source" title="'+esc(explanation)+'" aria-label="'+esc(explanation)+'">'+
-   '<i style="background:'+sourcePalette[name]+'"></i></span>';
+ const info=sourceInfo(item);
+ if(!info)return '';
+ return '<span class="change-source-label">'+(info.first?'Перший сигнал':'Підтвердив')+'</span>'+
+  '<span class="first-source" title="'+esc(info.explanation)+'" aria-label="'+esc(info.explanation)+'">'+
+  '<i style="background:'+sourcePalette[info.name]+'"></i>'+
+  '<span class="change-source-name">'+esc(info.name)+'</span></span>';
+}
+function formatEventRanges(value){
+ // Escape before highlighting to prevent untrusted source data from injecting HTML.
+ return esc(value||'').replace(/((?:[01]\d|2[0-4]):[0-5]\d)\s*[–—-]\s*((?:[01]\d|2[0-4]):[0-5]\d)/g,
+  (_match,start,end)=>'<span class="outage-start">'+start+'</span><span class="outage-separator">–</span><span class="outage-end">'+end+'</span>');
 }
 function eventCard(item){
  const kind=eventKind(item),changed=kind==='changed',parts=eventParts(item),t=eventTime(item);
+ const evidence=firstSourceDot(item);
  return '<div class="change-item '+(changed?'change-edited':'change-published')+'">'+
-   '<div class="change-top"><span class="change-time">'+(t?'Виявлено '+esc(t):'Час невідомий')+'</span>'+
-     '<span class="change-type">'+(changed?'Зміна':'Публікація')+'</span></div>'+
-   (changed?'<div class="change-diff"><div class="change-before"><span>Було</span><b>'+esc(parts.before||'немає даних')+'</b></div><div class="change-after"><span>Стало</span><b>'+esc(parts.after)+'</b></div></div>':
-     '<div class="change-initial">'+esc(parts.after)+'</div>')+
-   (firstSourceDot(item)?'<div class="change-sources">'+firstSourceDot(item)+'</div>':'')+
+  '<div class="change-top"><span class="change-time">'+(t?'Виявлено '+esc(t):'Час невідомий')+'</span>'+
+   '<span class="change-type">'+(changed?'Зміна':'Публікація')+'</span></div>'+
+  (changed?'<div class="change-diff"><div class="change-before"><span>Було</span><b>'+formatEventRanges(parts.before||'немає даних')+'</b></div><div class="change-after"><span>Стало</span><b>'+formatEventRanges(parts.after)+'</b></div></div>':
+   '<div class="change-initial">'+formatEventRanges(parts.after)+'</div>')+
+  (evidence?'<div class="change-sources">'+evidence+'</div>':'')+
  '</div>';
 }
+function compactYesterdayCard(item){
+ const p=eventParts(item),time=eventTime(item),source=sourceInfo(item);
+ return '<div class="yesterday-item">'+
+  '<span class="yesterday-clock">'+esc(time||'--:--')+'</span>'+
+  '<div class="yesterday-content">'+
+   '<div class="yesterday-before"><span>Було</span>'+formatEventRanges(p.before||'без відключень')+'</div>'+
+   '<div class="yesterday-after"><span>Стало</span>'+formatEventRanges(p.after)+'</div>'+
+   (source?'<div class="yesterday-source"><i style="background:'+sourcePalette[source.name]+'"></i>'+esc(source.name)+'</div>':'')+
+  '</div></div>';
+}
+function eventDetectedDate(item){
+ const date=new Date(item?.at||'');
+ if(!Number.isFinite(date.getTime()))return null;
+ const parts=Object.fromEntries(dateF.formatToParts(date).filter(x=>x.type!=='literal').map(x=>[x.type,x.value]));
+ return parts.year+'-'+parts.month+'-'+parts.day;
+}
 function events(){
- const day=tab==='today'?now().iso:tomorrow(now().iso);
- const logs=(activeLocation()?.logs||[]).filter(item=>item.date===day);
+ const current=now();
+ const day=tab==='today'?current.iso:tomorrow(current.iso);
+ const all=activeLocation()?.logs||[];
+ const logs=all.filter(item=>item.date===day);
  const edits=logs.filter(item=>eventKind(item)==='changed').length;
  $('changeDailyCount').textContent=String(edits);
  $('changeDailyCount').title=edits+' змін у графіку на '+day;
  $('dailyCountTooltip').textContent=edits+' змін графіка на '+day.split('-').reverse().join('.')+'. Враховуються лише зміни годин, а не перша публікація.';
- $('latest').innerHTML=logs.length?eventCard(logs[0]):'<p class="changes-none">За цю дату подій немає</p>';
- $('older').innerHTML=logs.slice(1).map(eventCard).join('');
- $('more').hidden=logs.length<=1;
+ $('latest').innerHTML=logs.length?logs.map(eventCard).join(''):'<p class="changes-none">За цю дату подій немає</p>';
+ // "Yesterday" is about when the update was observed (Kyiv time), not
+ // the date of the schedule it affected. A Sunday discovery may change Monday.
+ const d=new Date(current.iso+'T12:00:00Z');
+ d.setUTCDate(d.getUTCDate()-1);
+ const yesterday=d.toISOString().slice(0,10);
+ const history=all.filter(item=>eventDetectedDate(item)===yesterday&&eventKind(item)==='changed');
+ $('previousTitle').textContent='Попередні події · '+yesterday.slice(8)+'.'+yesterday.slice(5,7)+' ('+history.length+')';
+ $('older').innerHTML=history.length?'<div class="yesterday-list">'+history.map(compactYesterdayCard).join('')+'</div>':
+  '<p class="changes-none">За '+yesterday.slice(8)+'.'+yesterday.slice(5,7)+' змін у збереженій історії немає</p>';
+ $('more').hidden=false;
 }
 let githubRun=null,githubCheckedAt=0,githubUnavailable=false;
 const GH_RUNS_URL='https://api.github.com/repos/EpicMan1997/svitlo-dubechnya/actions/workflows/refresh.yml/runs?event=workflow_dispatch&per_page=3';
