@@ -2,11 +2,7 @@ name: Update schedules and publish website
 on:
   push:
     branches: [main]
-  schedule:
-    # Best-effort GitHub schedule; queued jobs can be delayed or dropped.
-    # A 15-minute best-effort schedule, offset from the start of each hour.
-    # GitHub can delay or drop scheduled events; the website reports real age.
-    - cron: '11,26,41,56 * * * *'
+  # Regular checks are triggered externally every 10 minutes via workflow_dispatch.
   workflow_dispatch:
 permissions:
   contents: write
