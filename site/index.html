@@ -252,7 +252,7 @@ function events(){
  $('more').hidden=logs.length<=1;
 }
 let githubRun=null,githubCheckedAt=0,githubUnavailable=false;
-const GH_RUNS_URL='https://api.github.com/repos/EpicMan1997/svitlo-dubechnya/actions/runs?per_page=3';
+const GH_RUNS_URL='https://api.github.com/repos/EpicMan1997/svitlo-dubechnya/actions/workflows/refresh.yml/runs?event=workflow_dispatch&per_page=3';
 async function checkGithubRuns(){
  try{
    const r=await fetch(GH_RUNS_URL,{headers:{'Accept':'application/vnd.github+json'},cache:'no-store'});
@@ -303,7 +303,7 @@ function updateRefreshRing(){
    }else if(run.status==='in_progress'){
      message+=' · GitHub: виконується';
    }else if(run.status==='completed'&&run.conclusion==='failure'){
-     message+=' · GitHub: помилка';
+     message+=' · остання перевірка не завершилась';
    }
  }
  if(Number.isFinite(age)&&age>=15*60&&!message.includes('GitHub:')){
