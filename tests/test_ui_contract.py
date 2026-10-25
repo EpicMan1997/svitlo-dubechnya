@@ -31,6 +31,25 @@ class VisualStatusContract(unittest.TestCase):
         self.assertIn("function events(){", HTML)
         self.assertIn("changeDailyCount", HTML)
 
+    def test_source_palette_is_shared(self):
+        self.assertIn("const palette=sourcePalette", HTML)
+        self.assertIn("colors=sourcePalette", HTML)
+        self.assertIn("const sourcePalette={", HTML)
+
+    def test_five_current_source_colors_are_distinct(self):
+        import re
+        palette = re.search(r"const sourcePalette=\\{(.*?)\\};", HTML, re.S)
+        self.assertIsNotNone(palette)
+        colors = dict(re.findall(r"'([^']+)':'(#[0-9a-fA-F]{6})'", palette.group(1)))
+        names = ['Карта світла', 'КолиСвітло', 'КолиБуде', 'Київщина.info', 'Alerts Energy']
+        self.assertEqual(len(set(colors[name] for name in names)), 5)
+        self.assertEqual(colors['ДТЕК'], colors['Київщина.info'])
+
+    def test_historic_event_does_not_claim_unverified_first_signal(self):
+        self.assertIn("Одне з джерел, що підтвердили зміну:", HTML)
+        self.assertIn("knownFirst?'Перший сигнал':'Підтвердив'", HTML)
+        self.assertIn("item.sources_confirmed.find(n=>sourcePalette[n])", HTML)
+
 
 if __name__ == '__main__':
     unittest.main()
