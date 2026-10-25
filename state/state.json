@@ -202,22 +202,44 @@
     },
     "2026-10-26": {
       "date": "2026-10-26",
-      "detail": "Графік ще не опубліковано",
-      "outages": [],
-      "source_observations": {},
+      "detail": "Зіставлено незалежні джерела",
+      "outages": [
+        [
+          "12:30",
+          "16:30"
+        ]
+      ],
+      "source_observations": {
+        "Alerts Energy": {
+          "fingerprint": "[[\"12:30\", \"16:30\"]]",
+          "first_seen": "2026-10-25T20:20+02:00"
+        },
+        "Карта світла": {
+          "fingerprint": "[[\"12:30\", \"16:30\"]]",
+          "first_seen": "2026-10-25T20:20+02:00"
+        }
+      },
       "source_reports": {
         "Alerts Energy": {
-          "fetch_failed": false,
-          "outages": null,
+          "outages": [
+            [
+              "12:30",
+              "16:30"
+            ]
+          ],
           "partial": [],
-          "status": "unavailable",
+          "status": "match",
           "url": "https://alerts.energy/kyivska-oblast"
         },
         "Карта світла": {
-          "fetch_failed": false,
-          "outages": null,
+          "outages": [
+            [
+              "12:30",
+              "16:30"
+            ]
+          ],
           "partial": [],
-          "status": "unavailable",
+          "status": "match",
           "url": "https://mapasvitla.com.ua/kyivska-oblast/dtek-krem/3.1"
         },
         "Київщина.info": {
@@ -243,8 +265,11 @@
         }
       },
       "source_updated": "",
-      "sources": [],
-      "status": "unknown",
+      "sources": [
+        "Alerts Energy",
+        "Карта світла"
+      ],
+      "status": "normal",
       "url": "https://mapasvitla.com.ua/kyivska-oblast/dtek-krem/3.1"
     }
   },
@@ -778,6 +803,24 @@
     }
   },
   "logs": [
+    {
+      "after": [
+        [
+          "12:30",
+          "16:30"
+        ]
+      ],
+      "at": "2026-10-25T20:20+02:00",
+      "before": null,
+      "date": "2026-10-26",
+      "first_observed_source": null,
+      "kind": "published",
+      "message": "Опубліковано графік: 12:30–16:30",
+      "sources_confirmed": [
+        "Alerts Energy",
+        "Карта світла"
+      ]
+    },
     {
       "at": "2026-10-25T08:16+02:00",
       "date": "2026-10-25",
