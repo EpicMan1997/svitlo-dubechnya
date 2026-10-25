@@ -141,6 +141,7 @@
           "url": "https://alerts.energy/kyivska-oblast"
         },
         "БезСвітла": {
+          "fetch_failed": true,
           "outages": [
             [
               "07:00",
@@ -153,7 +154,7 @@
           ],
           "partial": [],
           "status": "old",
-          "url": "https://bezsvitla.com.ua/kyivska-oblast/pirnivska-hromada/visa-dubecna/grafik-na-2026-10-25"
+          "url": "https://bezsvitla.com.ua/kyivska-oblast/grafik-na-2026-10-25"
         },
         "Київщина.info": {
           "outages": [
@@ -197,7 +198,7 @@
         "КолиСвітло"
       ],
       "status": "normal",
-      "url": "https://bezsvitla.com.ua/kyivska-oblast/pirnivska-hromada/visa-dubecna/grafik-na-2026-10-25"
+      "url": "https://bezsvitla.com.ua/kyivska-oblast/grafik-na-2026-10-25"
     },
     "2026-10-26": {
       "date": "2026-10-26",
@@ -206,30 +207,35 @@
       "source_observations": {},
       "source_reports": {
         "Alerts Energy": {
+          "fetch_failed": false,
           "outages": null,
           "partial": [],
           "status": "unavailable",
           "url": "https://alerts.energy/kyivska-oblast"
         },
         "БезСвітла": {
+          "fetch_failed": true,
           "outages": null,
           "partial": [],
           "status": "unavailable",
-          "url": "https://bezsvitla.com.ua/kyivska-oblast/pirnivska-hromada/visa-dubecna/grafik-na-2026-10-26"
+          "url": "https://bezsvitla.com.ua/kyivska-oblast/grafik-na-2026-10-26"
         },
         "Київщина.info": {
+          "fetch_failed": false,
           "outages": null,
           "partial": [],
           "status": "unavailable",
           "url": "https://kyivshchyna.info/hrafik-vidkliuchen-svitla-kyivska-oblast/"
         },
         "КолиБуде": {
+          "fetch_failed": false,
           "outages": null,
           "partial": [],
           "status": "unavailable",
           "url": "https://kolybude.com/kyiv-oblast"
         },
         "КолиСвітло": {
+          "fetch_failed": false,
           "outages": null,
           "partial": [],
           "status": "unavailable",
@@ -239,7 +245,7 @@
       "source_updated": "",
       "sources": [],
       "status": "unknown",
-      "url": "https://bezsvitla.com.ua/kyivska-oblast/pirnivska-hromada/visa-dubecna/grafik-na-2026-10-26"
+      "url": "https://bezsvitla.com.ua/kyivska-oblast/grafik-na-2026-10-26"
     }
   },
   "last_heartbeat": "2026-10-24",
