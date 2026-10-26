@@ -227,8 +227,8 @@
           "first_seen": "2026-10-26T00:01+02:00"
         },
         "КолиСвітло": {
-          "fingerprint": "[[\"12:30\", \"16:30\"]]",
-          "first_seen": "2026-10-26T00:01+02:00"
+          "fingerprint": "[[\"12:30\", \"16:30\"], [\"23:00\", \"24:00\"]]",
+          "first_seen": "2026-10-26T20:31+02:00"
         }
       },
       "source_reports": {
@@ -281,10 +281,14 @@
             [
               "12:30",
               "16:30"
+            ],
+            [
+              "23:00",
+              "24:00"
             ]
           ],
           "partial": [],
-          "status": "match",
+          "status": "diff",
           "url": "https://kolysvitlo.com/schedule/dtek_kyiv_oblast"
         }
       },
@@ -293,8 +297,7 @@
         "Alerts Energy",
         "Карта світла",
         "Київщина.info",
-        "КолиБуде",
-        "КолиСвітло"
+        "КолиБуде"
       ],
       "status": "normal",
       "url": "https://mapasvitla.com.ua/kyivska-oblast/dtek-krem/3.1"
