@@ -301,9 +301,22 @@
     },
     "2026-10-27": {
       "date": "2026-10-27",
-      "detail": "Очікуємо незалежне підтвердження",
-      "outages": [],
+      "detail": "Зіставлено незалежні джерела",
+      "outages": [
+        [
+          "09:30",
+          "13:30"
+        ],
+        [
+          "20:00",
+          "24:00"
+        ]
+      ],
       "source_observations": {
+        "Alerts Energy": {
+          "fingerprint": "[[\"09:30\", \"13:30\"], [\"20:00\", \"24:00\"]]",
+          "first_seen": "2026-10-26T20:10+02:00"
+        },
         "Карта світла": {
           "fingerprint": "[[\"09:30\", \"13:30\"], [\"20:00\", \"24:00\"]]",
           "first_seen": "2026-10-26T20:01+02:00"
@@ -311,10 +324,18 @@
       },
       "source_reports": {
         "Alerts Energy": {
-          "fetch_failed": false,
-          "outages": null,
+          "outages": [
+            [
+              "09:30",
+              "13:30"
+            ],
+            [
+              "20:00",
+              "24:00"
+            ]
+          ],
           "partial": [],
-          "status": "unavailable",
+          "status": "match",
           "url": "https://alerts.energy/kyivska-oblast"
         },
         "Карта світла": {
@@ -329,7 +350,7 @@
             ]
           ],
           "partial": [],
-          "status": "diff",
+          "status": "match",
           "url": "https://mapasvitla.com.ua/kyivska-oblast/dtek-krem/3.1"
         },
         "Київщина.info": {
@@ -355,8 +376,11 @@
         }
       },
       "source_updated": "",
-      "sources": [],
-      "status": "unknown",
+      "sources": [
+        "Alerts Energy",
+        "Карта світла"
+      ],
+      "status": "normal",
       "url": "https://mapasvitla.com.ua/kyivska-oblast/dtek-krem/3.1"
     }
   },
@@ -1353,6 +1377,28 @@
     }
   },
   "logs": [
+    {
+      "after": [
+        [
+          "09:30",
+          "13:30"
+        ],
+        [
+          "20:00",
+          "24:00"
+        ]
+      ],
+      "at": "2026-10-26T20:10+02:00",
+      "before": null,
+      "date": "2026-10-27",
+      "first_observed_source": "Карта світла",
+      "kind": "published",
+      "message": "Опубліковано графік: 09:30–13:30, 20:00–24:00",
+      "sources_confirmed": [
+        "Alerts Energy",
+        "Карта світла"
+      ]
+    },
     {
       "after": [
         [
