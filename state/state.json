@@ -207,6 +207,10 @@
         [
           "12:30",
           "16:30"
+        ],
+        [
+          "23:00",
+          "24:00"
         ]
       ],
       "source_observations": {
@@ -215,12 +219,12 @@
           "first_seen": "2026-10-26T12:01+02:00"
         },
         "Карта світла": {
-          "fingerprint": "[[\"12:30\", \"16:30\"]]",
-          "first_seen": "2026-10-25T20:20+02:00"
+          "fingerprint": "[[\"12:30\", \"16:30\"], [\"23:00\", \"24:00\"]]",
+          "first_seen": "2026-10-26T20:40+02:00"
         },
         "Київщина.info": {
-          "fingerprint": "[[\"12:30\", \"16:30\"]]",
-          "first_seen": "2026-10-26T00:01+02:00"
+          "fingerprint": "[[\"12:30\", \"16:30\"], [\"23:00\", \"24:00\"]]",
+          "first_seen": "2026-10-26T20:40+02:00"
         },
         "КолиБуде": {
           "fingerprint": "[[\"12:30\", \"16:30\"]]",
@@ -240,7 +244,7 @@
             ]
           ],
           "partial": [],
-          "status": "match",
+          "status": "diff",
           "url": "https://alerts.energy/kyivska-oblast"
         },
         "Карта світла": {
@@ -248,6 +252,10 @@
             [
               "12:30",
               "16:30"
+            ],
+            [
+              "23:00",
+              "24:00"
             ]
           ],
           "partial": [],
@@ -259,6 +267,10 @@
             [
               "12:30",
               "16:30"
+            ],
+            [
+              "23:00",
+              "24:00"
             ]
           ],
           "partial": [],
@@ -273,7 +285,7 @@
             ]
           ],
           "partial": [],
-          "status": "match",
+          "status": "diff",
           "url": "https://kolybude.com/kyiv-oblast"
         },
         "КолиСвітло": {
@@ -288,16 +300,15 @@
             ]
           ],
           "partial": [],
-          "status": "diff",
+          "status": "match",
           "url": "https://kolysvitlo.com/schedule/dtek_kyiv_oblast"
         }
       },
       "source_updated": "",
       "sources": [
-        "Alerts Energy",
         "Карта світла",
         "Київщина.info",
-        "КолиБуде"
+        "КолиСвітло"
       ],
       "status": "normal",
       "url": "https://mapasvitla.com.ua/kyivska-oblast/dtek-krem/3.1"
@@ -1380,6 +1391,34 @@
     }
   },
   "logs": [
+    {
+      "after": [
+        [
+          "12:30",
+          "16:30"
+        ],
+        [
+          "23:00",
+          "24:00"
+        ]
+      ],
+      "at": "2026-10-26T20:40+02:00",
+      "before": [
+        [
+          "12:30",
+          "16:30"
+        ]
+      ],
+      "date": "2026-10-26",
+      "first_observed_source": "КолиСвітло",
+      "kind": "changed",
+      "message": "Змінено графік: 12:30–16:30 → 12:30–16:30, 23:00–24:00",
+      "sources_confirmed": [
+        "Карта світла",
+        "Київщина.info",
+        "КолиСвітло"
+      ]
+    },
     {
       "after": [
         [
