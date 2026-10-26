@@ -207,10 +207,6 @@
         [
           "12:30",
           "16:30"
-        ],
-        [
-          "23:00",
-          "24:00"
         ]
       ],
       "source_observations": {
@@ -227,12 +223,12 @@
           "first_seen": "2026-10-26T20:40+02:00"
         },
         "КолиБуде": {
-          "fingerprint": "[[\"12:30\", \"16:30\"], [\"23:00\", \"24:00\"]]",
-          "first_seen": "2026-10-26T20:50+02:00"
+          "fingerprint": "[[\"12:30\", \"16:30\"]]",
+          "first_seen": "2026-10-26T22:50+02:00"
         },
         "КолиСвітло": {
-          "fingerprint": "[[\"12:30\", \"16:30\"], [\"23:00\", \"24:00\"]]",
-          "first_seen": "2026-10-26T20:31+02:00"
+          "fingerprint": "[[\"12:30\", \"16:30\"]]",
+          "first_seen": "2026-10-26T22:50+02:00"
         }
       },
       "source_reports": {
@@ -244,7 +240,7 @@
             ]
           ],
           "partial": [],
-          "status": "diff",
+          "status": "match",
           "url": "https://alerts.energy/kyivska-oblast"
         },
         "Карта світла": {
@@ -259,7 +255,7 @@
             ]
           ],
           "partial": [],
-          "status": "match",
+          "status": "diff",
           "url": "https://mapasvitla.com.ua/kyivska-oblast/dtek-krem/3.1"
         },
         "Київщина.info": {
@@ -274,7 +270,7 @@
             ]
           ],
           "partial": [],
-          "status": "match",
+          "status": "diff",
           "url": "https://kyivshchyna.info/hrafik-vidkliuchen-svitla-kyivska-oblast/"
         },
         "КолиБуде": {
@@ -282,10 +278,6 @@
             [
               "12:30",
               "16:30"
-            ],
-            [
-              "23:00",
-              "24:00"
             ]
           ],
           "partial": [],
@@ -297,10 +289,6 @@
             [
               "12:30",
               "16:30"
-            ],
-            [
-              "23:00",
-              "24:00"
             ]
           ],
           "partial": [],
@@ -310,8 +298,7 @@
       },
       "source_updated": "",
       "sources": [
-        "Карта світла",
-        "Київщина.info",
+        "Alerts Energy",
         "КолиБуде",
         "КолиСвітло"
       ],
@@ -1493,6 +1480,34 @@
     }
   },
   "logs": [
+    {
+      "after": [
+        [
+          "12:30",
+          "16:30"
+        ]
+      ],
+      "at": "2026-10-26T22:50+02:00",
+      "before": [
+        [
+          "12:30",
+          "16:30"
+        ],
+        [
+          "23:00",
+          "24:00"
+        ]
+      ],
+      "date": "2026-10-26",
+      "first_observed_source": "Alerts Energy",
+      "kind": "changed",
+      "message": "Змінено графік: 12:30–16:30, 23:00–24:00 → 12:30–16:30",
+      "sources_confirmed": [
+        "Alerts Energy",
+        "КолиБуде",
+        "КолиСвітло"
+      ]
+    },
     {
       "after": [
         [
