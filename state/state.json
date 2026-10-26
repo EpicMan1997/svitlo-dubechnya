@@ -526,8 +526,8 @@
               "first_seen": "2026-10-26T00:01+02:00"
             },
             "КолиСвітло": {
-              "fingerprint": "[[\"08:30\", \"12:00\"], [\"15:30\", \"19:30\"]]",
-              "first_seen": "2026-10-26T00:01+02:00"
+              "fingerprint": "[[\"08:30\", \"12:00\"], [\"15:30\", \"19:30\"], [\"22:30\", \"24:00\"]]",
+              "first_seen": "2026-10-26T21:20+02:00"
             }
           },
           "source_reports": {
@@ -591,10 +591,14 @@
                 [
                   "15:30",
                   "19:30"
+                ],
+                [
+                  "22:30",
+                  "24:00"
                 ]
               ],
               "partial": [],
-              "status": "match",
+              "status": "diff",
               "url": "https://kolysvitlo.com/schedule/dtek_kyiv"
             }
           },
@@ -602,8 +606,7 @@
           "sources": [
             "Alerts Energy",
             "Карта світла",
-            "КолиБуде",
-            "КолиСвітло"
+            "КолиБуде"
           ],
           "status": "normal",
           "url": "https://mapasvitla.com.ua/kyiv/dtek-kem/10.1"
