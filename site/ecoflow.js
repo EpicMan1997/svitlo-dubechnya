@@ -84,6 +84,7 @@
       '<div class="eco-capacity-line">' + (d.capacityWh === null ? '<span>Ємність: уточнюється</span>' : '<strong>' + capacity + '</strong>') +
       '<span class="eco-size-note">Розмір відносно ємності</span></div>' +
       '<p class="eco-device-caption">' + info + '</p>' +
+      (d.capacityWh !== null ? '<div class="eco-relative-label">Масштаб ємності відносно 4,096 кВт·год</div><div class="eco-relative-track" aria-label="Паспортна ємність ' + niceWh(d.capacityWh) + '"><i style="width:' + Math.round(d.capacityWh / 4096 * 1000) / 10 + '%"></i></div>' : '') +
       stats +
       '<div class="eco-device-foot"><span>Автономність: не розраховано</span><span>Не підключено</span></div>' +
       '<div class="eco-admin-only eco-device-admin">' +
