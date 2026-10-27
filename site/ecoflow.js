@@ -8,32 +8,32 @@
     dacha: {
       name: 'Дача', space: 'Дача',
       devices: [
-        { name: 'DELTA Pro 3', capacityWh: 4096, pct: 84, inputW: 0, outputW: 620, type: 'station', id: 'dp3' },
-        { name: 'Додаткова батарея DELTA Pro 3', capacityWh: 4096, pct: 82, type: 'battery', parent: 'DELTA Pro 3', parentId: 'dp3', id: 'dp3eb' },
-        { name: 'DELTA 3 Plus', capacityWh: 1024, pct: 92, inputW: 120, outputW: 38, type: 'station', id: 'd3p' },
-        { name: 'DELTA 2', capacityWh: 1024, pct: 64, inputW: 0, outputW: 75, type: 'station', id: 'd2' },
-        { name: 'RIVER 3 Plus Wireless', capacityWh: 286, pct: 29, inputW: 0, outputW: 12, type: 'station', id: 'r3pw' }
+        { name: 'DELTA Pro 3', capacityWh: 4096, pct: 84, inputW: 0, outputW: 620, type: 'station', id: 'dp3', operation: 'discharging' },
+        { name: 'Додаткова батарея DELTA Pro 3', capacityWh: 4096, pct: 82, type: 'battery', parent: 'DELTA Pro 3', parentId: 'dp3', id: 'dp3eb', operation: 'discharging' },
+        { name: 'DELTA 3 Plus', capacityWh: 1024, pct: 92, inputW: 120, outputW: 38, type: 'station', id: 'd3p', operation: 'charging' },
+        { name: 'DELTA 2', capacityWh: 1024, pct: 64, inputW: 0, outputW: 75, type: 'station', id: 'd2', operation: 'discharging' },
+        { name: 'RIVER 3 Plus Wireless', capacityWh: 286, pct: 29, inputW: 0, outputW: 12, type: 'station', id: 'r3pw', operation: 'discharging' }
       ]
     },
     home: {
       name: 'Дім', space: 'Квартира',
       devices: [
         // PowerOcean: 6 kW inverter, currently one 5 kWh battery; system delivers 3 kW now, 6 kW with two batteries.
-        { name: 'PowerOcean', capacityWh: 5000, inverterKw: 6, systemPowerKw: 3, twoBatterySystemKw: 6, batteryCount: 1, pct: 67, inputW: 300, outputW: 760, type: 'system', id: 'po' }
+        { name: 'PowerOcean', capacityWh: 5000, inverterKw: 6, systemPowerKw: 3, twoBatterySystemKw: 6, batteryCount: 1, pct: 67, inputW: 300, outputW: 760, type: 'system', id: 'po', operation: 'discharging' }
       ]
     },
     solovky: {
       name: 'Соловки', space: 'Соловки',
       devices: [
-        { name: 'DELTA 2', capacityWh: 1024, pct: 54, inputW: 0, outputW: 125, type: 'station', id: 'd2' },
-        { name: 'Додаткова батарея DELTA 2', capacityWh: 1024, pct: 49, type: 'battery', parent: 'DELTA 2', parentId: 'd2', id: 'd2eb' },
-        { name: 'RIVER 2', capacityWh: 256, pct: 18, inputW: 0, outputW: 26, type: 'station', id: 'r2' }
+        { name: 'DELTA 2', capacityWh: 1024, pct: 54, inputW: 0, outputW: 125, type: 'station', id: 'd2', operation: 'discharging' },
+        { name: 'Додаткова батарея DELTA 2', capacityWh: 1024, pct: 49, type: 'battery', parent: 'DELTA 2', parentId: 'd2', id: 'd2eb', operation: 'discharging' },
+        { name: 'RIVER 2', capacityWh: 256, pct: 18, inputW: 0, outputW: 26, type: 'station', id: 'r2', operation: 'discharging' }
       ]
     },
     naumenky: {
       name: 'Науменки', space: 'Науменки',
       devices: [
-        { name: 'DELTA 2', capacityWh: 1024, pct: 71, inputW: 0, outputW: 93, type: 'station', id: 'd2' }
+        { name: 'DELTA 2', capacityWh: 1024, pct: 71, inputW: 93, outputW: 93, type: 'station', id: 'd2', operation: 'holding' }
       ]
     }
   });
@@ -59,6 +59,20 @@
     if (pct >= 35) return 'medium';
     if (pct >= 20) return 'low';
     return 'critical';
+  }
+
+  const operationMeta = {
+    charging: { label: 'Заряджається', sign: '↓' },
+    discharging: { label: 'Розряджається', sign: '↑' },
+    holding: { label: 'Підтримує заряд', sign: '•' }
+  };
+  function operationBadge(device) {
+    const status = Object.prototype.hasOwnProperty.call(operationMeta, device.operation)
+      ? device.operation : 'holding';
+    const { label, sign } = operationMeta[status];
+    return '<span class="eco-operation eco-operation-' + status + '">' +
+      '<span class="eco-operation-icon" aria-hidden="true">' + sign + '</span>' +
+      label + '</span>';
   }
 
   function formatAutonomy(capacityWh, chargePct, outputW) {
@@ -119,7 +133,7 @@
       '" aria-label="' + d.name + ', заряд ' + d.pct + '%">' +
       '<div class="eco-device-head"><div class="eco-device-ident">' +
       '<strong class="eco-device-name">' + d.name + '</strong>' +
-      '<span class="eco-device-model">' + titleNote + '</span></div></div>' +
+      '<span class="eco-device-model">' + titleNote + '</span></div>' + operationBadge(d) + '</div>' +
       '<div class="eco-battery"><span class="eco-battery-percent">' + d.pct +
       '%</span><span class="eco-battery-art" aria-hidden="true"><i style="width:' +
       d.pct + '%"></i></span></div>' +
@@ -138,6 +152,7 @@
       return '<div class="eco-system-part charge-' + level(d.pct) + '">' +
         '<div class="eco-system-part-top"><span class="eco-system-part-label">' + role + '</span>' +
         '<strong class="eco-system-percent">' + d.pct + '%</strong></div>' +
+        operationBadge(d) +
         chargeTrack(d.pct, name) +
         '<span class="eco-system-part-cap">' + niceWh(d.capacityWh) + '</span>' +
         '</div>';
