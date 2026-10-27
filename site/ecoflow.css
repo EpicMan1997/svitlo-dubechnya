@@ -582,3 +582,103 @@ main > .layout > section.card > #display .schedule-details{margin-top:auto}
   .eco-bulk-card{padding:12px}
   .eco-target-list{max-height:170px}
 }
+
+
+/* Timeline v2: the chart spans full width; change history unfolds under it, above sources. */
+main > .layout{display:block;grid-template-columns:none;align-items:initial}
+main > .layout > .schedule-card{
+  display:block;
+  height:auto;
+  width:100%;
+  padding:20px;
+}
+main > .layout > .schedule-card > #display{height:auto;display:block;min-height:0}
+main > .layout > .schedule-card #display .graph{margin-top:26px}
+main > .layout > .schedule-card #scheduleDetailsHost{margin-top:13px}
+main > .layout > .schedule-card #scheduleDetailsHost > .schedule-details{margin-top:0}
+main > .layout .history-inline{
+  display:block;
+  margin-top:12px;
+  padding:0 16px;
+  border-radius:12px;
+  border:1px solid #344a64;
+  background:#172439;
+  align-self:auto;
+  min-height:0;
+}
+.history-inline .changes>summary{min-height:51px;padding:9px 0}
+.history-inline .changes-header strong{font-size:15px}
+.history-inline .changes-content{margin-top:0;padding-top:12px;padding-bottom:15px}
+.history-inline .change-item{margin-top:0;padding:13px 16px}
+.history-inline .change-comparison{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;
+}
+.history-inline .comparison-row{padding:10px 13px}
+.history-inline .comparison-delta{grid-column:1 / -1;justify-content:flex-end;padding-top:3px}
+.history-inline .changes .event{margin-top:0}
+.history-inline .earlier-changes{margin-top:12px}
+.history-inline .yesterday-list{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+  gap:10px;
+}
+.history-inline .yesterday-item{
+  min-width:0;
+  border:1px solid #364b66;
+  border-radius:10px;
+  background:#1c2d45;
+  padding:12px;
+}
+.history-inline .yesterday-overview{margin-top:12px}
+.history-inline .older{border-top:1px solid #344761;padding-top:12px}
+.history-inline .change-sources{margin-top:11px}
+@media(max-width:650px){
+  main > .layout > .schedule-card{padding:14px}
+  main > .layout .history-inline{padding:0 12px}
+  .history-inline .changes-content{padding-top:10px}
+  .history-inline .change-comparison{grid-template-columns:1fr}
+  .history-inline .comparison-delta{grid-column:auto}
+  .history-inline .yesterday-list{grid-template-columns:1fr}
+}
+
+/* Charging profile selector: one common mode, different watts for each model. */
+.eco-speed-preset{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:5px;
+  padding:4px;
+  border:1px solid #425b77;
+  background:#14243a;
+  border-radius:10px;
+}
+.eco-speed-preset-button{
+  min-width:0;
+  border:1px solid transparent;
+  border-radius:7px;
+  background:transparent;
+  color:#b5c9e2;
+  padding:9px 4px;
+  font:720 11px/1.25 system-ui;
+  cursor:pointer;
+}
+.eco-speed-preset-button.active{
+  color:#fef3c7;
+  border-color:#a47f38;
+  background:#4a3a21;
+  box-shadow:inset 0 1px 0 #fef3c719;
+}
+.eco-speed-preset-button:focus-visible{outline:2px solid #facc15;outline-offset:2px}
+.eco-speed-select{
+  width:min(150px,53%);
+  max-width:none;
+  font-size:11px;
+  padding:7px 5px;
+  flex:none;
+}
+.eco-target-row:has(.eco-speed-select) .eco-target-label{flex:1;max-width:48%}
+@media(max-width:650px){
+  .eco-speed-select{font-size:12px}
+  .eco-speed-preset-button{font-size:12px;padding:10px 5px}
+}
