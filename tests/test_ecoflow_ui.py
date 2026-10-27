@@ -21,7 +21,7 @@ class EcoFlowPreviewContract(unittest.TestCase):
         self.assertEqual(JS.count("capacityWh: 1024"), 5)
         self.assertEqual(JS.count("capacityWh: 286"), 1)
         self.assertEqual(JS.count("capacityWh: 256"), 1)
-        self.assertEqual(JS.count("capacityWh: null"), 1)
+        self.assertEqual(JS.count("capacityWh: 5000"), 1)
 
     def test_demo_not_presented_as_live_telemetry(self):
         self.assertIn("API не підключено", HTML)
@@ -40,11 +40,13 @@ class EcoFlowPreviewContract(unittest.TestCase):
         self.assertIn("не виконує автентифікацію", HTML)
         self.assertIn(".eco-shell.is-admin-preview", CSS)
 
-    def test_capacity_is_proportional_and_powerocean_unknown(self):
-        self.assertIn("d.capacityWh / 4096", JS)
+    def test_capacity_is_proportional_and_powerocean_is_known(self):
+        self.assertIn("d.capacityWh / MAX_BATTERY_WH", JS)
+        self.assertIn("MAX_BATTERY_WH = 5000", JS)
         self.assertIn("flex-grow:' + d.capacityWh", JS)
-        self.assertIn("capacityWh: null, powerKw: 5", JS)
-        self.assertIn("Ємність акумуляторів PowerOcean ще не уточнена", JS)
+        self.assertIn("capacityWh: 5000, inverterKw: 5, batteryPowerKw: 3, twoBatteryPowerKw: 6, batteryCount: 1", JS)
+        self.assertIn("інвертор ", JS)
+        self.assertIn("батарейна потужність зараз ", JS)
         self.assertIn('id="eco-capacity-strip"', HTML)
 
     def test_location_changer_and_pwa_integration(self):
