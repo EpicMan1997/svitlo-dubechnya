@@ -526,3 +526,59 @@ main > nav.tabs > button[data-tab="tomorrow"]{justify-self:end;margin:0}
   .eco-system .eco-common-stats{grid-template-columns:repeat(2,minmax(0,1fr))}
   .eco-system .eco-autonomy{grid-column:1 / -1}
 }
+
+
+/* Equal-height schedule and history cards, including expanded history. */
+main > .layout{align-items:stretch}
+main > .layout > .card{align-self:stretch;height:100%;min-height:0}
+main > .layout > section.card > #display{height:100%;display:flex;flex-direction:column}
+main > .layout > section.card > #display .schedule-details{margin-top:auto}
+@media(max-width:800px){
+  main > .layout > .card{height:auto}
+  main > .layout > section.card > #display{height:auto}
+  main > .layout > section.card > #display .schedule-details{margin-top:3px}
+}
+
+/* Admin: shared limit / AC / charge-speed control panel. Visual drafts only. */
+.eco-bulk-panel{margin-top:16px;padding:15px;border:1px solid #455d78;border-radius:14px;background:#17263a}
+.eco-bulk-title{display:flex;gap:10px;justify-content:space-between;align-items:baseline;flex-wrap:wrap}
+.eco-bulk-title strong{font-size:17px;color:#f2f7ff}
+.eco-bulk-title span{font-size:12px;color:#9bb2ce}
+.eco-bulk-toolbar{display:flex;align-items:center;gap:12px;justify-content:space-between;margin:13px 0;flex-wrap:wrap}
+.eco-bulk-scope{font-size:12px;font-weight:700;color:#c3d6ec;display:flex;align-items:center;gap:10px}
+.eco-bulk-scope select,.eco-speed-select{font:600 13px system-ui;color:#f1f5f9;background:#263951;border:1px solid #526a87;border-radius:9px;padding:8px;min-width:0}
+.eco-bulk-scope select:focus-visible,.eco-speed-select:focus-visible{outline:2px solid #facc15;outline-offset:2px}
+.eco-bulk-scope-note{font-size:11px;color:#96b2d0}
+.eco-bulk-actions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));align-items:stretch;gap:12px}
+.eco-bulk-card{display:flex;flex-direction:column;gap:11px;min-width:0;background:#1c2f47;border:1px solid #3b5472;border-radius:12px;padding:14px}
+.eco-bulk-card h4{font-size:15px;font-weight:780;margin:0;color:#f1f5f9}
+.eco-bulk-subtitle{font-size:11px;color:#a3b9d4;line-height:1.45;margin:0}
+.eco-bulk-range{display:flex;align-items:center;gap:10px}
+.eco-bulk-range input{flex:1;min-width:40px;accent-color:#facc15}
+.eco-bulk-range output{font-weight:800;font-size:18px;color:#facc15;font-variant-numeric:tabular-nums;min-width:46px;text-align:right}
+.eco-target-top{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:11px;color:#b3c7e0}
+.eco-target-actions{display:inline-flex;gap:6px;flex-wrap:wrap}
+.eco-target-actions button{font-size:11px;font-weight:700;border:1px solid #516882;background:#2a405b;border-radius:7px;padding:5px 8px;color:#dceaf8;cursor:pointer}
+.eco-target-actions button:hover{background:#35516f}
+.eco-target-list{border:1px solid #344d69;border-radius:9px;overflow-y:auto;max-height:193px;background:#15263c;padding:3px 9px}
+.eco-target-row{display:flex;align-items:center;justify-content:space-between;gap:7px;min-height:43px;padding:6px 0;border-bottom:1px solid #2f445f}
+.eco-target-row:last-child{border-bottom:0}
+.eco-target-label{display:flex;align-items:center;gap:9px;min-width:0;flex:1;font-size:12px;line-height:1.35;color:#e1ebf7;cursor:pointer}
+.eco-target-label input{accent-color:#eab308;flex:none;width:16px;height:16px;margin:0}
+.eco-target-label span{min-width:0;overflow-wrap:anywhere}
+.eco-target-label small{display:block;background:transparent;padding:1px 0 0;color:#96b5d6;font-size:10px}
+.eco-speed-select{max-width:78px;flex:none;padding:7px 5px;font-size:12px}
+.eco-target-empty{margin:10px 2px;color:#94a9c4;font-size:12px;line-height:1.5}
+.eco-bulk-apply{display:inline-flex;align-items:center;justify-content:center;padding:10px 9px;min-height:39px;border-radius:9px;background:#2c4967;color:#d2e5f5;border:1px solid #4e6885;font:730 12px system-ui}
+.eco-bulk-apply:disabled{opacity:.48;cursor:not-allowed}
+.eco-bulk-card > .eco-bulk-apply{margin-top:auto}
+.eco-bulk-buttons{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin-top:auto}
+.eco-bulk-danger{background:#502c3b;border-color:#7b4955;color:#ffe2e7}
+@media(max-width:960px){.eco-bulk-actions{grid-template-columns:repeat(2,minmax(0,1fr))}.eco-bulk-card:last-child{grid-column:1/-1}}
+@media(max-width:650px){
+  .eco-bulk-panel{padding:12px}
+  .eco-bulk-actions{grid-template-columns:1fr}
+  .eco-bulk-card:last-child{grid-column:auto}
+  .eco-bulk-card{padding:12px}
+  .eco-target-list{max-height:170px}
+}
