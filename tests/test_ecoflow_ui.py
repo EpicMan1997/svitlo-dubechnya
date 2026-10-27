@@ -126,5 +126,44 @@ class EcoFlowPreviewContract(unittest.TestCase):
 
 
 
+    def test_dacha_delta_three_plus_before_delta_two(self):
+        dacha = JS.split("dacha: {", 1)[1].split("home: {", 1)[0]
+        self.assertLess(dacha.index("name: 'DELTA 3 Plus'"), dacha.index("name: 'DELTA 2'"))
+
+    def test_equal_height_schedule_and_expanded_history(self):
+        self.assertIn("main > .layout{align-items:stretch}", CSS)
+        self.assertIn("main > .layout > .card{align-self:stretch;height:100%;min-height:0}", CSS)
+        self.assertIn("main > .layout > section.card > #display{height:100%;display:flex;flex-direction:column}", CSS)
+        self.assertIn("main > .layout > section.card > #display .schedule-details{margin-top:auto}", CSS)
+        self.assertIn("main > .layout > .card{height:auto}", CSS)
+
+    def test_admin_shared_actions_and_independent_targets(self):
+        self.assertIn('id="eco-admin-bulk"', HTML)
+        self.assertIn('id="eco-bulk-content"', HTML)
+        self.assertIn("'eco-admin-bulk').hidden = !enabled", JS)
+        for group in ("limit", "ac", "speed"):
+            self.assertIn("targetRows('" + group + "'", JS)
+        for action in ("Застосувати ліміт", "Увімкнути AC", "Вимкнути AC", "Застосувати швидкості"):
+            self.assertIn(action, JS)
+        self.assertIn("data-eco-target", JS)
+        self.assertIn("data-eco-speed", JS)
+        self.assertIn("data-eco-select", JS)
+        self.assertIn("value=\"all\"", JS)
+        self.assertIn("function renderBulkPanel()", JS)
+        self.assertIn("new Set()", JS)
+        self.assertIn("Object.keys(adminDraft.selected).forEach(group => adminDraft.selected[group].clear())", JS)
+        self.assertIn(".eco-bulk-actions{display:grid", CSS)
+
+    def test_no_unsecured_admin_commands_and_powerocean_is_separate(self):
+        self.assertIn("PowerOcean requires separate verified commands", JS)
+        self.assertIn(".filter(d => d.type === 'station')", JS)
+        self.assertNotRegex(JS, r"\bfetch\s*\(|XMLHttpRequest|WebSocket")
+        self.assertIn("type=\"button\" disabled>Увімкнути AC", JS)
+        self.assertIn("type=\"button\" disabled>Вимкнути AC", JS)
+        self.assertIn("type=\"button\" disabled>Застосувати швидкості", JS)
+        self.assertNotIn("Доступ після захищеного підключення.", JS)
+
+
+
 if __name__ == "__main__":
     unittest.main()
