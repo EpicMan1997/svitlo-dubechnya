@@ -326,11 +326,21 @@
     $('eco-demo-total').dataset.level = weighted === null ? 'unknown' : level(weighted);
     $('eco-demo-note').textContent = weighted === null ? 'Ємність батарей ще невідома' : 'Зважений за ємністю';
     // Here the segment width, unlike a card's layout size, is mathematically proportional to Wh.
+    const batteries = new Map(place.devices.filter(d => d.type === 'battery' && d.parentId).map(d => [d.parentId, d]));
+    const mainIds = new Set(place.devices.map(d => d.id));
+    const systems = place.devices.flatMap(d => {
+      if (d.type === 'battery' && d.parentId && mainIds.has(d.parentId)) return [];
+      const linked = batteries.get(d.id);
+      if (!linked) return [{ name: d.name, wh: d.capacityWh, pct: d.pct }];
+      const wh = d.capacityWh + linked.capacityWh;
+      const pct = Math.round((d.capacityWh * d.pct + linked.capacityWh * linked.pct) / wh);
+      return [{ name: d.name + ' + додаткова батарея', wh, pct }];
+    });
     $('eco-capacity-strip').innerHTML = allKnown
-      ? place.devices.map(d =>
-          '<span class="eco-cap-segment charge-' + level(d.pct) + '" style="flex-grow:' + d.capacityWh +
-          '" title="' + d.name + ': ' + niceWh(d.capacityWh) + ', заряд ' + d.pct + '%">' +
-          '<i style="width:' + d.pct + '%"></i></span>'
+      ? systems.map(system =>
+          '<span class="eco-cap-segment charge-' + level(system.pct) + '" style="flex-grow:' + system.wh +
+          '" title="' + system.name + ': ' + niceWh(system.wh) + ', заряд ' + system.pct + '%">' +
+          '<i style="width:' + system.pct + '%"></i></span>'
         ).join('')
       : '<span class="eco-cap-unknown">Ємність цієї батареї ще не уточнена</span>';
     $('eco-devices').innerHTML = renderDeviceGrid(place.devices);
