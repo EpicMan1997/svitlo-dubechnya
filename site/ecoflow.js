@@ -18,8 +18,8 @@
     home: {
       name: 'Квартира',
       devices: [
-        // One 5 kWh battery installed; battery output ~3 kW (two modules ~6 kW). Inverter rated 5 kW.
-        { name: 'PowerOcean', capacityWh: 5000, inverterKw: 5, batteryPowerKw: 3, twoBatteryPowerKw: 6, batteryCount: 1, pct: 67, inputW: 300, outputW: 760, type: 'system', id: 'po' }
+        // PowerOcean: 6 kW inverter, currently one 5 kWh battery; system delivers 3 kW now, 6 kW with two batteries.
+        { name: 'PowerOcean', capacityWh: 5000, inverterKw: 6, systemPowerKw: 3, twoBatterySystemKw: 6, batteryCount: 1, pct: 67, inputW: 300, outputW: 760, type: 'system', id: 'po' }
       ]
     },
     solovky: {
@@ -67,7 +67,7 @@
     const capacity = d.capacityWh === null ? 'Ємність акумуляторів невідома' : niceWh(d.capacityWh);
     const typeLabel = isBattery ? 'Додаткова батарея' : d.type === 'system' ? 'Домашня система' : 'Зарядна станція';
     const info = d.type === 'system'
-      ? '1 батарея · ' + capacity + ' · інвертор ' + d.inverterKw + ' кВт · батарейна потужність зараз ' + d.batteryPowerKw + ' кВт (з двома: ' + d.twoBatteryPowerKw + ' кВт)'
+      ? '1 батарея · ' + capacity + ' · інвертор ' + d.inverterKw + ' кВт · потужність системи зараз ' + d.systemPowerKw + ' кВт (із другою батареєю: ' + d.twoBatterySystemKw + ' кВт)'
       : isBattery ? 'Підключена до ' + d.parent : 'Номінальна ємність ' + capacity;
     const charge = level(d.pct);
     const stats = isBattery ?
