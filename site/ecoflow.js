@@ -86,10 +86,23 @@
       '</div>';
   }
 
-  function adminControls() {
+  const individualLimitPresets = [100, 80, 50, 5];
+  // UI-only drafts: a separate selection per physical station and location.
+  const individualChargeLimits = new Map();
+
+  function adminControls(device) {
+    const key = activeEcoLocation + ':' + device.id;
+    const selected = individualChargeLimits.get(key) ?? 80;
+    const controls = individualLimitPresets.map(percent =>
+      '<button type="button" class="eco-limit-preset' + (selected === percent ? ' is-active' : '') +
+      '" data-eco-individual-limit="' + percent + '" data-eco-device="' + key +
+      '" aria-pressed="' + String(selected === percent) + '">' + percent + '%</button>'
+    ).join('');
     return '<div class="eco-admin-only eco-device-admin"><strong>Керування</strong>' +
-      '<div class="eco-admin-controls"><label>Ліміт заряджання' +
-      '<input type="range" min="50" max="100" value="90" disabled></label>' +
+      '<div class="eco-admin-controls"><div class="eco-individual-limit">' +
+      '<span class="eco-individual-label">Ліміт заряджання</span>' +
+      '<div class="eco-limit-presets" role="group" aria-label="Ліміт заряджання ' + device.name + '">' +
+      controls + '</div></div>' +
       '<button type="button" disabled>AC-вихід</button></div>' +
       '</div>';
   }
@@ -113,7 +126,7 @@
       chargeTrack(d.pct, d.name) +
       '<div class="eco-capacity-line"><strong>' + capacity + '</strong></div>' +
       energyStats(d, d.capacityWh, d.pct) +
-      adminControls() +
+      adminControls(d) +
       '</article>';
   }
 
@@ -137,7 +150,7 @@
       '<span>' + weighted + '% загалом</span></div></div>' +
       '<div class="eco-system-parts">' + batteryPart(main, 'Основна') + batteryPart(addon, 'Додаткова') + '</div>' +
       energyStats(main, capacityWh, weighted) +
-      adminControls() +
+      adminControls(main) +
       '</article>';
   }
 
@@ -177,7 +190,7 @@
     dp3: { quiet: 500, balanced: 1000, fast: 2900 },
     d3p: { quiet: 200, balanced: 500, fast: 1500 },
     d2: { quiet: 200, balanced: 500, fast: 1200 },
-    r3pw: { quiet: 100, balanced: 200, fast: 380 },
+    r3pw: { quiet: 80, balanced: 200, fast: 380 },
     r2: { quiet: 100, balanced: 200, fast: 360 }
   };
   const speedModes = [
@@ -192,7 +205,7 @@
       '" aria-label="Режим заряджання ' + station.name + '">' +
       speedModes.map(mode => '<option value="' + mode.key + '"' +
         (selected === mode.key ? ' selected' : '') + '>' + mode.label +
-        ' · ' + profile[mode.key] + ' Вт</option>').join('') + '</select>';
+        ' · ' + (station.id === 'r3pw' && mode.key === 'quiet' ? 'до 80 Вт' : profile[mode.key] + ' Вт') + '</option>').join('') + '</select';
   }
 
   function targetRows(group, withSpeed) {
@@ -348,6 +361,27 @@
     $('eco-devices').innerHTML = renderDeviceGrid(place.devices);
     renderBulkPanel();
   }
+
+  // Individual limit presets affect only the displayed draft, never the EcoFlow devices.
+  root.addEventListener('click', event => {
+    const button = event.target.closest('button[data-eco-individual-limit]');
+    if (!button || !root.contains(button)) return;
+    const value = Number(button.dataset.ecoIndividualLimit);
+    const key = button.dataset.ecoDevice;
+    if (!individualLimitPresets.includes(value)) return;
+    if (!key.startsWith(activeEcoLocation + ':')) return;
+    const allowed = inventory[activeEcoLocation].devices.some(d =>
+      d.type !== 'battery' && (activeEcoLocation + ':' + d.id) === key);
+    if (!allowed) return;
+    individualChargeLimits.set(key, value);
+    const group = button.closest('.eco-limit-presets');
+    if (!group) return;
+    group.querySelectorAll('button[data-eco-individual-limit]').forEach(option => {
+      const active = Number(option.dataset.ecoIndividualLimit) === value;
+      option.classList.toggle('is-active', active);
+      option.setAttribute('aria-pressed', String(active));
+    });
+  });
 
   // Read-only capacity detail: hover, keyboard focus or touch/click.
   const capacityStrip = $('eco-capacity-strip');
