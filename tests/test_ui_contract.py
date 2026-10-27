@@ -80,6 +80,11 @@ class VisualStatusContract(unittest.TestCase):
         self.assertIn("if(tab==='tomorrow'&&tomorrowFingerprint()){markTomorrowSeen();updateTomorrowTab()}", HTML)
         self.assertIn("setInterval(reload,30000)", HTML)
 
+    def test_city_ten_is_display_label_only(self):
+        # The third-party source identifier 10.1 remains untouched by the UI.
+        self.assertIn("locationId==='azov28b'?'10':c?.group||'—'", HTML)
+        self.assertIn("c?.group||'—'", HTML)
+
     def test_short_outage_boundaries_merge_without_losing_original_times(self):
         self.assertIn("function prepareBoundaryLabels(out){", HTML)
         self.assertIn("prepareBoundaryLabels(out);const city=", HTML)
