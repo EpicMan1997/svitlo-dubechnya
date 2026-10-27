@@ -54,8 +54,8 @@ class EcoFlowPreviewContract(unittest.TestCase):
         self.assertIn("new CustomEvent('svitlo:location-change'", HTML)
         self.assertNotIn('href="#ecoflow"', HTML)
         self.assertIn('<section class="eco-shell"', HTML)
-        self.assertIn('"./ecoflow.css"', SW)
-        self.assertIn('"./ecoflow.js"', SW)
+        self.assertIn('"./ecoflow.css?v=18"', SW)
+        self.assertIn('"./ecoflow.js?v=18"', SW)
 
 
     def test_device_section_first_and_header_rearranged(self):
@@ -284,6 +284,21 @@ class EcoFlowPreviewContract(unittest.TestCase):
         self.assertIn("padding:0", CSS)
         self.assertIn('main > nav.tabs > button[data-tab="tomorrow"]{justify-self:end;margin-right:0;margin-left:0}', CSS)
         self.assertIn("main > nav.tabs{padding:0}", CSS)
+
+
+    def test_ecoflow_branding_and_fresh_pwa_assets(self):
+        self.assertIn('eco-title-monogram', HTML)
+        self.assertIn('stroke="#67E8F9"', HTML)
+        self.assertIn('href="./ecoflow.css?v=18"', HTML)
+        self.assertIn('src="./ecoflow.js?v=18"', HTML)
+        self.assertIn("updateViaCache:'none'", HTML)
+        self.assertIn('nashe-svitlo-static-v18', SW)
+        self.assertIn('url.pathname.endsWith("/ecoflow.css")', SW)
+        self.assertIn('url.pathname.endsWith("/ecoflow.js")', SW)
+        self.assertIn('fetch(request, {cache: "no-store"})', SW)
+        self.assertIn('caches.match(request)', SW)
+        self.assertIn(".eco-title-monogram{", CSS)
+
 
 
 if __name__ == "__main__":
