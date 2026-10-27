@@ -99,13 +99,14 @@ class VisualStatusContract(unittest.TestCase):
             self.assertTrue(state['locations'][key]['logs'])
             self.assertTrue(state['locations'][key]['days'])
 
-    def test_group_only_in_location_menu_not_permanent_header(self):
-        # The full source queue is a detail on demand, not a persistent badge.
-        self.assertNotIn('id="locationGroup"', HTML)
-        self.assertIn("const group=data?.locations?.[b.dataset.location]?.group;", HTML)
-        self.assertIn("hint.textContent=group?'Група '+group:''", HTML)
+    def test_main_group_number_in_header_and_menu(self):
+        # Only the main group is visible; source queue precision stays internal.
+        self.assertIn('<span id="locationLabel">Дача</span><small id="locationGroup">3</small>', HTML)
+        self.assertIn("const c=activeLocation()", HTML)
+        self.assertIn("$('locationGroup').textContent=String(c?.group||'—').split('.')[0]", HTML)
+        self.assertIn("hint.textContent=group?'Група '+String(group).split('.')[0]:''", HTML)
+        self.assertIn(".location-button #locationGroup{flex:none", HTML)
         self.assertIn("hint.hidden=!group", HTML)
-        self.assertIn('<span id="locationLabel">Дача</span><span class="location-chevron"', HTML)
         refresh = ROOT.joinpath("scripts/refresh.py").read_text(encoding="utf-8")
         self.assertIn("'group':'4.1'", refresh)
         self.assertIn("'group':'10.1'", refresh)
