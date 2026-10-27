@@ -9,7 +9,7 @@
       name: 'Дача',
       devices: [
         { name: 'DELTA Pro 3', capacityWh: 4096, pct: 84, inputW: 0, outputW: 620, type: 'station', id: 'dp3' },
-        { name: 'Додаткова батарея DELTA Pro 3', capacityWh: 4096, pct: 82, type: 'battery', parent: 'DELTA Pro 3', id: 'dp3eb' },
+        { name: 'Додаткова батарея DELTA Pro 3', capacityWh: 4096, pct: 82, type: 'battery', parent: 'DELTA Pro 3', parentId: 'dp3', id: 'dp3eb' },
         { name: 'DELTA 2', capacityWh: 1024, pct: 64, inputW: 0, outputW: 75, type: 'station', id: 'd2' },
         { name: 'DELTA 3 Plus', capacityWh: 1024, pct: 92, inputW: 120, outputW: 38, type: 'station', id: 'd3p' },
         { name: 'RIVER 3 Plus Wireless', capacityWh: 286, pct: 29, inputW: 0, outputW: 12, type: 'station', id: 'r3pw' }
@@ -26,7 +26,7 @@
       name: 'Соловки',
       devices: [
         { name: 'DELTA 2', capacityWh: 1024, pct: 54, inputW: 0, outputW: 125, type: 'station', id: 'd2' },
-        { name: 'Додаткова батарея DELTA 2', capacityWh: 1024, pct: 49, type: 'battery', parent: 'DELTA 2', id: 'd2eb' },
+        { name: 'Додаткова батарея DELTA 2', capacityWh: 1024, pct: 49, type: 'battery', parent: 'DELTA 2', parentId: 'd2', id: 'd2eb' },
         { name: 'RIVER 2', capacityWh: 256, pct: 18, inputW: 0, outputW: 26, type: 'station', id: 'r2' }
       ]
     },
@@ -61,7 +61,7 @@
     if (pct >= 20) return 'low';
     return 'critical';
   }
-  function deviceView(d) {
+  function deviceView(d, linked = false) {
     const isBattery = d.type === 'battery';
     const size = capClass(d.capacityWh);
     const capacity = d.capacityWh === null ? 'Ємність акумуляторів невідома' : niceWh(d.capacityWh);
@@ -76,8 +76,8 @@
         '<div class="eco-device-stat"><span>Вхід · демо</span><strong>' + d.inputW + ' Вт</strong></div>' +
         '<div class="eco-device-stat"><span>Вихід · демо</span><strong>' + d.outputW + ' Вт</strong></div>' +
       '</div>';
-    return '<article class="eco-device ' + size + ' charge-' + charge + '" aria-label="' + d.name + ', демонстраційний заряд ' + d.pct + ' відсотків">' +
-      '<div class="eco-device-head"><div class="eco-device-ident"><strong class="eco-device-name">' + d.name + '</strong>' +
+    return '<article class="eco-device ' + size + ' charge-' + charge + (linked ? (isBattery ? ' eco-linked-extension' : ' eco-linked-main') : '') + '" aria-label="' + d.name + ', демонстраційний заряд ' + d.pct + ' відсотків">' +
+      '<div class="eco-device-head"><div class="eco-device-ident">' + (linked ? '<span class="eco-link-role">' + (isBattery ? 'Додаткова батарея' : 'Основна станція') + '</span>' : '') + '<strong class="eco-device-name">' + d.name + '</strong>' +
       '<span class="eco-device-model">' + typeLabel + '</span></div><span class="eco-device-badge">Демо</span></div>' +
       '<div class="eco-battery"><span class="eco-battery-percent">' + d.pct + '%</span>' +
       '<span class="eco-battery-art" aria-hidden="true"><i style="width:' + d.pct + '%"></i></span></div>' +
@@ -90,11 +90,33 @@
       stats +
       '<div class="eco-device-foot"><span>Автономність: не розраховано</span><span>Не підключено</span></div>' +
       '<div class="eco-admin-only eco-device-admin">' +
-      '<strong>Керування · майбутній адмінрежим</strong>' +
-      '<div class="eco-admin-controls"><label>Ліміт заряджання <input type="range" min="50" max="100" value="90" disabled></label>' +
-      '<button type="button" disabled>AC: керування недоступне</button></div>' +
-      '<span>Тільки макет. Команди не виконуються, авторизації ще немає.</span>' +
-      '</div></article>';
+      '<strong>' + (isBattery ? 'Додаткова батарея' : 'Керування · майбутній адмінрежим') + '</strong>' +
+      (isBattery ? '<p>Параметри цього акумулятора керуються через основну станцію ' + d.parent + '.</p>' :
+        '<div class="eco-admin-controls"><label>Ліміт заряджання <input type="range" min="50" max="100" value="90" disabled></label>' +
+        '<button type="button" disabled>AC: керування недоступне</button></div>') +
+      '<span>Лише макет. Команди не виконуються, авторизації ще немає.</span>' +
+      '</div></article';
+  }
+
+  // One visual power system per main station, with its battery linked inside.
+  function renderDeviceGrid(devices) {
+    const addons = new Map(devices.filter(d => d.type === 'battery' && d.parentId).map(d => [d.parentId, d]));
+    const ids = new Set(devices.map(d => d.id));
+    return devices.map(d => {
+      if (d.type === 'battery' && d.parentId && ids.has(d.parentId)) return '';
+      const addon = addons.get(d.id);
+      if (!addon) return deviceView(d);
+      const total = d.capacityWh + addon.capacityWh;
+      const avg = Math.round((d.pct * d.capacityWh + addon.pct * addon.capacityWh) / total);
+      return '<section class="eco-pair" aria-label="Система ' + d.name + ' із додатковою батареєю">' +
+        '<div class="eco-pair-head"><div class="eco-pair-title"><span class="eco-pair-icon" aria-hidden="true">↔</span>' +
+        '<div><strong>' + d.name + ' + додаткова батарея</strong>' +
+        '<span class="eco-pair-subtitle">Єдина система · 2 акумулятори</span></div></div>' +
+        '<div class="eco-pair-summary"><b>' + niceWh(total) + '</b><span class="eco-pair-average charge-' + level(avg) + '">' + avg + '% · демо</span></div></div>' +
+        '<div class="eco-pair-grid">' + deviceView(d, true) + deviceView(addon, true) + '</div>' +
+        '<div class="eco-pair-caption"><span class="eco-linked-dot"></span>Додаткова батарея підключена до основної станції. Показники заряду кожного акумулятора окремі.</div>' +
+        '</section>';
+    }).join('');
   }
 
   function updateLocation(id) {
@@ -121,7 +143,7 @@
           '<i style="width:' + d.pct + '%"></i></span>'
         ).join('')
       : '<span class="eco-cap-unknown">Ємність цієї батареї ще не уточнена</span>';
-    $('eco-devices').innerHTML = place.devices.map(deviceView).join('');
+    $('eco-devices').innerHTML = renderDeviceGrid(place.devices);
     $('eco-scale-note').textContent = allKnown ?
       'Площа карток приблизно відповідає ємності станцій; пропорційна шкала показує точне співвідношення кВт·год.' :
       'Для цієї локації є батареї з невідомою ємністю.';
