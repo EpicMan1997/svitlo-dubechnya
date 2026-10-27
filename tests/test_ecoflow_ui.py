@@ -77,19 +77,36 @@ class EcoFlowPreviewContract(unittest.TestCase):
         self.assertIn('main > .tabs{width:100%;padding-right:14px}', CSS)
         self.assertIn(".eco-admin-toggle[aria-checked=\"true\"]", CSS)
 
-    def test_expansion_batteries_share_an_explicit_pair(self):
+    def test_expansion_batteries_are_one_system_card(self):
         self.assertIn("parentId: 'dp3'", JS)
         self.assertIn("parentId: 'd2'", JS)
         self.assertIn("function renderDeviceGrid(devices)", JS)
         self.assertIn("const addons = new Map(", JS)
         self.assertIn("ids.has(d.parentId)", JS)
-        self.assertIn("deviceView(d, true) + deviceView(addon, true)", JS)
-        self.assertIn("niceWh(total)", JS)
-        self.assertIn('class="eco-pair-grid"', JS)
-        self.assertIn(".eco-pair-grid", CSS)
-        self.assertIn("@media(max-width:760px)", CSS)
-        self.assertIn("Параметри цього акумулятора керуються через основну станцію", JS)
+        self.assertIn("return addon ? systemView(d, addon) : deviceView(d);", JS)
+        self.assertIn('class="eco-system eco-system-paired', JS)
+        self.assertIn('class="eco-system-parts"', JS)
+        self.assertIn("batteryPart(main, 'Основна')", JS)
+        self.assertIn("batteryPart(addon, 'Додаткова')", JS)
+        self.assertIn("niceWh(capacityWh)", JS)
+        self.assertIn(".eco-system-parts{display:grid", CSS)
+        self.assertIn("formatAutonomy(capacityWh, chargePct, outputW)", JS)
+        self.assertIn("energyStats(main, capacityWh, weighted)", JS)
 
+    def test_header_alignment_and_tabs_reach_graph_end(self):
+        self.assertIn("main > header .location-shell,\nmain > header #clock,\nmain > header .header-time{min-height:58px}", CSS)
+        self.assertIn("main > nav.tabs{", CSS)
+        self.assertIn("grid-template-columns:minmax(0,1fr) max-content", CSS)
+        self.assertIn('main > nav.tabs > button[data-tab="tomorrow"]{justify-self:end;margin:0}', CSS)
+        self.assertIn("main > nav.tabs{width:100%;padding-right:0}", CSS)
+
+    def test_power_and_autonomy_are_shared_at_system_level(self):
+        self.assertIn("function energyStats(d, capWh, pct)", JS)
+        self.assertIn("Math.round(capacityWh * chargePct / 100 * 0.85 / outputW", JS)
+        self.assertIn("Автономність", JS)
+        self.assertNotIn("Автономність: —", JS)
+        self.assertNotIn("Вхід / вихід контролює основна станція", JS)
+        self.assertIn("disabled", JS)
 
 
     def test_compact_location_and_space_mapping(self):
