@@ -26,10 +26,21 @@ class VisualStatusContract(unittest.TestCase):
         self.assertNotIn("status==='delayed'", HTML)
         self.assertIn("age>=15*60", HTML)
 
-    def test_github_status_does_not_confuse_development_push_with_scheduled_refresh(self):
-        self.assertIn("event=workflow_dispatch", HTML)
+    def test_freshness_does_not_expose_github_implementation_details(self):
         self.assertIn("function events(){", HTML)
         self.assertIn("changeDailyCount", HTML)
+        self.assertIn("if(Number.isFinite(age)&&age>=15*60)message+=' · перевірка запізнюється';", HTML)
+        self.assertNotIn("checkGithubRuns", HTML)
+        self.assertNotIn("githubCheckedAt", HTML)
+        self.assertNotIn("GitHub:", HTML)
+
+    def test_obolon_is_clean_and_city_dtek_is_manual_only(self):
+        self.assertNotIn("Група 4.1 попередня — потрібна адресна перевірка ДТЕК", HTML)
+        self.assertIn("locationId!=='obolonskyi54'&&!activeLocation()?.address_verified", HTML)
+        self.assertIn("ДТЕК</a><span class=\"source-verdict source-manual-verdict\">За адресою", HTML)
+        self.assertIn("Перевірити вручну на сайті ДТЕК", HTML)
+        self.assertIn("Object.keys(urls).filter(name=>rows[name]?.status==='match')", HTML)
+        self.assertNotIn("'ДТЕК':'https://www.dtek-kem.com.ua/ua/shutdowns'", HTML)
 
     def test_source_palette_is_shared(self):
         self.assertIn("const palette=sourcePalette", HTML)

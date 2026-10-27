@@ -67,8 +67,12 @@ class Tests(unittest.TestCase):
  def test_city_source_dtek_not_faked(self):
   expected={'date':D.isoformat(),'status':'normal','outages':[['07:30','11:00']],'sources':['КолиСвітло','КолиБуде']}
   result=city_sources(expected,{'candidates':[]},(('07:30','11:00'),),(('07:30','11:00'),),'https://example.com',{})
-  self.assertEqual(result['ДТЕК']['status'],'unavailable')
+  self.assertNotIn('ДТЕК',result)
   self.assertEqual(result['КолиСвітло']['status'],'match')
+  self.assertEqual(len(result),4)
+  script=Path(__file__).resolve().parents[1].joinpath('scripts/refresh.py').read_text(encoding='utf-8')
+  self.assertNotIn("city_dtek=fetch(",script)
+  self.assertNotIn("'ДТЕК':None",script)
  def test_alerts_region_half_hour_codes(self):
   slots=[0]*24
   for i in range(8,12):slots[i]=1

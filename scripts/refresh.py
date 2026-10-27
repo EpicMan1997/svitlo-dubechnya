@@ -333,7 +333,6 @@ def make_log_event(now,target,old,new,message):
 
 CITY_KOLY = 'https://kolysvitlo.com/schedule/dtek_kyiv'
 CITY_BUDE = 'https://kolybude.com/kyiv'
-CITY_DTEK = 'https://www.dtek-kem.com.ua/ua/shutdowns'
 CITY_LOCATIONS = {
     'obolonskyi54': {'name':'Оболонський проспект 54','group':'4.1','address_verified':False,
                     'street':'https://bezsvitla.com.ua/kyiv/prosp-obolonskyi'},
@@ -399,10 +398,10 @@ def parse_city_bude(html,target,today,group):
     return normalize(result) if result else None
 
 def city_sources(entry,bez,koly,bude,street,prev,alerts=None):
-    targets={'Карта світла':street,'КолиСвітло':CITY_KOLY,'КолиБуде':CITY_BUDE,
-             'ДТЕК':CITY_DTEK,'Alerts Energy':ALERTS_CITY}
+    """Only independently parsed schedules count; DTEK uses address-level AJAX, not public page HTML."""
+    targets={'Карта світла':street,'КолиСвітло':CITY_KOLY,'КолиБуде':CITY_BUDE,'Alerts Energy':ALERTS_CITY}
     data={'Карта світла':bez['candidates'][0] if len(bez['candidates'])==1 else None,
-          'КолиСвітло':koly,'КолиБуде':bude,'ДТЕК':None,'Alerts Energy':alerts}
+          'КолиСвітло':koly,'КолиБуде':bude,'Alerts Energy':alerts}
     previous=prev.get('source_reports',{})
     compare=tuple(tuple(x) for x in entry.get('outages',[]))
     out={}
@@ -421,7 +420,6 @@ def update_city_locations(now,today,old,errors):
     """Separate city operator, street address, queue, and history; never reuse dacha data."""
     city_koly=fetch(CITY_KOLY,'КолиСвітло Київ',errors)
     city_bude=fetch(CITY_BUDE,'КолиБуде Київ',errors)
-    city_dtek=fetch(CITY_DTEK,'ДТЕК Київ',errors)
     city_alerts=fetch(ALERTS_CITY,'Alerts Energy Київ',errors)
     city_map_pages={group:fetch(MAP_CITY_PREFIX+group,'Карта світла Київ '+group,errors)
                     for group in {config['group'] for config in CITY_LOCATIONS.values()}}
