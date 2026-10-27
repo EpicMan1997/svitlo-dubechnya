@@ -58,3 +58,93 @@
 
 /* Keep Today / Tomorrow / EcoFlow reachable on narrow iPhone screens. */
 .tabs{flex-wrap:wrap}
+
+
+/* EcoFlow inventory v2: genuine capacities, fictitious SOC and inactive controls. */
+.eco-admin-toggle{display:inline-flex;align-items:center;gap:9px;background:#1c2b40;border:1px solid #42556d;border-radius:11px;padding:6px 9px;cursor:pointer;color:#dce9fa;font:700 12px system-ui;white-space:nowrap;margin-bottom:7px}
+.eco-admin-toggle-label{display:flex;align-items:baseline;gap:5px}
+.eco-admin-toggle small{font-size:9px;font-weight:700;color:#c4a863;background:transparent;padding:0}
+.eco-switch-track{width:33px;height:18px;border-radius:15px;background:#46566b;position:relative;display:inline-block;transition:background .2s}
+.eco-switch-track i{position:absolute;left:3px;top:3px;width:12px;height:12px;background:#fff;border-radius:50%;transition:transform .2s}
+.eco-admin-toggle[aria-checked="true"]{border-color:#8b7142;background:#352a1b;color:#fde68a}
+.eco-admin-toggle[aria-checked="true"] .eco-switch-track{background:#ba871e}
+.eco-admin-toggle[aria-checked="true"] .eco-switch-track i{transform:translateX(15px)}
+.eco-admin-toggle:focus-visible{outline:2px solid #facc15;outline-offset:3px}
+.eco-shell .eco-description strong{color:#fcd34d}
+.eco-scale-note{color:#9aaec8;font-size:12px;line-height:1.5;margin:3px 0 13px}
+.eco-metric-value[data-level="high"]{color:#4ade80}
+.eco-metric-value[data-level="good"]{color:#a3e635}
+.eco-metric-value[data-level="medium"]{color:#facc15}
+.eco-metric-value[data-level="low"]{color:#fb923c}
+.eco-metric-value[data-level="critical"]{color:#fb7185}
+.eco-devices{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:11px;align-items:stretch}
+.eco-device{--charge:#d7e3f2;--charge-muted:#7688a0;display:flex;flex-direction:column;min-width:0;padding:15px}
+.eco-device.size-large{grid-column:span 6}
+.eco-device.size-medium{grid-column:span 5}
+.eco-device.size-small{grid-column:span 2;padding:12px}
+.eco-device.size-unknown{grid-column:span 12}
+.eco-shell[data-location="naumenky"] .eco-device{grid-column:span 12}
+.eco-device.charge-high{--charge:#22c55e;--charge-muted:#14532d}
+.eco-device.charge-good{--charge:#84cc16;--charge-muted:#3f6212}
+.eco-device.charge-medium{--charge:#eab308;--charge-muted:#713f12}
+.eco-device.charge-low{--charge:#f97316;--charge-muted:#7c2d12}
+.eco-device.charge-critical{--charge:#ef4444;--charge-muted:#7f1d1d}
+.eco-device-ident{min-width:0}
+.eco-device-name{font-size:15px;line-height:1.25;display:block;overflow-wrap:anywhere}
+.eco-device-model{line-height:1.35}
+.eco-device-badge{flex:none}
+.eco-battery{margin-top:15px}
+.eco-battery-percent{color:var(--charge);font-size:clamp(27px,3vw,38px);line-height:1.1}
+.eco-battery-art{border-color:var(--charge)}
+.eco-battery-art:after{background:var(--charge)}
+.eco-battery-art i{background:var(--charge);border-radius:2px}
+.eco-charge-track{overflow:hidden;background:#344458;margin:10px 0 12px}
+.eco-charge-track i{display:block;height:100%;border-radius:50px;background:var(--charge);transition:width .2s}
+.eco-capacity-line{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:4px;color:#e2e8f0;font-size:13px}
+.eco-capacity-line strong{font-size:14px;font-variant-numeric:tabular-nums}
+.eco-size-note{font-size:10px;color:#91a8c4}
+.eco-device-caption{font-size:11px;line-height:1.4;color:#9db2cc;margin:6px 0 10px}
+.eco-attached-note{border-radius:9px;background:#23354c;color:#bacce0;padding:10px;line-height:1.5;font-size:11px}
+.eco-device-stats{margin-top:auto}
+.eco-device-foot{margin-top:auto;padding-top:11px;line-height:1.4;flex-wrap:wrap}
+.eco-device.size-small .eco-battery-art{display:none}
+.eco-device.size-small .eco-device-head{display:block}
+.eco-device.size-small .eco-device-badge{display:inline-block;margin-top:7px}
+.eco-device.size-small .eco-battery{margin-top:13px}
+.eco-device.size-small .eco-device-stats{grid-template-columns:1fr;gap:6px}
+.eco-device.size-small .eco-device-stat{padding:7px}
+.eco-device.size-small .eco-device-stat strong{font-size:13px}
+.eco-device.size-small .eco-device-foot{font-size:10px}
+.eco-device.size-unknown .eco-device-stats{margin-top:4px}
+.eco-admin-only{display:none!important}
+.eco-shell.is-admin-preview .eco-admin-only:not([hidden]){display:block!important}
+.eco-admin-mode-hint{margin-top:16px;border:1px solid #926c2a;background:#362c1b;border-radius:12px;padding:15px;font-size:12px;line-height:1.6;color:#e2cda1}
+.eco-admin-mode-hint strong{color:#fde68a}
+.eco-admin-mode-hint p{margin:7px 0 0}
+.eco-device-admin{border-top:1px dashed #64748b;margin-top:12px;padding-top:12px;color:#c3d3e5;font-size:11px;line-height:1.5}
+.eco-device-admin strong{color:#fcd34d;font-size:12px}
+.eco-admin-controls{display:flex;flex-wrap:wrap;gap:9px;margin:9px 0}
+.eco-admin-controls label{display:grid;gap:4px;flex:1;min-width:120px;background:#23344b;padding:8px;border-radius:8px}
+.eco-admin-controls input{width:100%;accent-color:#facc15}
+.eco-admin-controls button{background:#33455b;border:1px solid #526781;color:#b8c9db;border-radius:8px;cursor:not-allowed;padding:9px;flex:1;min-width:110px}
+.eco-admin-controls :disabled{opacity:.7}
+@media(max-width:950px){
+ .eco-device.size-medium{grid-column:span 6}
+ .eco-device.size-small{grid-column:span 12}
+ .eco-device.size-small .eco-device-head{display:flex}
+ .eco-device.size-small .eco-device-stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .eco-device.size-small .eco-battery-art{display:inline-block}
+}
+@media(max-width:650px){
+ .eco-devices{grid-template-columns:1fr}
+ .eco-device.size-large,.eco-device.size-medium,.eco-device.size-small,.eco-device.size-unknown{grid-column:1/-1}
+ .eco-device.size-small{padding:15px}
+ .eco-device.size-small .eco-device-badge{margin:0}
+ .eco-metrics{grid-template-columns:1fr}
+ .eco-metric:first-child{grid-column:auto}
+ .eco-device.size-small .eco-device-stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .eco-admin-toggle{padding:5px 7px;font-size:11px;gap:6px}
+ .eco-admin-toggle small{font-size:8px}
+ .eco-admin-toggle .eco-switch-track{width:29px}
+ .eco-admin-toggle[aria-checked="true"] .eco-switch-track i{transform:translateX(11px)}
+}
