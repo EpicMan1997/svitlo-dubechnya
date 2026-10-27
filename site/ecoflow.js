@@ -44,7 +44,6 @@
 
   const $ = id => document.getElementById(id);
   const uk = new Intl.NumberFormat('uk-UA', { maximumFractionDigits: 1 });
-  const MAX_BATTERY_WH = 5000; // Capacity scale: largest installed battery in the current inventory.
   function niceWh(wh) {
     return wh >= 1000 ? uk.format(wh / 1000) + ' кВт·год' : uk.format(wh) + ' Вт·год';
   }
