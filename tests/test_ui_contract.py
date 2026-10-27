@@ -69,6 +69,15 @@ class VisualStatusContract(unittest.TestCase):
         self.assertIn("if(tab==='tomorrow'&&tomorrowFingerprint()){markTomorrowSeen();updateTomorrowTab()}", HTML)
         self.assertIn("setInterval(reload,30000)", HTML)
 
+    def test_short_outage_boundaries_merge_without_losing_original_times(self):
+        self.assertIn("function prepareBoundaryLabels(out){", HTML)
+        self.assertIn("prepareBoundaryLabels(out);const city=", HTML)
+        self.assertIn("merged.textContent=from+'–'+to", HTML)
+        self.assertIn("a.hidden=true;b.hidden=true", HTML)
+        self.assertIn("getBoundingClientRect().width", HTML)
+        self.assertIn(".axis.outage-boundary[hidden]{display:none!important}", HTML)
+        self.assertIn("Math.abs(start-currentMinute)<=30||Math.abs(end-currentMinute)<=30", HTML)
+
     def test_daily_change_badge_high_contrast_and_color_thresholds(self):
         self.assertIn("min-width:32px;height:32px", HTML)
         self.assertIn("font-size:18px;font-weight:850", HTML)
