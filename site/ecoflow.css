@@ -682,3 +682,59 @@ main > .layout .history-inline{
   .eco-speed-select{font-size:12px}
   .eco-speed-preset-button{font-size:12px;padding:10px 5px}
 }
+
+
+/* Full-width schedule: Today at the graph start, Tomorrow at its right edge. */
+main > nav.tabs{
+  width:100%;
+  max-width:none;
+  padding-inline:0;
+  grid-template-columns:minmax(0,1fr) max-content;
+}
+main > nav.tabs > button[data-tab="today"]{justify-self:start}
+main > nav.tabs > button[data-tab="tomorrow"]{justify-self:end;margin:0}
+
+/* Compact, readable count of previous edits. */
+.history-inline .earlier-changes>summary{justify-content:space-between;gap:12px}
+.past-change-count{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-width:26px;
+  height:26px;
+  padding:0 7px;
+  border-radius:999px;
+  background:#30445c;
+  border:1px solid #56728e;
+  color:#e7f1ff;
+  font-size:12px;
+  font-weight:850;
+  font-variant-numeric:tabular-nums;
+}
+
+/* Tooltip floats outside the proportional bar's clipping region. */
+.eco-capacity-tooltip{
+  position:fixed;
+  left:0;
+  top:0;
+  width:max-content;
+  max-width:min(310px,calc(100vw - 16px));
+  padding:10px 13px;
+  background:#263b55;
+  border:1px solid #7393b6;
+  border-radius:10px;
+  color:#f8fafc;
+  box-shadow:0 7px 24px #0009;
+  font:700 12px/1.45 system-ui;
+  text-align:center;
+  white-space:normal;
+  pointer-events:none;
+  z-index:300;
+}
+.eco-capacity-tooltip[hidden]{display:none!important}
+.eco-cap-segment{cursor:help}
+.eco-cap-segment:focus-visible{
+  outline:2px solid #facc15;
+  outline-offset:-3px;
+  z-index:1;
+}
