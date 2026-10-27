@@ -846,3 +846,90 @@ main > nav.tabs{width:100%;padding-left:0;padding-right:20px}
   .eco-operation{font-size:10px;padding:5px 8px;min-height:26px}
   .eco-system-part .eco-operation{margin-top:8px}
 }
+
+
+/* Both history headers use the same chevron, alignment and compact spacing. */
+.history-inline .earlier-changes>summary,
+.history-inline .older>summary{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  min-height:43px;
+  padding:9px 2px;
+  list-style:none;
+  cursor:pointer;
+  font-size:12px;
+  line-height:1.45;
+  font-weight:760;
+  color:#cbdcf0;
+}
+.history-inline .earlier-changes>summary::-webkit-details-marker,
+.history-inline .older>summary::-webkit-details-marker{display:none}
+.history-inline .earlier-changes>summary::after{content:none!important}
+.history-inline .archive-arrow{
+  display:inline-block;
+  position:relative;
+  align-self:center;
+  flex:0 0 16px;
+  width:16px;
+  height:18px;
+  color:#b9cbe2;
+  font:750 19px/18px system-ui;
+}
+.history-inline .archive-arrow::before{
+  content:"›";
+  position:absolute;
+  inset:0;
+  transform:rotate(0deg);
+  transform-origin:center;
+}
+.history-inline details[open]>summary>.archive-arrow::before{transform:rotate(90deg)}
+.past-change-label{display:inline-flex;align-items:center;gap:7px;min-width:0;flex-wrap:wrap}
+.past-change-count{
+  display:inline-grid;
+  place-items:center;
+  min-width:25px;
+  height:25px;
+  box-sizing:border-box;
+  padding:0 6px;
+  border-radius:999px;
+  background:#472033;
+  border:2px solid #fb7185;
+  color:#fda4af;
+  font-size:13px;
+  line-height:1;
+  font-weight:850;
+  font-variant-numeric:tabular-nums;
+}
+.yesterday-summary-label{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:5px 15px;
+  min-width:0;
+}
+.history-inline .yesterday-summary-short{
+  display:inline-block;
+  margin:0;
+  color:#9fb4cf;
+  font-size:11px;
+  line-height:1.45;
+}
+/* Tabs align flush with the outer edges of the schedule card, not its padded chart contents. */
+main > nav.tabs{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) max-content;
+  width:100%;
+  max-width:none;
+  box-sizing:border-box;
+  margin-inline:0;
+  padding:0;
+  justify-content:stretch;
+}
+main > nav.tabs > button[data-tab="today"]{justify-self:start}
+main > nav.tabs > button[data-tab="tomorrow"]{justify-self:end;margin-right:0;margin-left:0}
+@media(max-width:650px){
+  main > nav.tabs{padding:0}
+  .yesterday-summary-label{gap:3px 9px}
+}
