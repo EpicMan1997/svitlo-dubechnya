@@ -194,7 +194,7 @@ class EcoFlowPreviewContract(unittest.TestCase):
 
 
     def test_previous_changes_counter_and_yesterday_label(self):
-        self.assertIn('Минулі зміни <span class="past-change-count">', HTML)
+        self.assertIn('Минулі зміни сьогодні <span class="past-change-count">', HTML)
         self.assertIn("previousEdits.length", HTML)
         self.assertNotIn("<summary>Ще '+previousEdits.length", HTML)
         self.assertIn("$('previousTitle').textContent='Зміни і графік вчора'", HTML)
@@ -250,6 +250,27 @@ class EcoFlowPreviewContract(unittest.TestCase):
         self.assertIn("r3pw: { quiet: 80, balanced: 200, fast: 380 }", JS)
         self.assertIn("mode.key === 'quiet' ? 'до 80 Вт'", JS)
         self.assertIn("'</select>'", JS)
+
+
+    def test_matching_archive_arrows_and_prominent_daily_counter(self):
+        self.assertIn('class="past-change-label"', HTML)
+        self.assertIn("Минулі зміни сьогодні", HTML)
+        self.assertIn('class="archive-arrow" aria-hidden="true"', HTML)
+        self.assertEqual(HTML.count('class="archive-arrow"'), 2)
+        self.assertIn('class="yesterday-summary-label"', HTML)
+        self.assertIn(".history-inline .archive-arrow::before", CSS)
+        self.assertIn(".history-inline details[open]>summary>.archive-arrow::before", CSS)
+        self.assertIn(".past-change-count{", CSS)
+        self.assertIn("border:2px solid #fb7185", CSS)
+        self.assertIn(".history-inline .earlier-changes>summary::after{content:none!important}", CSS)
+
+    def test_tomorrow_flush_with_schedule_card_edge(self):
+        self.assertIn("main > nav.tabs{", CSS)
+        self.assertIn("box-sizing:border-box", CSS)
+        self.assertIn("margin-inline:0", CSS)
+        self.assertIn("padding:0", CSS)
+        self.assertIn('main > nav.tabs > button[data-tab="tomorrow"]{justify-self:end;margin-right:0;margin-left:0}', CSS)
+        self.assertIn("main > nav.tabs{padding:0}", CSS)
 
 
 if __name__ == "__main__":
