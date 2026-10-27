@@ -80,10 +80,23 @@ class VisualStatusContract(unittest.TestCase):
         self.assertIn("if(tab==='tomorrow'&&tomorrowFingerprint()){markTomorrowSeen();updateTomorrowTab()}", HTML)
         self.assertIn("setInterval(reload,30000)", HTML)
 
-    def test_city_ten_is_display_label_only(self):
-        # The third-party source identifier 10.1 remains untouched by the UI.
-        self.assertIn("locationId==='azov28b'?'10':c?.group||'—'", HTML)
-        self.assertIn("c?.group||'—'", HTML)
+    def test_all_group_badges_display_main_number_only(self):
+        # Front-end aliases only. Full source queues remain unchanged in refresh.py.
+        self.assertIn("String(c?.group||'—').split('.')[0]", HTML)
+        self.assertNotIn("locationId==='azov28b'?'10':c?.group||'—'", HTML)
+        refresh = ROOT.joinpath("scripts/refresh.py").read_text(encoding="utf-8")
+        self.assertIn("'group':'4.1'", refresh)
+        self.assertIn("'group':'10.1'", refresh)
+        self.assertIn("parse_mapasvitla(city_map_pages[config['group']]", refresh)
+
+    def test_previous_daily_changes_are_collapsed_but_available(self):
+        self.assertIn("const previousEdits=logs.filter(item=>eventKind(item)==='changed'&&item!==logs[0]);", HTML)
+        self.assertIn("previousEdits.map(compactYesterdayCard).join('')", HTML)
+        self.assertIn("previousEdits.length?'<details id=\"earlierChanges\"", HTML)
+        self.assertIn("const earlierOpen=$('earlierChanges')?.dataset.scope===earlierScope&&$('earlierChanges').open;", HTML)
+        self.assertIn("data-scope=", HTML)
+        self.assertIn("eventCard(logs[0])", HTML)
+        self.assertIn(".earlier-changes>summary", HTML)
 
     def test_short_outage_boundaries_merge_without_losing_original_times(self):
         self.assertIn("function prepareBoundaryLabels(out){", HTML)

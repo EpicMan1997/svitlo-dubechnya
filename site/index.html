@@ -172,6 +172,15 @@ h1{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .older{margin-top:12px}
 .older>summary{font-size:12px;font-weight:650;color:#bcd0e8}
 
+/* Optional previous edits: last event stays prominent, older ones stay compact. */
+.earlier-changes{margin-top:9px;padding-top:9px;border-top:1px solid #344761}
+.earlier-changes>summary{display:flex;align-items:center;justify-content:space-between;gap:8px;
+ padding:7px 1px;font-size:12px;font-weight:750;color:#bcd0e8;list-style:none}
+.earlier-changes>summary::-webkit-details-marker{display:none}
+.earlier-changes>summary::after{content:'';width:7px;height:7px;flex:none;
+ border-right:2px solid #a9bad2;border-bottom:2px solid #a9bad2;transform:rotate(45deg);margin-right:3px}
+.earlier-changes[open]>summary::after{transform:rotate(225deg)}
+.earlier-changes .yesterday-list{margin-top:2px}
 /* A count, not an expandable preview. Info appears on hover, keyboard focus or long press. */
 .count-control{position:relative;display:inline-flex;vertical-align:middle}
 .count-control .change-count{cursor:help;touch-action:manipulation}
@@ -619,7 +628,13 @@ function events(){
  changeCount.classList.add(edits===0?'zero':edits<=2?'few':'many');
  changeCount.title=edits+' змін у графіку на '+day;
  $('dailyCountTooltip').textContent=edits+' змін графіка на '+day.split('-').reverse().join('.')+'. Враховуються лише зміни годин, а не перша публікація.';
- $('latest').innerHTML=logs.length?eventCard(logs[0]):'<p class="changes-none">За цю дату подій немає</p>';
+ // Show the newest event, with older confirmed edits available on demand.
+ const earlierScope=locationId+'-'+day;
+ const earlierOpen=$('earlierChanges')?.dataset.scope===earlierScope&&$('earlierChanges').open;
+ const previousEdits=logs.filter(item=>eventKind(item)==='changed'&&item!==logs[0]);
+ const previousLabel=previousEdits.length===1?'зміна':previousEdits.length<=4?'зміни':'змін';
+ $('latest').innerHTML=(logs.length?eventCard(logs[0]):'<p class="changes-none">За цю дату подій немає</p>')+
+  (previousEdits.length?'<details id="earlierChanges" class="earlier-changes" data-scope="'+esc(earlierScope)+'" '+(earlierOpen?'open':'')+'><summary>Ще '+previousEdits.length+' '+previousLabel+'</summary><div class="yesterday-list">'+previousEdits.map(compactYesterdayCard).join('')+'</div></details>':'');
  // The summary describes the schedule FOR yesterday; events are changes
  // to yesterday's schedule, not changes to future dates observed yesterday.
  const d=new Date(current.iso+'T12:00:00Z');
@@ -769,7 +784,7 @@ function updateCurrentPower(n){
  $('powerNowLabel').textContent=!canPredict?'Зараз: невідомо':isOut?'Зараз: світла немає':'Зараз: світло є';
  chip.parentElement?.classList.toggle('status-has-power-off',state==='power-off');
 }
-function tick(){const n=now();$('clock').innerHTML=n.time+'<span>'+n.display+'</span>';updateRefreshRing();const s=currentStatus(selected(n).entry);if(n.iso!==dayShown||s!==modeShown){dayShown=n.iso;paint(n);events()}move(n);updateCurrentPower(n)}async function reload(){try{const r=await fetch('./data.json?t='+Date.now(),{cache:'no-store'});if(!r.ok)throw Error(r.status);const j=await r.json();if(!j.days||!Array.isArray(j.logs))throw Error('payload');data=j;paint();events();if(tab==='tomorrow'&&tomorrowFingerprint()){markTomorrowSeen();updateTomorrowTab()}}catch(e){if(!data)paint();console.warn(e)}}function updateLocationHeader(){const c=activeLocation();const names={dacha:'Квіткова 251',obolonskyi54:'Оболонський проспект 54',ivasiuka43:'Володимира Івасюка 43',azov28b:'Героїв полку Азов 28Б'};$('locationLabel').textContent=names[locationId]||'Дача';$('locationGroup').textContent=locationId==='azov28b'?'10':c?.group||'—';document.querySelectorAll('[data-location]').forEach(b=>b.classList.toggle('selected',b.dataset.location===locationId))}function closeLocationMenu(){const m=$('locationMenu');m.hidden=true;$('locationButton').setAttribute('aria-expanded','false')}function selectLocation(key){if(!['dacha','obolonskyi54','ivasiuka43','azov28b'].includes(key))return;locationId=key;remember('dubechnya-selected-location',key);closeLocationMenu();paint();events()}function installMetricInfoTooltip(){
+function tick(){const n=now();$('clock').innerHTML=n.time+'<span>'+n.display+'</span>';updateRefreshRing();const s=currentStatus(selected(n).entry);if(n.iso!==dayShown||s!==modeShown){dayShown=n.iso;paint(n);events()}move(n);updateCurrentPower(n)}async function reload(){try{const r=await fetch('./data.json?t='+Date.now(),{cache:'no-store'});if(!r.ok)throw Error(r.status);const j=await r.json();if(!j.days||!Array.isArray(j.logs))throw Error('payload');data=j;paint();events();if(tab==='tomorrow'&&tomorrowFingerprint()){markTomorrowSeen();updateTomorrowTab()}}catch(e){if(!data)paint();console.warn(e)}}function updateLocationHeader(){const c=activeLocation();const names={dacha:'Квіткова 251',obolonskyi54:'Оболонський проспект 54',ivasiuka43:'Володимира Івасюка 43',azov28b:'Героїв полку Азов 28Б'};$('locationLabel').textContent=names[locationId]||'Дача';$('locationGroup').textContent=String(c?.group||'—').split('.')[0];document.querySelectorAll('[data-location]').forEach(b=>b.classList.toggle('selected',b.dataset.location===locationId))}function closeLocationMenu(){const m=$('locationMenu');m.hidden=true;$('locationButton').setAttribute('aria-expanded','false')}function selectLocation(key){if(!['dacha','obolonskyi54','ivasiuka43','azov28b'].includes(key))return;locationId=key;remember('dubechnya-selected-location',key);closeLocationMenu();paint();events()}function installMetricInfoTooltip(){
  let pressTimer=null,fromLongPress=false;
  const control=()=>document.getElementById('metricInfoControl');
  const button=()=>document.getElementById('metricInfoTrigger');
