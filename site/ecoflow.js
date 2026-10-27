@@ -1,12 +1,12 @@
-/* EcoFlow dashboard preview. Static demonstration only: NO API, NO secrets and NO commands. */
+/* EcoFlow static data model until cloud telemetry is connected; no remote commands. */
 (function () {
   'use strict';
 
-  // These percentages and watts are EXAMPLES, not measurements.
+  // Placeholder percentages and watt values until real telemetry is connected.
   // capacityWh contains nominal manufacturer capacity, never inverter output.
   const inventory = Object.freeze({
     dacha: {
-      name: 'Дача',
+      name: 'Дача', space: 'Дача',
       devices: [
         { name: 'DELTA Pro 3', capacityWh: 4096, pct: 84, inputW: 0, outputW: 620, type: 'station', id: 'dp3' },
         { name: 'Додаткова батарея DELTA Pro 3', capacityWh: 4096, pct: 82, type: 'battery', parent: 'DELTA Pro 3', parentId: 'dp3', id: 'dp3eb' },
@@ -16,14 +16,14 @@
       ]
     },
     home: {
-      name: 'Квартира',
+      name: 'Дім', space: 'Квартира',
       devices: [
         // PowerOcean: 6 kW inverter, currently one 5 kWh battery; system delivers 3 kW now, 6 kW with two batteries.
         { name: 'PowerOcean', capacityWh: 5000, inverterKw: 6, systemPowerKw: 3, twoBatterySystemKw: 6, batteryCount: 1, pct: 67, inputW: 300, outputW: 760, type: 'system', id: 'po' }
       ]
     },
     solovky: {
-      name: 'Соловки',
+      name: 'Соловки', space: 'Соловки',
       devices: [
         { name: 'DELTA 2', capacityWh: 1024, pct: 54, inputW: 0, outputW: 125, type: 'station', id: 'd2' },
         { name: 'Додаткова батарея DELTA 2', capacityWh: 1024, pct: 49, type: 'battery', parent: 'DELTA 2', parentId: 'd2', id: 'd2eb' },
@@ -31,7 +31,7 @@
       ]
     },
     naumenky: {
-      name: 'Науменки',
+      name: 'Науменки', space: 'Науменки',
       devices: [
         { name: 'DELTA 2', capacityWh: 1024, pct: 71, inputW: 0, outputW: 93, type: 'station', id: 'd2' }
       ]
@@ -73,28 +73,28 @@
     const stats = isBattery ?
       '<div class="eco-attached-note">Вхід / вихід контролює основна станція. Потужності окремо не показуємо.</div>' :
       '<div class="eco-device-stats">' +
-        '<div class="eco-device-stat"><span>Вхід · демо</span><strong>' + d.inputW + ' Вт</strong></div>' +
-        '<div class="eco-device-stat"><span>Вихід · демо</span><strong>' + d.outputW + ' Вт</strong></div>' +
+        '<div class="eco-device-stat"><span>Вхід</span><strong>' + d.inputW + ' Вт</strong></div>' +
+        '<div class="eco-device-stat"><span>Вихід</span><strong>' + d.outputW + ' Вт</strong></div>' +
       '</div>';
-    return '<article class="eco-device ' + size + ' charge-' + charge + (linked ? (isBattery ? ' eco-linked-extension' : ' eco-linked-main') : '') + '" aria-label="' + d.name + ', демонстраційний заряд ' + d.pct + ' відсотків">' +
+    return '<article class="eco-device ' + size + ' charge-' + charge + (linked ? (isBattery ? ' eco-linked-extension' : ' eco-linked-main') : '') + '" aria-label="' + d.name + ', заряд ' + d.pct + ' відсотків">' +
       '<div class="eco-device-head"><div class="eco-device-ident">' + (linked ? '<span class="eco-link-role">' + (isBattery ? 'Додаткова батарея' : 'Основна станція') + '</span>' : '') + '<strong class="eco-device-name">' + d.name + '</strong>' +
-      '<span class="eco-device-model">' + typeLabel + '</span></div><span class="eco-device-badge">Демо</span></div>' +
+      '<span class="eco-device-model">' + typeLabel + '</span></div></div>' +
       '<div class="eco-battery"><span class="eco-battery-percent">' + d.pct + '%</span>' +
       '<span class="eco-battery-art" aria-hidden="true"><i style="width:' + d.pct + '%"></i></span></div>' +
-      '<div class="eco-charge-track" role="progressbar" aria-label="Приклад рівня заряду" aria-valuemin="0" aria-valuemax="100" aria-valuenow="' + d.pct + '">' +
+      '<div class="eco-charge-track" role="progressbar" aria-label="Рівень заряду" aria-valuemin="0" aria-valuemax="100" aria-valuenow="' + d.pct + '">' +
       '<i style="width:' + d.pct + '%"></i></div>' +
       '<div class="eco-capacity-line">' + (d.capacityWh === null ? '<span>Ємність: уточнюється</span>' : '<strong>' + capacity + '</strong>') +
       '<span class="eco-size-note">Розмір відносно ємності</span></div>' +
       '<p class="eco-device-caption">' + info + '</p>' +
       (d.capacityWh !== null ? '<div class="eco-relative-label">Масштаб ємності відносно 5 кВт·год</div><div class="eco-relative-track" aria-label="Паспортна ємність ' + niceWh(d.capacityWh) + '"><i style="width:' + Math.round(d.capacityWh / MAX_BATTERY_WH * 1000) / 10 + '%"></i></div>' : '') +
       stats +
-      '<div class="eco-device-foot"><span>Автономність: не розраховано</span><span>Не підключено</span></div>' +
+      '<div class="eco-device-foot"><span>Автономність: —</span></div>' +
       '<div class="eco-admin-only eco-device-admin">' +
-      '<strong>' + (isBattery ? 'Додаткова батарея' : 'Керування · майбутній адмінрежим') + '</strong>' +
+      '<strong>' + (isBattery ? 'Додаткова батарея' : 'Керування') + '</strong>' +
       (isBattery ? '<p>Параметри цього акумулятора керуються через основну станцію ' + d.parent + '.</p>' :
         '<div class="eco-admin-controls"><label>Ліміт заряджання <input type="range" min="50" max="100" value="90" disabled></label>' +
         '<button type="button" disabled>AC: керування недоступне</button></div>') +
-      '<span>Лише макет. Команди не виконуються, авторизації ще немає.</span>' +
+      '<span>Керування заблоковане до підключення та перевірки доступу.</span>' +
       '</div></article>';
   }
 
@@ -112,7 +112,7 @@
         '<div class="eco-pair-head"><div class="eco-pair-title"><span class="eco-pair-icon" aria-hidden="true">↔</span>' +
         '<div><strong>' + d.name + ' + додаткова батарея</strong>' +
         '<span class="eco-pair-subtitle">Єдина система · 2 акумулятори</span></div></div>' +
-        '<div class="eco-pair-summary"><b>' + niceWh(total) + '</b><span class="eco-pair-average charge-' + level(avg) + '">' + avg + '% · демо</span></div></div>' +
+        '<div class="eco-pair-summary"><b>' + niceWh(total) + '</b><span class="eco-pair-average charge-' + level(avg) + '">' + avg + '%</span></div></div>' +
         '<div class="eco-pair-grid">' + deviceView(d, true) + deviceView(addon, true) + '</div>' +
         '<div class="eco-pair-caption"><span class="eco-linked-dot"></span>Додаткова батарея підключена до основної станції. Показники заряду кожного акумулятора окремі.</div>' +
         '</section>';
@@ -129,38 +129,48 @@
       : null;
     root.dataset.location = id;
     $('eco-selected-location').textContent = place.name;
+    $('eco-space-name').textContent = place.space;
     $('eco-count').textContent = String(place.devices.length);
     $('eco-capacity').textContent = allKnown ? niceWh(totalWh) : 'Уточнюється';
     $('eco-capacity-note').textContent = allKnown ? 'Сума номінальних ємностей батарей' : 'Ємність системи ще не уточнена';
     $('eco-demo-total').textContent = weighted === null ? '—' : weighted + '%';
     $('eco-demo-total').dataset.level = weighted === null ? 'unknown' : level(weighted);
-    $('eco-demo-note').textContent = weighted === null ? 'Ємність батарей ще невідома' : 'Приклад середньозваженого заряду';
+    $('eco-demo-note').textContent = weighted === null ? 'Ємність батарей ще невідома' : 'Зважений за ємністю';
     // Here the segment width, unlike a card's layout size, is mathematically proportional to Wh.
     $('eco-capacity-strip').innerHTML = allKnown
       ? place.devices.map(d =>
           '<span class="eco-cap-segment charge-' + level(d.pct) + '" style="flex-grow:' + d.capacityWh +
-          '" title="' + d.name + ': ' + niceWh(d.capacityWh) + ', демо заряд ' + d.pct + '%">' +
+          '" title="' + d.name + ': ' + niceWh(d.capacityWh) + ', заряд ' + d.pct + '%">' +
           '<i style="width:' + d.pct + '%"></i></span>'
         ).join('')
       : '<span class="eco-cap-unknown">Ємність цієї батареї ще не уточнена</span>';
     $('eco-devices').innerHTML = renderDeviceGrid(place.devices);
-    $('eco-scale-note').textContent = allKnown ?
-      'Площа карток приблизно відповідає ємності станцій; пропорційна шкала показує точне співвідношення кВт·год.' :
-      'Для цієї локації є батареї з невідомою ємністю.';
   }
 
-  // Front-end preview toggle. This is NOT authentication and does not grant privileges.
-  function setAdminPreview(enabled) {
-    root.classList.toggle('is-admin-preview', enabled);
+  // Admin controls stay disabled pending authenticated server access.
+  function setAdminMode(enabled) {
+    root.classList.toggle('is-admin-mode', enabled);
     document.body.classList.toggle('eco-admin-visible', enabled);
     toggle.setAttribute('aria-checked', String(enabled));
-    toggle.title = enabled ? 'Вимкнути демонстрацію адмінрежиму' : 'Показати майбутні елементи керування (демо)';
+    toggle.title = enabled ? 'Вимкнути Admin' : 'Увімкнути Admin';
     $('eco-admin-mode-hint').hidden = !enabled;
   }
   toggle.addEventListener('click', function () {
-    setAdminPreview(toggle.getAttribute('aria-checked') !== 'true');
+    setAdminMode(toggle.getAttribute('aria-checked') !== 'true');
   });
-  setAdminPreview(false);
+  setAdminMode(false);
+
+  // Keep Admin reachable after the header scrolls out of view.
+  const adminHost = toggle.closest('.header-time');
+  const siteHeader = document.querySelector('main > header');
+  function syncFloatingAdmin() {
+    if (!adminHost || !siteHeader) return;
+    const threshold = siteHeader.offsetTop + siteHeader.offsetHeight + 12;
+    adminHost.classList.toggle('is-floating', window.scrollY > threshold);
+  }
+  window.addEventListener('scroll', syncFloatingAdmin, { passive: true });
+  window.addEventListener('resize', syncFloatingAdmin);
+  syncFloatingAdmin();
 
   const selectedButton = document.querySelector('[data-location].selected');
   const restored = selectedButton?.dataset.location || 'dacha';
