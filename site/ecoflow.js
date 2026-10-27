@@ -157,7 +157,8 @@
     scope: 'current',
     chargeLimit: 90,
     selected: { limit: new Set(), ac: new Set(), speed: new Set() },
-    speeds: new Map()
+    speeds: new Map(),
+    speedPreset: 'balanced'
   };
   let activeEcoLocation = 'dacha';
 
@@ -167,7 +168,31 @@
     // Expansion batteries belong to the primary; PowerOcean requires separate verified commands.
     return locIds.flatMap(loc => inventory[loc].devices
       .filter(d => d.type === 'station')
-      .map(d => ({ key: loc + ':' + d.id, name: d.name, loc, place: inventory[loc].name })));
+      .map(d => ({ key: loc + ':' + d.id, name: d.name, id: d.id, loc, place: inventory[loc].name })));
+  }
+
+  // Per-model AC input power targets in W. Values are illustrative until device API capabilities are verified.
+  // DELTA 2 200/500/1200 W follows EcoFlow's documented quiet/optimized/max settings.
+  const chargingProfiles = {
+    dp3: { quiet: 500, balanced: 1000, fast: 2900 },
+    d3p: { quiet: 200, balanced: 500, fast: 1500 },
+    d2: { quiet: 200, balanced: 500, fast: 1200 },
+    r3pw: { quiet: 100, balanced: 200, fast: 380 },
+    r2: { quiet: 100, balanced: 200, fast: 360 }
+  };
+  const speedModes = [
+    { key: 'quiet', label: 'Тиха' },
+    { key: 'balanced', label: 'Оптимальна' },
+    { key: 'fast', label: 'Швидка' }
+  ];
+  function speedOptions(station) {
+    const profile = chargingProfiles[station.id];
+    const selected = adminDraft.speeds.get(station.key) || adminDraft.speedPreset;
+    return '<select class="eco-speed-select" data-eco-speed="' + station.key +
+      '" aria-label="Режим заряджання ' + station.name + '">' +
+      speedModes.map(mode => '<option value="' + mode.key + '"' +
+        (selected === mode.key ? ' selected' : '') + '>' + mode.label +
+        ' · ' + profile[mode.key] + ' Вт</option>').join('') + '</select>';
   }
 
   function targetRows(group, withSpeed) {
@@ -175,14 +200,7 @@
     const set = adminDraft.selected[group];
     const rows = stations.map(station => {
       const checked = set.has(station.key);
-      const rate = adminDraft.speeds.get(station.key) || '50';
-      const speedSelect = withSpeed
-        ? '<select class="eco-speed-select" data-eco-speed="' + station.key +
-          '" aria-label="Швидкість заряджання ' + station.name + '">' +
-          ['25', '50', '75', '100'].map(x =>
-            '<option value="' + x + '"' + (x === rate ? ' selected' : '') + '>' + x + '%</option>').join('') +
-          '</select>'
-        : '';
+      const speedSelect = withSpeed ? speedOptions(station) : '';
       return '<div class="eco-target-row"><label class="eco-target-label">' +
         '<input type="checkbox" data-eco-group="' + group + '" data-eco-target="' +
         station.key + '"' + (checked ? ' checked' : '') + '>' +
@@ -223,7 +241,11 @@
       '<button class="eco-bulk-apply eco-bulk-danger" type="button" disabled>Вимкнути AC</button></div>' +
       '</section>' +
       '<section class="eco-bulk-card"><h4>Швидкість заряджання</h4>' +
-      '<p class="eco-bulk-subtitle">Частка максимальної AC-потужності кожної станції</p>' +
+      '<div class="eco-speed-preset" role="group" aria-label="Режим заряджання для вибраних станцій">' +
+      speedModes.map(mode => '<button type="button" data-eco-preset="' + mode.key +
+        '" class="eco-speed-preset-button' + (adminDraft.speedPreset === mode.key ? ' active' : '') + '">' +
+        mode.label + '</button>').join('') + '</div>' +
+      '<p class="eco-bulk-subtitle">Потужність у ватах залежить від моделі. Можна змінити режим кожної станції окремо.</p>' +
       targetRows('speed', true) +
       '<button class="eco-bulk-apply" type="button" disabled>Застосувати швидкості</button></section></div>';
   }
@@ -231,6 +253,18 @@
   const bulkContent = $('eco-bulk-content');
   if (bulkContent) {
     bulkContent.addEventListener('click', event => {
+      const presetButton = event.target.closest('button[data-eco-preset]');
+      if (presetButton) {
+        const mode = presetButton.dataset.ecoPreset;
+        if (!speedModes.some(item => item.key === mode)) return;
+        adminDraft.speedPreset = mode;
+        const available = new Set(selectableStations().map(st => st.key));
+        adminDraft.selected.speed.forEach(key => {
+          if (available.has(key)) adminDraft.speeds.set(key, mode);
+        });
+        renderBulkPanel();
+        return;
+      }
       const button = event.target.closest('button[data-eco-select]');
       if (!button) return;
       const group = button.dataset.ecoGroup;
@@ -262,7 +296,7 @@
       } else if (target.dataset.ecoSpeed) {
         const key = target.dataset.ecoSpeed;
         if (!selectableStations().some(st => st.key === key)) return;
-        const value = ['25', '50', '75', '100'].includes(target.value) ? target.value : '50';
+        const value = speedModes.some(item => item.key === target.value) ? target.value : 'balanced';
         adminDraft.speeds.set(key, value);
         adminDraft.selected.speed.add(key);
       } else return;
