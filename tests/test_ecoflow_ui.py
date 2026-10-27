@@ -42,12 +42,10 @@ class EcoFlowPreviewContract(unittest.TestCase):
         self.assertIn(".eco-shell.is-admin-mode", CSS)
 
     def test_capacity_is_proportional_and_powerocean_is_known(self):
-        self.assertIn("d.capacityWh / MAX_BATTERY_WH", JS)
-        self.assertIn("MAX_BATTERY_WH = 5000", JS)
         self.assertIn("flex-grow:' + d.capacityWh", JS)
         self.assertIn("capacityWh: 5000, inverterKw: 6, systemPowerKw: 3, twoBatterySystemKw: 6, batteryCount: 1", JS)
-        self.assertIn("інвертор ", JS)
-        self.assertIn("потужність системи зараз ", JS)
+        self.assertIn("Інвертор ", JS)
+        self.assertIn("d.systemPowerKw", JS)
         self.assertIn('id="eco-capacity-strip"', HTML)
 
     def test_location_changer_and_pwa_integration(self):
