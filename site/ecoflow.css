@@ -738,3 +738,8 @@ main > nav.tabs > button[data-tab="tomorrow"]{justify-self:end;margin:0}
   outline-offset:-3px;
   z-index:1;
 }
+
+
+/* Match the right edge of the actual graph bar, inside its card padding. */
+main > nav.tabs{width:100%;padding-left:0;padding-right:20px}
+@media(max-width:650px){main > nav.tabs{padding-right:14px}}
