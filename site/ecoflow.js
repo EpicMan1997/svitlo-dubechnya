@@ -220,7 +220,7 @@
       '" aria-label="Режим заряджання ' + station.name + '">' +
       speedModes.map(mode => '<option value="' + mode.key + '"' +
         (selected === mode.key ? ' selected' : '') + '>' + mode.label +
-        ' · ' + (station.id === 'r3pw' && mode.key === 'quiet' ? 'до 80 Вт' : profile[mode.key] + ' Вт') + '</option>').join('') + '</select';
+        ' · ' + (station.id === 'r3pw' && mode.key === 'quiet' ? 'до 80 Вт' : profile[mode.key] + ' Вт') + '</option>').join('') + '</select>';
   }
 
   function targetRows(group, withSpeed) {
