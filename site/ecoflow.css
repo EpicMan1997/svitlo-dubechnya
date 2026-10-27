@@ -169,3 +169,69 @@
 .eco-cap-segment.charge-critical{--charge:#ef4444}
 .eco-cap-segment i{display:block;position:absolute;left:0;top:0;bottom:0;background:var(--charge)}
 .eco-cap-unknown{color:#bbcbe0;background:#29384b;border:1px dashed #64748b;border-radius:6px;padding:11px;flex:1;font-size:12px;line-height:1.5}
+
+
+/* v3 refinements: joined power systems, better header, accessible Admin preview switch. */
+header{align-items:flex-start}
+.header-time{justify-content:flex-start;align-items:flex-end}
+.location-shell .site-clock{font-size:clamp(19px,2.4vw,24px);line-height:1.25;font-weight:800;text-align:left;margin:3px 0 0 45px;color:#facc15;white-space:nowrap;font-variant-numeric:tabular-nums}
+.location-shell .site-clock span{display:inline-block;margin-left:10px;font-size:11px;line-height:1.3;color:#b7c8df;font-weight:650;vertical-align:2px}
+.eco-admin-toggle{min-height:44px;display:inline-flex;align-items:center;justify-content:space-between;gap:12px;border:1px solid #48607f;background:#1d334d;border-radius:13px;padding:10px 13px;color:#f8fafc;font:760 15px/1.15 system-ui;box-shadow:0 1px 2px #0003;transition:background .15s,border-color .15s;white-space:nowrap;margin:0}
+.eco-admin-toggle:hover{background:#294361;border-color:#6180a5}
+.eco-admin-toggle:focus-visible{outline:2px solid #facc15;outline-offset:3px}
+.eco-admin-toggle-label{display:inline-flex;align-items:center;gap:8px;font-size:15px;font-weight:800}
+.eco-admin-toggle small{display:inline-flex;padding:3px 6px;background:#384a63;border:1px solid #5c6e84;border-radius:6px;font:700 10px/1 system-ui;color:#cbd5e1;letter-spacing:.01em}
+.eco-switch-track{display:inline-flex;align-items:center;width:46px;height:24px;flex:none;background:#506277;border-radius:30px}
+.eco-switch-track i{left:3px;top:3px;width:18px;height:18px;background:#fff;box-shadow:0 1px 3px #0005;border-radius:50%}
+.eco-admin-toggle[aria-checked="true"]{color:#fef3c7;border-color:#ba8e36;background:#3c321f}
+.eco-admin-toggle[aria-checked="true"] small{border-color:#99712f;background:#5e4824;color:#fde68a}
+.eco-admin-toggle[aria-checked="true"] .eco-switch-track{background:#d5a22e}
+.eco-admin-toggle[aria-checked="true"] .eco-switch-track i{transform:translateX(22px)}
+.eco-pair{grid-column:span 12;min-width:0;border:1px solid #3d5874;border-radius:17px;background:#132238;padding:16px}
+.eco-pair-head{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:15px}
+.eco-pair-title{display:flex;gap:10px;align-items:center;min-width:0}
+.eco-pair-title strong{display:block;font-size:16px;line-height:1.25;color:#f1f5f9}
+.eco-pair-subtitle{display:block;font-size:11px;color:#94b0d0;margin-top:5px}
+.eco-pair-icon{display:grid;place-items:center;width:33px;height:33px;border-radius:10px;border:1px solid #587ca3;background:#284463;color:#b4d5f5;font-size:20px;flex:none}
+.eco-pair-summary{display:flex;align-items:center;gap:11px;flex-wrap:wrap}
+.eco-pair-summary b{font-size:15px;white-space:nowrap;color:#f8fafc;font-variant-numeric:tabular-nums}
+.eco-pair-average{font-size:12px;white-space:nowrap;font-weight:790;border-radius:8px;padding:6px 9px;border:1px solid #4a617b;background:#263d52}
+.eco-pair-average.charge-high{color:#4ade80}
+.eco-pair-average.charge-good{color:#a3e635}
+.eco-pair-average.charge-medium{color:#facc15}
+.eco-pair-average.charge-low{color:#fb923c}
+.eco-pair-average.charge-critical{color:#fb7185}
+.eco-pair-grid{position:relative;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:stretch}
+.eco-pair-grid .eco-device{grid-column:auto!important;width:100%;background:#1b3049;border-color:#3a5471;padding:15px}
+.eco-pair-grid .eco-device.eco-linked-extension{background:#172b41;border-color:#4b7095}
+.eco-pair-grid::after{content:"";position:absolute;left:calc(50% - 13px);top:44%;width:26px;height:5px;border:1px solid #77a6d4;background:#37638b;border-radius:8px;z-index:2;pointer-events:none;box-shadow:0 0 0 3px #132238}
+.eco-link-role{display:inline-block;font-size:10px;font-weight:800;letter-spacing:.035em;text-transform:uppercase;color:#a9cdf0;margin-bottom:7px}
+.eco-linked-extension .eco-link-role{color:#e0bb79}
+.eco-pair-caption{margin-top:13px;display:flex;align-items:center;gap:9px;color:#9bb8d5;font-size:11px;line-height:1.5}
+.eco-linked-dot{width:8px;height:8px;flex:none;border-radius:50%;background:#60a5fa;box-shadow:0 0 0 3px #23405d}
+.eco-pair .eco-device-foot{margin-top:auto}
+.eco-pair-grid .eco-device.size-large .eco-battery-art,.eco-pair-grid .eco-device.size-medium .eco-battery-art{display:inline-block}
+@media(max-width:760px){
+ .eco-pair-grid{grid-template-columns:1fr;gap:16px}
+ .eco-pair-grid::after{left:calc(50% - 2px);top:calc(50% - 14px);height:28px;width:4px}
+ .eco-pair-head{align-items:flex-start}
+}
+@media(max-width:480px){
+ .location-shell .site-clock{margin-left:37px;font-size:20px}
+ .location-shell .site-clock span{font-size:10px;margin-left:6px}
+ .eco-admin-toggle{font-size:15px;padding:9px 10px;min-height:43px;gap:9px}
+ .eco-admin-toggle-label{font-size:14px;gap:5px}
+ .eco-admin-toggle small{font-size:9px}
+ .eco-switch-track{width:40px;height:22px}
+ .eco-switch-track i{height:16px;width:16px}
+ .eco-admin-toggle[aria-checked="true"] .eco-switch-track i{transform:translateX(18px)}
+ .eco-pair{padding:12px}
+ .eco-pair-summary{gap:8px}
+ .eco-pair-title strong{font-size:14px}
+}
+@media(max-width:360px){
+ .eco-admin-toggle small{display:none}
+ .eco-admin-toggle{gap:6px}
+ .location-shell .site-clock{font-size:18px}
+ .location-shell .site-clock span{display:block;margin:0}
+}
