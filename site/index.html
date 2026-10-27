@@ -655,7 +655,6 @@ function events(){
  const earlierScope=locationId+'-'+day;
  const earlierOpen=$('earlierChanges')?.dataset.scope===earlierScope&&$('earlierChanges').open;
  const previousEdits=logs.filter(item=>eventKind(item)==='changed'&&item!==logs[0]);
- const previousLabel=previousEdits.length===1?'зміна':previousEdits.length<=4?'зміни':'змін';
  $('latest').innerHTML=(logs.length?eventCard(logs[0]):'<p class="changes-none">За цю дату подій немає</p>')+
   (previousEdits.length?'<details id="earlierChanges" class="earlier-changes" data-scope="'+esc(earlierScope)+'" '+(earlierOpen?'open':'')+'><summary>Минулі зміни <span class="past-change-count">'+previousEdits.length+'</span></summary><div class="yesterday-list">'+previousEdits.map(compactYesterdayCard).join('')+'</div></details>':'');
  // The summary describes the schedule FOR yesterday; events are changes
@@ -679,7 +678,6 @@ function events(){
  const yIntervals=yRanges===null?null:parseHistoryIntervals(yRanges.map(([a,b])=>a+'–'+b).join(', ')||'Без відключень');
  const yMinutes=yIntervals===null?null:historicOutageMinutes(yIntervals.map(([a,b])=>a+'–'+b).join(', ')||'Без відключень');
  const count=history.length;
- const yDate=yesterday.slice(8)+'.'+yesterday.slice(5,7);
  $('previousTitle').textContent='Зміни і графік вчора';
  const countLabel=$('yesterdayCount');
  countLabel.textContent=String(count);
