@@ -1,5 +1,5 @@
 /* Network-first shell, and NEVER cache outage data; stale forecasts are safety-sensitive. */
-const SHELL_CACHE = "nashe-svitlo-static-v6";
+const SHELL_CACHE = "nashe-svitlo-static-v7";
 const STATIC = ["./", "./favicon.svg", "./touch-bulb-v2.png", "./manifest.webmanifest", "./ecoflow.css", "./ecoflow.js"];
 self.addEventListener("install", event => {
   event.waitUntil(caches.open(SHELL_CACHE).then(cache => cache.addAll(STATIC)).then(() => self.skipWaiting()));
