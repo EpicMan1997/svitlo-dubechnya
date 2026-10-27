@@ -62,6 +62,7 @@ class EcoFlowPreviewContract(unittest.TestCase):
         self.assertLess(HTML.index(">Станції та акумулятори<"),
                         HTML.index(">Огляд батарей<"))
         self.assertIn('class="site-clock" id="clock"', HTML)
+        self.assertIn('</small></button></div></div><div class="site-clock" id="clock"', HTML)
         self.assertLess(HTML.index('id="locationMenu"'), HTML.index('id="clock"'))
         self.assertLess(HTML.index('id="clock"'), HTML.index('id="ecoAdminToggle"'))
         self.assertEqual(HTML.count('id="clock"'), 1)
