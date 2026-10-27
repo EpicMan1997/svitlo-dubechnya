@@ -38,7 +38,8 @@ class EcoFlowPreviewContract(unittest.TestCase):
         self.assertIn('aria-checked="false"', HTML)
         self.assertIn("setAdminMode(false)", JS)
         self.assertIn("toggle.addEventListener('click'", JS)
-        self.assertIn("Захищене підключення ще не налаштоване", HTML)
+        self.assertNotIn('id="eco-admin-mode-hint"', HTML)
+        self.assertNotIn("eco-admin-mode-hint", JS)
         self.assertIn(".eco-shell.is-admin-mode", CSS)
 
     def test_capacity_is_proportional_and_powerocean_is_known(self):
@@ -189,6 +190,32 @@ class EcoFlowPreviewContract(unittest.TestCase):
         self.assertIn("type=\"button\" disabled>Вимкнути AC", JS)
         self.assertIn("type=\"button\" disabled>Застосувати швидкості", JS)
         self.assertNotIn("Доступ після захищеного підключення.", JS)
+
+
+
+    def test_previous_changes_counter_and_yesterday_label(self):
+        self.assertIn('Минулі зміни <span class="past-change-count">', HTML)
+        self.assertIn("previousEdits.length", HTML)
+        self.assertNotIn("<summary>Ще '+previousEdits.length", HTML)
+        self.assertIn("$('previousTitle').textContent='Зміни і графік вчора'", HTML)
+        self.assertNotIn("$('previousTitle').textContent='Зміни і графік '+yDate", HTML)
+        self.assertIn(".past-change-count{", CSS)
+
+    def test_tomorrow_aligned_to_full_width_chart(self):
+        self.assertIn("main > nav.tabs{width:100%;padding-left:0;padding-right:20px}", CSS)
+        self.assertIn("@media(max-width:650px){main > nav.tabs{padding-right:14px}}", CSS)
+        self.assertIn('main > nav.tabs > button[data-tab="tomorrow"]{justify-self:end;margin:0}', CSS)
+
+    def test_capacity_hover_and_focus_tooltip(self):
+        self.assertIn('id="eco-capacity-tooltip"', HTML)
+        self.assertIn('role="tooltip" hidden', HTML)
+        self.assertIn('data-eco-tooltip=', JS)
+        self.assertIn("system.name + ' · ' + system.pct", JS)
+        self.assertIn("const pct = Math.round((d.capacityWh * d.pct + linked.capacityWh * linked.pct) / wh)", JS)
+        for event_name in ("pointerover", "pointerout", "focusin", "focusout", "click"):
+            self.assertIn("capacityStrip.addEventListener('" + event_name + "'", JS)
+        self.assertIn(".eco-capacity-tooltip[hidden]{display:none!important}", CSS)
+        self.assertIn("hideCapacityTooltip()", JS)
 
 
 
