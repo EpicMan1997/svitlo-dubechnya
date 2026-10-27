@@ -26,9 +26,9 @@ class EcoFlowPreviewContract(unittest.TestCase):
     def test_disconnected_device_values_are_not_claimed_as_live(self):
         self.assertIn("Не підключено", HTML)
         self.assertIn("Відсотки та потужності поки не надходять", HTML)
-        panel = re.search(r'<section class="eco-shell"[\\s\\S]*?<\\/section>', HTML)
-        self.assertIsNotNone(panel)
-        self.assertNotRegex(panel.group(0) + JS, r"(?i)демо|демонстрац|макет|preview")
+        panel = HTML.split('<section class="eco-shell"', 1)[1].split('</section>', 1)[0]
+        self.assertTrue(panel)
+        self.assertNotRegex(panel + JS, r"(?i)демо|демонстрац|макет|preview")
         self.assertNotRegex(JS, r"\bfetch\s*\(|XMLHttpRequest|WebSocket")
         self.assertIn("disabled", JS)
 
