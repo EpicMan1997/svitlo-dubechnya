@@ -62,8 +62,8 @@
   }
 
   const operationMeta = {
-    charging: { label: 'Заряджається', sign: '↓' },
-    discharging: { label: 'Розряджається', sign: '↑' },
+    charging: { label: 'Заряджається', sign: '↑' },
+    discharging: { label: 'Розряджається', sign: '↓' },
     holding: { label: 'Підтримує заряд', sign: '•' },
     unknown: { label: 'Статус невідомий', sign: '?' }
   };
@@ -399,23 +399,18 @@
     });
   });
 
-  // Read-only capacity detail: hover, keyboard focus or touch/click.
+  // Persistent, centered detail row. It does not reposition when the hovered bar changes.
   const capacityStrip = $('eco-capacity-strip');
   const capacityTooltip = $('eco-capacity-tooltip');
   function hideCapacityTooltip() {
-    if (capacityTooltip) capacityTooltip.hidden = true;
+    if (!capacityTooltip) return;
+    capacityTooltip.textContent = '';
+    capacityTooltip.dataset.active = 'false';
   }
   function showCapacityTooltip(segment) {
     if (!segment || !capacityTooltip || !segment.dataset.ecoTooltip) return;
     capacityTooltip.textContent = segment.dataset.ecoTooltip;
-    capacityTooltip.hidden = false;
-    const position = segment.getBoundingClientRect();
-    const tooltipSize = capacityTooltip.getBoundingClientRect();
-    const viewportWidth = window.innerWidth;
-    const middle = position.left + position.width / 2 - tooltipSize.width / 2;
-    capacityTooltip.style.left = Math.max(8, Math.min(middle, viewportWidth - tooltipSize.width - 8)) + 'px';
-    const above = position.top - tooltipSize.height - 9;
-    capacityTooltip.style.top = (above >= 8 ? above : position.bottom + 9) + 'px';
+    capacityTooltip.dataset.active = 'true';
   }
   if (capacityStrip && capacityTooltip) {
     capacityStrip.addEventListener('pointerover', event => {
@@ -440,8 +435,6 @@
     document.addEventListener('pointerdown', event => {
       if (!event.target.closest('.eco-capacity-strip')) hideCapacityTooltip();
     });
-    window.addEventListener('scroll', hideCapacityTooltip, { passive: true });
-    window.addEventListener('resize', hideCapacityTooltip);
   }
 
   // Admin controls stay disabled pending authenticated server access.
