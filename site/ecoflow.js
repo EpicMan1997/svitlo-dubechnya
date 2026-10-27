@@ -339,12 +339,59 @@
     $('eco-capacity-strip').innerHTML = allKnown
       ? systems.map(system =>
           '<span class="eco-cap-segment charge-' + level(system.pct) + '" style="flex-grow:' + system.wh +
-          '" title="' + system.name + ': ' + niceWh(system.wh) + ', заряд ' + system.pct + '%">' +
+          '" tabindex="0" role="img" aria-label="' + system.name + ', заряд ' + system.pct + ' відсотків"' +
+          ' data-eco-tooltip="' + system.name + ' · ' + system.pct + '% · ' + niceWh(system.wh) + '">' +
           '<i style="width:' + system.pct + '%"></i></span>'
         ).join('')
       : '<span class="eco-cap-unknown">Ємність цієї батареї ще не уточнена</span>';
+    hideCapacityTooltip();
     $('eco-devices').innerHTML = renderDeviceGrid(place.devices);
     renderBulkPanel();
+  }
+
+  // Read-only capacity detail: hover, keyboard focus or touch/click.
+  const capacityStrip = $('eco-capacity-strip');
+  const capacityTooltip = $('eco-capacity-tooltip');
+  function hideCapacityTooltip() {
+    if (capacityTooltip) capacityTooltip.hidden = true;
+  }
+  function showCapacityTooltip(segment) {
+    if (!segment || !capacityTooltip || !segment.dataset.ecoTooltip) return;
+    capacityTooltip.textContent = segment.dataset.ecoTooltip;
+    capacityTooltip.hidden = false;
+    const position = segment.getBoundingClientRect();
+    const tooltipSize = capacityTooltip.getBoundingClientRect();
+    const viewportWidth = window.innerWidth;
+    const middle = position.left + position.width / 2 - tooltipSize.width / 2;
+    capacityTooltip.style.left = Math.max(8, Math.min(middle, viewportWidth - tooltipSize.width - 8)) + 'px';
+    const above = position.top - tooltipSize.height - 9;
+    capacityTooltip.style.top = (above >= 8 ? above : position.bottom + 9) + 'px';
+  }
+  if (capacityStrip && capacityTooltip) {
+    capacityStrip.addEventListener('pointerover', event => {
+      const segment = event.target.closest('.eco-cap-segment');
+      if (segment) showCapacityTooltip(segment);
+    });
+    capacityStrip.addEventListener('pointerout', event => {
+      const next = event.relatedTarget?.closest?.('.eco-cap-segment');
+      if (!next) hideCapacityTooltip();
+    });
+    capacityStrip.addEventListener('focusin', event => {
+      const segment = event.target.closest('.eco-cap-segment');
+      if (segment) showCapacityTooltip(segment);
+    });
+    capacityStrip.addEventListener('focusout', event => {
+      if (!event.relatedTarget?.closest?.('.eco-cap-segment')) hideCapacityTooltip();
+    });
+    capacityStrip.addEventListener('click', event => {
+      const segment = event.target.closest('.eco-cap-segment');
+      if (segment) showCapacityTooltip(segment);
+    });
+    document.addEventListener('pointerdown', event => {
+      if (!event.target.closest('.eco-capacity-strip')) hideCapacityTooltip();
+    });
+    window.addEventListener('scroll', hideCapacityTooltip, { passive: true });
+    window.addEventListener('resize', hideCapacityTooltip);
   }
 
   // Admin controls stay disabled pending authenticated server access.
@@ -353,7 +400,6 @@
     document.body.classList.toggle('eco-admin-visible', enabled);
     toggle.setAttribute('aria-checked', String(enabled));
     toggle.title = enabled ? 'Вимкнути Admin' : 'Увімкнути Admin';
-    $('eco-admin-mode-hint').hidden = !enabled;
     $('eco-admin-bulk').hidden = !enabled;
   }
   toggle.addEventListener('click', function () {
