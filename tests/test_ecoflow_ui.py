@@ -42,7 +42,7 @@ class EcoFlowPreviewContract(unittest.TestCase):
         self.assertIn(".eco-shell.is-admin-mode", CSS)
 
     def test_capacity_is_proportional_and_powerocean_is_known(self):
-        self.assertIn("flex-grow:' + d.capacityWh", JS)
+        self.assertIn("flex-grow:' + system.wh", JS)
         self.assertIn("capacityWh: 5000, inverterKw: 6, systemPowerKw: 3, twoBatterySystemKw: 6, batteryCount: 1", JS)
         self.assertIn("Інвертор ", JS)
         self.assertIn("d.systemPowerKw", JS)
@@ -130,12 +130,39 @@ class EcoFlowPreviewContract(unittest.TestCase):
         dacha = JS.split("dacha: {", 1)[1].split("home: {", 1)[0]
         self.assertLess(dacha.index("name: 'DELTA 3 Plus'"), dacha.index("name: 'DELTA 2'"))
 
-    def test_equal_height_schedule_and_expanded_history(self):
-        self.assertIn("main > .layout{align-items:stretch}", CSS)
-        self.assertIn("main > .layout > .card{align-self:stretch;height:100%;min-height:0}", CSS)
-        self.assertIn("main > .layout > section.card > #display{height:100%;display:flex;flex-direction:column}", CSS)
-        self.assertIn("main > .layout > section.card > #display .schedule-details{margin-top:auto}", CSS)
-        self.assertIn("main > .layout > .card{height:auto}", CSS)
+    def test_full_width_chart_with_inline_change_history(self):
+        self.assertIn('class="card schedule-card"', HTML)
+        self.assertIn('class="history history-inline"', HTML)
+        self.assertIn('id="scheduleDetailsHost"', HTML)
+        self.assertLess(HTML.index('id="display"'), HTML.index('class="history history-inline"'))
+        self.assertLess(HTML.index('class="history history-inline"'), HTML.index('id="scheduleDetailsHost"'))
+        self.assertIn("const detailsAt=html.indexOf", HTML)
+        self.assertIn("$('scheduleDetailsHost').innerHTML=html.slice(detailsAt)", HTML)
+        self.assertIn("document.querySelector('#scheduleDetailsHost .schedule-details')", HTML)
+        self.assertIn("main > .layout{display:block;grid-template-columns:none", CSS)
+        self.assertIn(".history-inline .change-comparison", CSS)
+        self.assertIn("grid-template-columns:repeat(2,minmax(0,1fr))", CSS)
+
+    def test_speed_presets_show_per_model_watts_and_allow_overrides(self):
+        self.assertIn("const chargingProfiles = {", JS)
+        self.assertIn("d2: { quiet: 200, balanced: 500, fast: 1200 }", JS)
+        self.assertIn("d3p: { quiet: 200, balanced: 500, fast: 1500 }", JS)
+        self.assertIn("dp3: { quiet: 500, balanced: 1000, fast: 2900 }", JS)
+        self.assertIn("Тиха", JS)
+        self.assertIn("Оптимальна", JS)
+        self.assertIn("Швидка", JS)
+        self.assertIn("data-eco-preset", JS)
+        self.assertIn("data-eco-speed", JS)
+        self.assertIn("adminDraft.speeds.set(key, value)", JS)
+        self.assertNotIn("['25', '50', '75', '100']", JS)
+        self.assertIn(".eco-speed-preset{", CSS)
+
+    def test_capacity_strip_groups_extra_battery_with_parent(self):
+        self.assertIn("const batteries = new Map(", JS)
+        self.assertIn("const systems = place.devices.flatMap(", JS)
+        self.assertIn("linked.capacityWh", JS)
+        self.assertIn("linked.pct", JS)
+        self.assertIn("flex-grow:' + system.wh", JS)
 
     def test_admin_shared_actions_and_independent_targets(self):
         self.assertIn('id="eco-admin-bulk"', HTML)
