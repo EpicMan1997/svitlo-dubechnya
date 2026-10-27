@@ -64,11 +64,12 @@
   const operationMeta = {
     charging: { label: 'Заряджається', sign: '↓' },
     discharging: { label: 'Розряджається', sign: '↑' },
-    holding: { label: 'Підтримує заряд', sign: '•' }
+    holding: { label: 'Підтримує заряд', sign: '•' },
+    unknown: { label: 'Статус невідомий', sign: '?' }
   };
   function operationBadge(device) {
     const status = Object.prototype.hasOwnProperty.call(operationMeta, device.operation)
-      ? device.operation : 'holding';
+      ? device.operation : 'unknown';
     const { label, sign } = operationMeta[status];
     return '<span class="eco-operation eco-operation-' + status + '">' +
       '<span class="eco-operation-icon" aria-hidden="true">' + sign + '</span>' +
