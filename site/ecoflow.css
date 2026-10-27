@@ -996,3 +996,20 @@ main > nav.tabs > button[data-tab="tomorrow"]{justify-self:end;margin-right:0;ma
 @media(max-width:650px){
   .eco-capacity-tooltip{font-size:11px;height:49px;min-height:49px}
 }
+
+
+/* EcoFlow identity: geometric white E monogram with cyan middle stroke. */
+.eco-title-monogram{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:35px;
+  height:35px;
+  flex:none;
+  background:linear-gradient(145deg,#263d50 0%,#142c3f 100%);
+  border:1px solid #47718a;
+  border-radius:10px;
+  color:#f8fafc;
+  box-shadow:inset 0 1px 0 #ffffff20,0 3px 9px #00000033;
+}
+.eco-title-monogram svg{display:block;width:27px;height:27px;flex:none}
