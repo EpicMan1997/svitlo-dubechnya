@@ -61,61 +61,95 @@
     if (pct >= 20) return 'low';
     return 'critical';
   }
-  function deviceView(d, linked = false) {
-    const isBattery = d.type === 'battery';
-    const size = capClass(d.capacityWh);
-    const capacity = d.capacityWh === null ? 'Ємність акумуляторів невідома' : niceWh(d.capacityWh);
-    const typeLabel = isBattery ? 'Додаткова батарея' : d.type === 'system' ? 'Домашня система' : 'Зарядна станція';
-    const info = d.type === 'system'
-      ? '1 батарея · ' + capacity + ' · інвертор ' + d.inverterKw + ' кВт · потужність системи зараз ' + d.systemPowerKw + ' кВт (із другою батареєю: ' + d.twoBatterySystemKw + ' кВт)'
-      : isBattery ? 'Підключена до ' + d.parent : 'Номінальна ємність ' + capacity;
-    const charge = level(d.pct);
-    const stats = isBattery ?
-      '<div class="eco-attached-note">Вхід / вихід контролює основна станція. Потужності окремо не показуємо.</div>' :
-      '<div class="eco-device-stats">' +
-        '<div class="eco-device-stat"><span>Вхід</span><strong>' + d.inputW + ' Вт</strong></div>' +
-        '<div class="eco-device-stat"><span>Вихід</span><strong>' + d.outputW + ' Вт</strong></div>' +
-      '</div>';
-    return '<article class="eco-device ' + size + ' charge-' + charge + (linked ? (isBattery ? ' eco-linked-extension' : ' eco-linked-main') : '') + '" aria-label="' + d.name + ', заряд ' + d.pct + ' відсотків">' +
-      '<div class="eco-device-head"><div class="eco-device-ident">' + (linked ? '<span class="eco-link-role">' + (isBattery ? 'Додаткова батарея' : 'Основна станція') + '</span>' : '') + '<strong class="eco-device-name">' + d.name + '</strong>' +
-      '<span class="eco-device-model">' + typeLabel + '</span></div></div>' +
-      '<div class="eco-battery"><span class="eco-battery-percent">' + d.pct + '%</span>' +
-      '<span class="eco-battery-art" aria-hidden="true"><i style="width:' + d.pct + '%"></i></span></div>' +
-      '<div class="eco-charge-track" role="progressbar" aria-label="Рівень заряду" aria-valuemin="0" aria-valuemax="100" aria-valuenow="' + d.pct + '">' +
-      '<i style="width:' + d.pct + '%"></i></div>' +
-      '<div class="eco-capacity-line">' + (d.capacityWh === null ? '<span>Ємність: уточнюється</span>' : '<strong>' + capacity + '</strong>') +
-      '<span class="eco-size-note">Розмір відносно ємності</span></div>' +
-      '<p class="eco-device-caption">' + info + '</p>' +
-      (d.capacityWh !== null ? '<div class="eco-relative-label">Масштаб ємності відносно 5 кВт·год</div><div class="eco-relative-track" aria-label="Паспортна ємність ' + niceWh(d.capacityWh) + '"><i style="width:' + Math.round(d.capacityWh / MAX_BATTERY_WH * 1000) / 10 + '%"></i></div>' : '') +
-      stats +
-      '<div class="eco-device-foot"><span>Автономність: —</span></div>' +
-      '<div class="eco-admin-only eco-device-admin">' +
-      '<strong>' + (isBattery ? 'Додаткова батарея' : 'Керування') + '</strong>' +
-      (isBattery ? '<p>Параметри цього акумулятора керуються через основну станцію ' + d.parent + '.</p>' :
-        '<div class="eco-admin-controls"><label>Ліміт заряджання <input type="range" min="50" max="100" value="90" disabled></label>' +
-        '<button type="button" disabled>AC: керування недоступне</button></div>') +
-      '<span>Керування заблоковане до підключення та перевірки доступу.</span>' +
-      '</div></article>';
+
+  function formatAutonomy(capacityWh, chargePct, outputW) {
+    if (!Number.isFinite(outputW) || outputW <= 0) return '—';
+    // Approximation using an 85% available energy factor.
+    const estimatedMinutes = Math.round(capacityWh * chargePct / 100 * 0.85 / outputW * 60 / 5) * 5;
+    const hours = Math.floor(estimatedMinutes / 60);
+    const mins = estimatedMinutes % 60;
+    return (hours ? hours + ' год' : '') + (mins ? (hours ? ' ' : '') + mins + ' хв' : '');
   }
 
-  // One visual power system per main station, with its battery linked inside.
+  function chargeTrack(pct, name) {
+    return '<div class="eco-charge-track" role="progressbar" aria-label="Заряд ' + name +
+      '" aria-valuemin="0" aria-valuemax="100" aria-valuenow="' + pct + '">' +
+      '<i style="width:' + pct + '%"></i></div>';
+  }
+
+  function energyStats(d, capWh, pct) {
+    const output = Number.isFinite(d.outputW) ? d.outputW : 0;
+    const autonomy = formatAutonomy(capWh, pct, output);
+    return '<div class="eco-device-stats eco-common-stats">' +
+      '<div class="eco-device-stat"><span>Вхід</span><strong>' + d.inputW + ' Вт</strong></div>' +
+      '<div class="eco-device-stat"><span>Вихід</span><strong>' + output + ' Вт</strong></div>' +
+      '<div class="eco-device-stat eco-autonomy"><span>Автономність</span><strong>' + autonomy + '</strong></div>' +
+      '</div>';
+  }
+
+  function adminControls() {
+    return '<div class="eco-admin-only eco-device-admin"><strong>Керування</strong>' +
+      '<div class="eco-admin-controls"><label>Ліміт заряджання' +
+      '<input type="range" min="50" max="100" value="90" disabled></label>' +
+      '<button type="button" disabled>AC-вихід</button></div>' +
+      '<span>Доступ після захищеного підключення.</span></div>';
+  }
+
+  function deviceView(d) {
+    const size = capClass(d.capacityWh);
+    const charge = level(d.pct);
+    const capacity = niceWh(d.capacityWh);
+    const titleNote = d.type === 'system'
+      ? 'Інвертор ' + d.inverterKw + ' кВт · система ' + d.systemPowerKw +
+        ' кВт (із другою батареєю ' + d.twoBatterySystemKw + ' кВт)'
+      : 'Зарядна станція';
+    return '<article class="eco-device eco-standalone ' + size + ' charge-' + charge +
+      '" aria-label="' + d.name + ', заряд ' + d.pct + '%">' +
+      '<div class="eco-device-head"><div class="eco-device-ident">' +
+      '<strong class="eco-device-name">' + d.name + '</strong>' +
+      '<span class="eco-device-model">' + titleNote + '</span></div></div>' +
+      '<div class="eco-battery"><span class="eco-battery-percent">' + d.pct +
+      '%</span><span class="eco-battery-art" aria-hidden="true"><i style="width:' +
+      d.pct + '%"></i></span></div>' +
+      chargeTrack(d.pct, d.name) +
+      '<div class="eco-capacity-line"><strong>' + capacity + '</strong></div>' +
+      energyStats(d, d.capacityWh, d.pct) +
+      adminControls() +
+      '</article>';
+  }
+
+  function systemView(main, addon) {
+    const capacityWh = main.capacityWh + addon.capacityWh;
+    const weighted = Math.round((main.capacityWh * main.pct + addon.capacityWh * addon.pct) / capacityWh);
+    const batteryPart = (d, role) => {
+      const name = role === 'Основна' ? 'основної станції' : 'додаткової батареї';
+      return '<div class="eco-system-part charge-' + level(d.pct) + '">' +
+        '<div class="eco-system-part-top"><span class="eco-system-part-label">' + role + '</span>' +
+        '<strong class="eco-system-percent">' + d.pct + '%</strong></div>' +
+        chargeTrack(d.pct, name) +
+        '<span class="eco-system-part-cap">' + niceWh(d.capacityWh) + '</span>' +
+        '</div>';
+    };
+    return '<article class="eco-system eco-system-paired charge-' + level(weighted) +
+      '" aria-label="' + main.name + ' із додатковою батареєю, загалом ' + niceWh(capacityWh) + '">' +
+      '<div class="eco-system-head"><div class="eco-system-title"><strong>' + main.name +
+      '</strong><span class="eco-system-tag">+ додаткова батарея</span></div>' +
+      '<div class="eco-system-total"><strong>' + niceWh(capacityWh) + '</strong>' +
+      '<span>' + weighted + '% загалом</span></div></div>' +
+      '<div class="eco-system-parts">' + batteryPart(main, 'Основна') + batteryPart(addon, 'Додаткова') + '</div>' +
+      energyStats(main, capacityWh, weighted) +
+      adminControls() +
+      '</article>';
+  }
+
+  // Each primary station and its expansion battery form ONE visual system.
   function renderDeviceGrid(devices) {
     const addons = new Map(devices.filter(d => d.type === 'battery' && d.parentId).map(d => [d.parentId, d]));
     const ids = new Set(devices.map(d => d.id));
     return devices.map(d => {
       if (d.type === 'battery' && d.parentId && ids.has(d.parentId)) return '';
       const addon = addons.get(d.id);
-      if (!addon) return deviceView(d);
-      const total = d.capacityWh + addon.capacityWh;
-      const avg = Math.round((d.pct * d.capacityWh + addon.pct * addon.capacityWh) / total);
-      return '<section class="eco-pair" aria-label="Система ' + d.name + ' із додатковою батареєю">' +
-        '<div class="eco-pair-head"><div class="eco-pair-title"><span class="eco-pair-icon" aria-hidden="true">↔</span>' +
-        '<div><strong>' + d.name + ' + додаткова батарея</strong>' +
-        '<span class="eco-pair-subtitle">Єдина система · 2 акумулятори</span></div></div>' +
-        '<div class="eco-pair-summary"><b>' + niceWh(total) + '</b><span class="eco-pair-average charge-' + level(avg) + '">' + avg + '%</span></div></div>' +
-        '<div class="eco-pair-grid">' + deviceView(d, true) + deviceView(addon, true) + '</div>' +
-        '<div class="eco-pair-caption"><span class="eco-linked-dot"></span>Додаткова батарея підключена до основної станції. Показники заряду кожного акумулятора окремі.</div>' +
-        '</section>';
+      return addon ? systemView(d, addon) : deviceView(d);
     }).join('');
   }
 
