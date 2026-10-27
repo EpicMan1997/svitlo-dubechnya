@@ -149,7 +149,7 @@
  .eco-admin-toggle[aria-checked="true"] .eco-switch-track i{transform:translateX(11px)}
 }
 
-/* Capacity reference is always 4096 Wh (the largest known battery). */
+/* Reference capacity is now 5000 Wh (installed PowerOcean pack). */
 .eco-relative-label{font-size:10px;color:#899fbb;margin-top:8px}
 .eco-relative-track{height:5px;background:#334155;border-radius:20px;margin:6px 0 13px;overflow:hidden}
 .eco-relative-track i{display:block;height:100%;background:#7da5ce;border-radius:20px;min-width:2px}
