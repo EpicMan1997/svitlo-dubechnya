@@ -1,0 +1,60 @@
+/* EcoFlow preview: intentionally read-only. No device telemetry or credentials. */
+.eco-top-shortcut{display:inline-flex;align-items:center;gap:7px;text-decoration:none;padding:11px 15px;background:#1a304a;color:#dbeafe;border:1px solid #395372;border-radius:11px;font:700 15px system-ui;white-space:nowrap}
+.eco-top-shortcut:hover,.eco-top-shortcut:focus-visible{background:#274765;color:#fff}
+.eco-top-shortcut:focus-visible,.eco-admin-preview summary:focus-visible{outline:2px solid #facc15;outline-offset:3px}
+.eco-shell{margin-top:16px;padding:20px;background:#111827;border:1px solid #334155;border-radius:18px;scroll-margin-top:16px}
+.eco-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.eco-kicker{text-transform:uppercase;letter-spacing:.1em;color:#98acc6;font-size:10px;font-weight:800}
+.eco-title{font-size:24px;margin:5px 0 0;line-height:1.25;display:flex;align-items:center;gap:10px}
+.eco-title-icon{display:inline-grid;place-items:center;width:34px;height:34px;border-radius:10px;background:#3b321a;color:#facc15;font-size:23px;font-weight:800}
+.eco-status{font-size:12px;font-weight:750;color:#fde68a;border:1px solid #8c6a27;background:#40321c;border-radius:30px;padding:7px 11px}
+.eco-description{color:#a9bbd3;margin:12px 0 0;line-height:1.55;font-size:13px;max-width:760px}
+.eco-space{margin-top:18px;padding:14px;border:1px solid #30445e;background:#162238;border-radius:13px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+.eco-space-name{font-size:15px;font-weight:800;display:block}
+.eco-space-subtitle{font-size:12px;color:#96aac4;display:block;margin-top:4px}
+.eco-tag{font-size:11px;color:#bbcadc;border:1px solid #475569;padding:6px 9px;border-radius:7px;white-space:nowrap}
+.eco-section-heading{margin:20px 0 10px;display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.eco-section-heading h3{font-size:17px;line-height:1.3;margin:0}
+.eco-section-heading span{font-size:12px;color:#9fb3cf}
+.eco-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.eco-metric{border-radius:12px;background:#1b2b42;padding:14px;min-width:0}
+.eco-metric-label{font-size:12px;color:#b9c9de;line-height:1.4}
+.eco-metric-value{margin-top:6px;font-size:23px;line-height:1.3;font-weight:800;color:#fff}
+.eco-metric-note{font-size:11px;color:#8da4c2;margin-top:5px;line-height:1.4}
+.eco-devices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}
+.eco-device{min-width:0;background:#19293d;border:1px solid #30455e;border-radius:14px;padding:16px}
+.eco-device-head{display:flex;justify-content:space-between;align-items:start;gap:10px}
+.eco-device-name{font-weight:780;font-size:15px}
+.eco-device-model{display:block;color:#91a8c4;font-size:12px;margin-top:3px}
+.eco-device-badge{border:1px solid #586579;border-radius:8px;background:#293448;font-size:10px;color:#c4cfdd;padding:5px 7px;white-space:nowrap}
+.eco-battery{margin-top:16px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.eco-battery-percent{font-size:30px;font-weight:800;font-variant-numeric:tabular-nums;color:#d7e3f2}
+.eco-battery-art{width:52px;height:26px;border:2px solid #667b96;border-radius:5px;position:relative;padding:3px;flex:none}
+.eco-battery-art:after{content:"";position:absolute;right:-7px;top:7px;width:5px;height:9px;border-radius:0 3px 3px 0;background:#667b96}
+.eco-battery-art i{display:block;height:100%;width:100%;background:repeating-linear-gradient(125deg,#34455a 0 5px,#435873 5px 9px);border-radius:1px}
+.eco-charge-track{margin:10px 0 14px;height:8px;background:repeating-linear-gradient(125deg,#374860 0 8px,#47546b 8px 15px);border-radius:50px}
+.eco-device-stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.eco-device-stat{border-radius:9px;padding:10px;background:#23354c}
+.eco-device-stat span{display:block;color:#a6bad3;font-size:11px}
+.eco-device-stat strong{display:block;margin-top:4px;color:#e4edf8;font-size:15px}
+.eco-device-foot{border-top:1px solid #34475f;margin-top:13px;padding-top:11px;color:#9bb0cc;font-size:11px;display:flex;justify-content:space-between;gap:10px}
+.eco-admin-preview{margin-top:18px;border-radius:13px;background:#152238;border:1px solid #344963;padding:0 15px}
+.eco-admin-preview summary{padding:16px 0;cursor:pointer;list-style:none;display:flex;align-items:center;gap:9px;font-weight:780;font-size:14px}
+.eco-admin-preview summary::-webkit-details-marker{display:none}
+.eco-admin-preview summary:after{content:"+";font-size:22px;color:#afc0d6;font-weight:400;margin-left:auto}
+.eco-admin-preview[open] summary:after{content:"−"}
+.eco-admin-label{font-size:10px;color:#fcd34d;background:#40321c;padding:4px 7px;border-radius:6px;margin-left:4px}
+.eco-admin-body{border-top:1px solid #344963;padding:14px 0 17px}
+.eco-admin-warning{font-size:12px;color:#c7d6e7;line-height:1.5}
+.eco-admin-fields{border:0;padding:0;margin:13px 0 0;display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.eco-admin-field{background:#223149;border:1px solid #3c4e68;border-radius:9px;padding:12px;opacity:.75}
+.eco-admin-field label,.eco-admin-field span{display:block;font-size:12px;color:#c6d5e8}
+.eco-admin-field strong{display:block;margin:6px 0;font-size:14px;color:#e2e8f0}
+.eco-admin-field input{max-width:100%;accent-color:#eab308}
+.eco-admin-field button{margin-top:9px;background:#34455e;border:1px solid #64748b;border-radius:8px;color:#c3d1e2;padding:8px 12px;cursor:not-allowed}
+.eco-security-note{font-size:11px;color:#93a8c5;margin-top:12px;line-height:1.5}
+@media(max-width:650px){.eco-shell{padding:15px}.eco-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.eco-metric:first-child{grid-column:1/-1}.eco-devices{grid-template-columns:1fr}.eco-admin-fields{grid-template-columns:1fr}.eco-section-heading{align-items:start}}
+@media(max-width:390px){.eco-top-shortcut{font-size:13px;padding:11px 12px}.eco-status{font-size:10px}.eco-metric{padding:11px}}
+
+/* Keep Today / Tomorrow / EcoFlow reachable on narrow iPhone screens. */
+.tabs{flex-wrap:wrap}
