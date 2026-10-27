@@ -418,11 +418,7 @@ h1{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
     <div class="eco-metric"><div class="eco-metric-label">Середній заряд</div><div class="eco-metric-value" id="eco-demo-total" data-level="unknown">—</div><div class="eco-metric-note" id="eco-demo-note">Зважений за ємністю</div></div>
     <div class="eco-metric"><div class="eco-metric-label">Акумуляторів та станцій</div><div class="eco-metric-value" id="eco-count">—</div><div class="eco-metric-note">У вибраній локації</div></div>
   </div>
-  <div class="eco-capacity-map" aria-label="Розподіл номінальної ємності"><div class="eco-capacity-map-heading"><strong>Розподіл ємності</strong></div><div class="eco-capacity-strip" id="eco-capacity-strip"></div></div>
-  <div id="eco-admin-mode-hint" class="eco-admin-only eco-admin-mode-hint" hidden>
-    <strong>Admin · Керування недоступне</strong>
-    <p>Захищене підключення ще не налаштоване. Усі команди заблоковані.</p>
-  </div>
+  <div class="eco-capacity-map" aria-label="Розподіл номінальної ємності"><div class="eco-capacity-map-heading"><strong>Розподіл ємності</strong></div><div class="eco-capacity-strip" id="eco-capacity-strip"></div><div class="eco-capacity-tooltip" id="eco-capacity-tooltip" role="tooltip" hidden></div></div>
 </section></main>
 <script>(function(){'use strict';let tab='today',data=null,dayShown='',modeShown='',locationId='dacha';const $=id=>document.getElementById(id),timeF=new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/Kyiv',hour:'2-digit',minute:'2-digit',second:'2-digit',hourCycle:'h23'}),dateF=new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/Kyiv',year:'numeric',month:'2-digit',day:'2-digit'}),human=new Intl.DateTimeFormat('uk-UA',{timeZone:'UTC',day:'numeric',month:'long'}),weekdayF=new Intl.DateTimeFormat('uk-UA',{timeZone:'UTC',weekday:'long'}),checkF=new Intl.DateTimeFormat('uk-UA',{timeZone:'Europe/Kyiv',day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit',hourCycle:'h23'});function formatChecked(x){if(!x)return 'немає даних';const d=new Date(x);if(!Number.isFinite(d.getTime()))return 'немає даних';return checkF.format(d).replace(/[,\s]+/g,' ').trim()}function now(){const t=Object.fromEntries(timeF.formatToParts(new Date()).filter(x=>x.type!=='literal').map(x=>[x.type,x.value])),d=Object.fromEntries(dateF.formatToParts(new Date()).filter(x=>x.type!=='literal').map(x=>[x.type,x.value]));return {iso:d.year+'-'+d.month+'-'+d.day,time:t.hour+':'+t.minute+':'+t.second,display:d.day+'.'+d.month+'.'+d.year,h:+t.hour,m:+t.minute,s:+t.second}}function tomorrow(s){const a=s.split('-').map(Number);return new Date(Date.UTC(a[0],a[1]-1,a[2]+1)).toISOString().slice(0,10)}function minute(s){const a=s.split(':').map(Number);return a[0]*60+a[1]}function pct(x){return x*100/1440}function esc(s){return String(s??'').replace(/[&<>"']/g,x=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[x]))}function activeLocation(){return data?.locations?.[locationId]||(locationId==='dacha'?{name:'Дача',group:'3.1',days:data?.days||{},logs:data?.logs||[],address_verified:true}:null)}function selected(n){const iso=tab==='today'?n.iso:tomorrow(n.iso);return {iso,entry:activeLocation()?.days?.[iso]||{status:'unknown',outages:[],detail:locationId==='dacha'?'Очікуємо графіка':'Потрібне підтвердження міського графіка'}}}function currentStatus(e){return e?.status||'unknown'}function tomorrowFingerprint(n){n=n||now();const iso=tomorrow(n.iso),entry=activeLocation()?.days?.[iso];if(!entry||currentStatus(entry)!=='normal'||!Array.isArray(entry.outages))return null;return {iso,hash:JSON.stringify(entry.outages)}}function remembered(k){
   let value=null;
@@ -661,7 +657,7 @@ function events(){
  const previousEdits=logs.filter(item=>eventKind(item)==='changed'&&item!==logs[0]);
  const previousLabel=previousEdits.length===1?'зміна':previousEdits.length<=4?'зміни':'змін';
  $('latest').innerHTML=(logs.length?eventCard(logs[0]):'<p class="changes-none">За цю дату подій немає</p>')+
-  (previousEdits.length?'<details id="earlierChanges" class="earlier-changes" data-scope="'+esc(earlierScope)+'" '+(earlierOpen?'open':'')+'><summary>Ще '+previousEdits.length+' '+previousLabel+'</summary><div class="yesterday-list">'+previousEdits.map(compactYesterdayCard).join('')+'</div></details>':'');
+  (previousEdits.length?'<details id="earlierChanges" class="earlier-changes" data-scope="'+esc(earlierScope)+'" '+(earlierOpen?'open':'')+'><summary>Минулі зміни <span class="past-change-count">'+previousEdits.length+'</span></summary><div class="yesterday-list">'+previousEdits.map(compactYesterdayCard).join('')+'</div></details>':'');
  // The summary describes the schedule FOR yesterday; events are changes
  // to yesterday's schedule, not changes to future dates observed yesterday.
  const d=new Date(current.iso+'T12:00:00Z');
@@ -684,7 +680,7 @@ function events(){
  const yMinutes=yIntervals===null?null:historicOutageMinutes(yIntervals.map(([a,b])=>a+'–'+b).join(', ')||'Без відключень');
  const count=history.length;
  const yDate=yesterday.slice(8)+'.'+yesterday.slice(5,7);
- $('previousTitle').textContent='Зміни і графік '+yDate;
+ $('previousTitle').textContent='Зміни і графік вчора';
  const countLabel=$('yesterdayCount');
  countLabel.textContent=String(count);
  countLabel.classList.remove('zero','few','many');
