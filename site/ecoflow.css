@@ -153,3 +153,19 @@
 .eco-relative-label{font-size:10px;color:#899fbb;margin-top:8px}
 .eco-relative-track{height:5px;background:#334155;border-radius:20px;margin:6px 0 13px;overflow:hidden}
 .eco-relative-track i{display:block;height:100%;background:#7da5ce;border-radius:20px;min-width:2px}
+
+
+/* Exact proportional capacity area by watt-hours; vertical fill is illustrative SOC. */
+.eco-capacity-map{margin-top:15px;padding:13px 14px;background:#162238;border:1px solid #30445e;border-radius:13px}
+.eco-capacity-map-heading{display:flex;justify-content:space-between;align-items:baseline;gap:7px;flex-wrap:wrap;margin-bottom:11px}
+.eco-capacity-map-heading strong{font-size:13px;color:#e2e8f0}
+.eco-capacity-map-heading span{font-size:11px;color:#91a7c4}
+.eco-capacity-strip{display:flex;gap:3px;min-height:34px;align-items:stretch;overflow:hidden;border-radius:6px}
+.eco-cap-segment{--charge:#94a3b8;position:relative;display:block;min-width:2px;flex-basis:0;background:#2e4057;border:1px solid #4b5d74;border-radius:3px;overflow:hidden}
+.eco-cap-segment.charge-high{--charge:#22c55e}
+.eco-cap-segment.charge-good{--charge:#84cc16}
+.eco-cap-segment.charge-medium{--charge:#eab308}
+.eco-cap-segment.charge-low{--charge:#f97316}
+.eco-cap-segment.charge-critical{--charge:#ef4444}
+.eco-cap-segment i{display:block;position:absolute;left:0;top:0;bottom:0;background:var(--charge)}
+.eco-cap-unknown{color:#bbcbe0;background:#29384b;border:1px dashed #64748b;border-radius:6px;padding:11px;flex:1;font-size:12px;line-height:1.5}
