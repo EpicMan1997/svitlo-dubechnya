@@ -65,7 +65,14 @@ class EcoFlowPreviewContract(unittest.TestCase):
         self.assertLess(HTML.index('id="locationMenu"'), HTML.index('id="clock"'))
         self.assertLess(HTML.index('id="clock"'), HTML.index('id="ecoAdminToggle"'))
         self.assertEqual(HTML.count('id="clock"'), 1)
-        self.assertIn('Admin <small>Preview</small>', HTML)
+        self.assertIn('<span class="eco-admin-toggle-label">Admin</span>', HTML)
+        self.assertIn('class="eco-admin-shield"', HTML)
+        self.assertNotIn('Admin <small>Preview</small>', HTML)
+        self.assertIn('main > header #clock', CSS)
+        self.assertIn('grid-template-columns:minmax(0,1fr) max-content minmax(0,1fr)', CSS)
+        self.assertIn('main > .tabs .tomorrow-tab{margin-left:auto}', CSS)
+        self.assertIn('width:calc(100% - 284px)', CSS)
+        self.assertIn('main > .tabs{width:100%;padding-right:14px}', CSS)
         self.assertIn(".eco-admin-toggle[aria-checked=\"true\"]", CSS)
 
     def test_expansion_batteries_share_an_explicit_pair(self):
