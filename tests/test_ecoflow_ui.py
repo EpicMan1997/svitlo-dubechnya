@@ -52,9 +52,35 @@ class EcoFlowPreviewContract(unittest.TestCase):
     def test_location_changer_and_pwa_integration(self):
         self.assertIn("svitlo:location-change", JS)
         self.assertIn("new CustomEvent('svitlo:location-change'", HTML)
-        self.assertIn('href="#ecoflow"', HTML)
+        self.assertNotIn('href="#ecoflow"', HTML)
+        self.assertIn('<section class="eco-shell"', HTML)
         self.assertIn('"./ecoflow.css"', SW)
         self.assertIn('"./ecoflow.js"', SW)
+
+
+    def test_device_section_first_and_header_rearranged(self):
+        self.assertLess(HTML.index(">Станції та акумулятори<"),
+                        HTML.index(">Огляд батарей<"))
+        self.assertIn('class="site-clock" id="clock"', HTML)
+        self.assertLess(HTML.index('id="locationMenu"'), HTML.index('id="clock"'))
+        self.assertLess(HTML.index('id="clock"'), HTML.index('id="ecoAdminToggle"'))
+        self.assertEqual(HTML.count('id="clock"'), 1)
+        self.assertIn('Admin <small>Preview</small>', HTML)
+        self.assertIn(".eco-admin-toggle[aria-checked=\"true\"]", CSS)
+
+    def test_expansion_batteries_share_an_explicit_pair(self):
+        self.assertIn("parentId: 'dp3'", JS)
+        self.assertIn("parentId: 'd2'", JS)
+        self.assertIn("function renderDeviceGrid(devices)", JS)
+        self.assertIn("const addons = new Map(", JS)
+        self.assertIn("ids.has(d.parentId)", JS)
+        self.assertIn("deviceView(d, true) + deviceView(addon, true)", JS)
+        self.assertIn("niceWh(total)", JS)
+        self.assertIn('class="eco-pair-grid"', JS)
+        self.assertIn(".eco-pair-grid", CSS)
+        self.assertIn("@media(max-width:760px)", CSS)
+        self.assertIn("Параметри цього акумулятора керуються через основну станцію", JS)
+
 
 
 if __name__ == "__main__":
