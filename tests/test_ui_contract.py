@@ -80,6 +80,23 @@ class VisualStatusContract(unittest.TestCase):
         self.assertIn("if(tab==='tomorrow'&&tomorrowFingerprint()){markTomorrowSeen();updateTomorrowTab()}", HTML)
         self.assertIn("setInterval(reload,30000)", HTML)
 
+    def test_location_aliases_keep_real_addresses_and_persistent_ids(self):
+        # Friendly family names do not alter historical keys or source groups.
+        self.assertIn("const names={dacha:'Дача',obolonskyi54:'Дім',ivasiuka43:'Соловки',azov28b:'Науменки'}", HTML)
+        for key, title, address in [
+            ('dacha','Дача','Квіткова 251 · Вища Дубечня'),
+            ('obolonskyi54','Дім','Оболонський проспект 54'),
+            ('ivasiuka43','Соловки','Володимира Івасюка 43'),
+            ('azov28b','Науменки','Героїв полку Азов 28Б'),
+        ]:
+            self.assertIn(f'data-location="{key}">{title} <small>{address}</small>', HTML)
+        self.assertIn('<span id="locationLabel">Дача</span><small id="locationGroup">3</small>', HTML)
+        self.assertIn("remember('dubechnya-selected-location',key)", HTML)
+        self.assertIn("const c=activeLocation()", HTML)
+        refresh = ROOT.joinpath("scripts/refresh.py").read_text(encoding="utf-8")
+        self.assertIn("'group':'4.1'", refresh)
+        self.assertIn("'group':'10.1'", refresh)
+
     def test_all_group_badges_display_main_number_only(self):
         # Front-end aliases only. Full source queues remain unchanged in refresh.py.
         self.assertIn("String(c?.group||'—').split('.')[0]", HTML)
