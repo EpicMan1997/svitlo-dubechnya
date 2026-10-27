@@ -18,8 +18,8 @@
     home: {
       name: 'Квартира',
       devices: [
-        // 5 kW is the inverter's power rating; the installed battery capacity is NOT known.
-        { name: 'PowerOcean', capacityWh: null, powerKw: 5, pct: 67, inputW: 300, outputW: 760, type: 'system', id: 'po' }
+        // One 5 kWh battery installed; battery output ~3 kW (two modules ~6 kW). Inverter rated 5 kW.
+        { name: 'PowerOcean', capacityWh: 5000, inverterKw: 5, batteryPowerKw: 3, twoBatteryPowerKw: 6, batteryCount: 1, pct: 67, inputW: 300, outputW: 760, type: 'system', id: 'po' }
       ]
     },
     solovky: {
@@ -44,6 +44,7 @@
 
   const $ = id => document.getElementById(id);
   const uk = new Intl.NumberFormat('uk-UA', { maximumFractionDigits: 1 });
+  const MAX_BATTERY_WH = 5000; // Capacity scale: largest installed battery in the current inventory.
   function niceWh(wh) {
     return wh >= 1000 ? uk.format(wh / 1000) + ' кВт·год' : uk.format(wh) + ' Вт·год';
   }
@@ -65,8 +66,9 @@
     const size = capClass(d.capacityWh);
     const capacity = d.capacityWh === null ? 'Ємність акумуляторів невідома' : niceWh(d.capacityWh);
     const typeLabel = isBattery ? 'Додаткова батарея' : d.type === 'system' ? 'Домашня система' : 'Зарядна станція';
-    const info = d.powerKw ? 'Інвертор ' + d.powerKw + ' кВт · батареї не уточнені' :
-      isBattery ? 'Підключена до ' + d.parent : 'Номінальна ємність ' + capacity;
+    const info = d.type === 'system'
+      ? '1 батарея · ' + capacity + ' · інвертор ' + d.inverterKw + ' кВт · батарейна потужність зараз ' + d.batteryPowerKw + ' кВт (з двома: ' + d.twoBatteryPowerKw + ' кВт)'
+      : isBattery ? 'Підключена до ' + d.parent : 'Номінальна ємність ' + capacity;
     const charge = level(d.pct);
     const stats = isBattery ?
       '<div class="eco-attached-note">Вхід / вихід контролює основна станція. Потужності окремо не показуємо.</div>' :
@@ -84,7 +86,7 @@
       '<div class="eco-capacity-line">' + (d.capacityWh === null ? '<span>Ємність: уточнюється</span>' : '<strong>' + capacity + '</strong>') +
       '<span class="eco-size-note">Розмір відносно ємності</span></div>' +
       '<p class="eco-device-caption">' + info + '</p>' +
-      (d.capacityWh !== null ? '<div class="eco-relative-label">Масштаб ємності відносно 4,096 кВт·год</div><div class="eco-relative-track" aria-label="Паспортна ємність ' + niceWh(d.capacityWh) + '"><i style="width:' + Math.round(d.capacityWh / 4096 * 1000) / 10 + '%"></i></div>' : '') +
+      (d.capacityWh !== null ? '<div class="eco-relative-label">Масштаб ємності відносно 5 кВт·год</div><div class="eco-relative-track" aria-label="Паспортна ємність ' + niceWh(d.capacityWh) + '"><i style="width:' + Math.round(d.capacityWh / MAX_BATTERY_WH * 1000) / 10 + '%"></i></div>' : '') +
       stats +
       '<div class="eco-device-foot"><span>Автономність: не розраховано</span><span>Не підключено</span></div>' +
       '<div class="eco-admin-only eco-device-admin">' +
@@ -107,10 +109,10 @@
     $('eco-selected-location').textContent = place.name;
     $('eco-count').textContent = String(place.devices.length);
     $('eco-capacity').textContent = allKnown ? niceWh(totalWh) : 'Уточнюється';
-    $('eco-capacity-note').textContent = allKnown ? 'Сума паспортних ємностей батарей' : '5 кВт інвертора не означає 5 кВт·год батареї';
+    $('eco-capacity-note').textContent = allKnown ? 'Сума номінальних ємностей батарей' : 'Ємність системи ще не уточнена';
     $('eco-demo-total').textContent = weighted === null ? '—' : weighted + '%';
     $('eco-demo-total').dataset.level = weighted === null ? 'unknown' : level(weighted);
-    $('eco-demo-note').textContent = weighted === null ? 'Ємність PowerOcean ще невідома' : 'Приклад середньозваженого заряду';
+    $('eco-demo-note').textContent = weighted === null ? 'Ємність батарей ще невідома' : 'Приклад середньозваженого заряду';
     // Here the segment width, unlike a card's layout size, is mathematically proportional to Wh.
     $('eco-capacity-strip').innerHTML = allKnown
       ? place.devices.map(d =>
@@ -118,11 +120,11 @@
           '" title="' + d.name + ': ' + niceWh(d.capacityWh) + ', демо заряд ' + d.pct + '%">' +
           '<i style="width:' + d.pct + '%"></i></span>'
         ).join('')
-      : '<span class="eco-cap-unknown">Ємність акумуляторів PowerOcean ще не уточнена (5 кВт - потужність інвертора)</span>';
+      : '<span class="eco-cap-unknown">Ємність цієї батареї ще не уточнена</span>';
     $('eco-devices').innerHTML = place.devices.map(deviceView).join('');
     $('eco-scale-note').textContent = allKnown ?
-      'Площа карток приблизно відповідає ємності станцій: більше кВт·год = більша картка.' :
-      'PowerOcean показано окремо: площу за ємністю визначимо після уточнення кількості батарей.';
+      'Площа карток приблизно відповідає ємності станцій; пропорційна шкала показує точне співвідношення кВт·год.' :
+      'Для цієї локації є батареї з невідомою ємністю.';
   }
 
   // Front-end preview toggle. This is NOT authentication and does not grant privileges.
