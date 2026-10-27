@@ -219,5 +219,38 @@ class EcoFlowPreviewContract(unittest.TestCase):
 
 
 
+    def test_every_battery_has_explicit_operation_state(self):
+        self.assertEqual(JS.count("operation: 'discharging'"), 8)
+        self.assertEqual(JS.count("operation: 'charging'"), 1)
+        self.assertEqual(JS.count("operation: 'holding'"), 1)
+        self.assertIn("charging: { label: 'Заряджається'", JS)
+        self.assertIn("discharging: { label: 'Розряджається'", JS)
+        self.assertIn("holding: { label: 'Підтримує заряд'", JS)
+        self.assertIn("unknown: { label: 'Статус невідомий'", JS)
+        self.assertIn("function operationBadge(device)", JS)
+        self.assertIn("operationBadge(d)", JS)
+        for classname in ("charging", "discharging", "holding", "unknown"):
+            self.assertIn(".eco-operation-" + classname, CSS)
+        self.assertIn(".eco-system-part .eco-operation", CSS)
+
+    def test_individual_charge_limit_presets_are_not_slider(self):
+        self.assertIn("const individualLimitPresets = [100, 80, 50, 5]", JS)
+        self.assertIn("function adminControls(device)", JS)
+        self.assertIn("adminControls(d)", JS)
+        self.assertIn("adminControls(main)", JS)
+        self.assertIn("const individualChargeLimits = new Map()", JS)
+        self.assertIn("data-eco-individual-limit", JS)
+        self.assertIn("individualChargeLimits.set(key, value)", JS)
+        self.assertIn("aria-pressed", JS)
+        self.assertNotIn('<input type="range" min="50" max="100" value="90" disabled>', JS)
+        self.assertIn(".eco-limit-presets", CSS)
+        self.assertIn(".eco-limit-preset.is-active", CSS)
+
+    def test_river_three_plus_quiet_is_eighty_watts(self):
+        self.assertIn("r3pw: { quiet: 80, balanced: 200, fast: 380 }", JS)
+        self.assertIn("mode.key === 'quiet' ? 'до 80 Вт'", JS)
+        self.assertIn("'</select>'", JS)
+
+
 if __name__ == "__main__":
     unittest.main()
