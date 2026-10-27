@@ -95,7 +95,7 @@
         '<div class="eco-admin-controls"><label>Ліміт заряджання <input type="range" min="50" max="100" value="90" disabled></label>' +
         '<button type="button" disabled>AC: керування недоступне</button></div>') +
       '<span>Лише макет. Команди не виконуються, авторизації ще немає.</span>' +
-      '</div></article';
+      '</div></article>';
   }
 
   // One visual power system per main station, with its battery linked inside.
