@@ -426,3 +426,103 @@ main > header .header-time.is-floating .eco-admin-toggle{
     right:12px;
   }
 }
+
+
+/* Release layout: balanced header, schedule tabs and unified battery systems. */
+main > header .location-shell,
+main > header #clock,
+main > header .header-time{min-height:58px}
+main > header .location-shell{display:flex;align-items:center}
+main > header .location-shell h1{display:flex;align-items:center;min-height:58px}
+main > header .location-button{display:inline-flex;align-items:center;min-height:58px}
+main > header .header-time{display:flex;align-items:center}
+main > header .eco-admin-toggle{min-height:58px;padding:12px 16px;gap:12px}
+main > header #clock{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:58px}
+main > header #clock span{margin:3px 0 0}
+main > header .header-time.is-floating{min-height:auto}
+main > header .header-time.is-floating .eco-admin-toggle{min-height:46px;padding:9px 13px}
+
+/* Day selectors are anchored to the start and end of the graph column. */
+main > nav.tabs{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) max-content;
+  align-items:center;
+  gap:8px;
+  width:calc(100% - 284px);
+  padding-right:20px;
+}
+main > nav.tabs > button[data-tab="today"]{justify-self:start}
+main > nav.tabs > button[data-tab="tomorrow"]{justify-self:end;margin:0}
+@media(max-width:800px){main > nav.tabs{width:100%;padding-right:0}}
+@media(max-width:650px){
+  main > header .location-shell,main > header .location-shell h1,main > header .location-button,main > header .header-time{min-height:52px}
+  main > header #clock{min-height:40px}
+  main > header .eco-admin-toggle{min-height:48px;padding:9px 10px}
+}
+
+/* One card = one power system, even when it has two physical batteries. */
+.eco-system{
+  --charge:#22c55e;
+  grid-column:span 12;
+  min-width:0;
+  background:#1b2c42;
+  border:1px solid #405a77;
+  border-radius:16px;
+  padding:18px;
+}
+.eco-system.charge-high{--charge:#22c55e}
+.eco-system.charge-good{--charge:#84cc16}
+.eco-system.charge-medium{--charge:#eab308}
+.eco-system.charge-low{--charge:#f97316}
+.eco-system.charge-critical{--charge:#ef4444}
+.eco-system-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+.eco-system-title{display:flex;align-items:center;flex-wrap:wrap;gap:9px}
+.eco-system-title > strong{font-weight:800;font-size:19px;line-height:1.25;color:#f8fafc}
+.eco-system-tag{border:1px solid #536e8b;border-radius:8px;background:#30455d;color:#b7d7f2;padding:5px 9px;font-size:11px;font-weight:700}
+.eco-system-total{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.eco-system-total strong{font-size:17px;font-weight:850;color:#f8fafc;white-space:nowrap}
+.eco-system-total span{color:var(--charge);font-weight:800;white-space:nowrap;font-variant-numeric:tabular-nums}
+.eco-system-parts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0;border:1px solid #405877;border-radius:12px;overflow:hidden;background:#21354d}
+.eco-system-part{--charge:#22c55e;min-width:0;padding:18px 16px 16px;display:flex;flex-direction:column}
+.eco-system-part + .eco-system-part{border-left:1px solid #547290;background:#1a2e46}
+.eco-system-part.charge-high{--charge:#22c55e}
+.eco-system-part.charge-good{--charge:#84cc16}
+.eco-system-part.charge-medium{--charge:#eab308}
+.eco-system-part.charge-low{--charge:#f97316}
+.eco-system-part.charge-critical{--charge:#ef4444}
+.eco-system-part-top{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.eco-system-part-label{font-size:12px;font-weight:750;color:#c1d5ed}
+.eco-system-percent{font-size:30px;line-height:1;font-weight:850;color:var(--charge);font-variant-numeric:tabular-nums}
+.eco-system-part .eco-charge-track{margin:15px 0 9px;background:#40536a}
+.eco-system-part-cap{font-size:12px;font-weight:700;color:#c3d6ea}
+.eco-common-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:15px}
+.eco-system .eco-common-stats{margin-top:15px}
+.eco-common-stats .eco-device-stat{background:#253b55;padding:13px 14px;min-width:0}
+.eco-common-stats .eco-device-stat strong{font-size:17px;line-height:1.25;white-space:normal;font-variant-numeric:tabular-nums}
+.eco-common-stats .eco-autonomy{background:#213e46}
+.eco-common-stats .eco-autonomy strong{color:#a7f3d0}
+.eco-standalone .eco-common-stats{margin-top:auto}
+.eco-standalone .eco-capacity-line{margin:1px 0 14px}
+.eco-standalone.size-small .eco-common-stats{grid-template-columns:1fr;gap:7px}
+.eco-standalone.size-small .eco-common-stats .eco-device-stat{padding:9px}
+.eco-standalone.size-medium .eco-common-stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+.eco-standalone.size-medium .eco-common-stats .eco-autonomy{grid-column:1 / -1}
+.eco-system .eco-device-admin{margin-top:16px}
+@media(max-width:650px){
+  .eco-system{padding:13px}
+  .eco-system-head{margin-bottom:12px}
+  .eco-system-title strong{font-size:16px}
+  .eco-system-total{gap:7px}
+  .eco-system-total strong{font-size:15px}
+  .eco-system-part{padding:14px 10px}
+  .eco-system-percent{font-size:25px}
+  .eco-common-stats{gap:7px}
+  .eco-common-stats .eco-device-stat{padding:10px}
+  .eco-common-stats .eco-device-stat strong{font-size:14px}
+}
+@media(max-width:390px){
+  .eco-system-parts{grid-template-columns:1fr}
+  .eco-system-part + .eco-system-part{border-left:0;border-top:1px solid #547290}
+  .eco-system .eco-common-stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .eco-system .eco-autonomy{grid-column:1 / -1}
+}
