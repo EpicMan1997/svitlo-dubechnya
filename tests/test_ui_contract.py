@@ -36,7 +36,7 @@ class VisualStatusContract(unittest.TestCase):
 
     def test_obolon_is_clean_and_city_dtek_is_manual_only(self):
         self.assertNotIn("Група 4.1 попередня — потрібна адресна перевірка ДТЕК", HTML)
-        self.assertIn("locationId!=='obolonskyi54'&&!activeLocation()?.address_verified", HTML)
+        self.assertIn("locationId!=='home'&&!activeLocation()?.address_verified", HTML)
         self.assertIn("ДТЕК</a><span class=\"source-verdict source-manual-verdict\">За адресою", HTML)
         self.assertIn("Перевірити вручну на сайті ДТЕК", HTML)
         self.assertIn("Object.keys(urls).filter(name=>rows[name]?.status==='match')", HTML)
@@ -80,27 +80,29 @@ class VisualStatusContract(unittest.TestCase):
         self.assertIn("if(tab==='tomorrow'&&tomorrowFingerprint()){markTomorrowSeen();updateTomorrowTab()}", HTML)
         self.assertIn("setInterval(reload,30000)", HTML)
 
-    def test_location_aliases_keep_real_addresses_and_persistent_ids(self):
-        # Friendly family names do not alter historical keys or source groups.
-        self.assertIn("const names={dacha:'Дача',obolonskyi54:'Дім',ivasiuka43:'Соловки',azov28b:'Науменки'}", HTML)
-        for key, title, address in [
-            ('dacha','Дача','Квіткова 251 · Вища Дубечня'),
-            ('obolonskyi54','Дім','Оболонський проспект 54'),
-            ('ivasiuka43','Соловки','Володимира Івасюка 43'),
-            ('azov28b','Науменки','Героїв полку Азов 28Б'),
-        ]:
-            self.assertIn(f'data-location="{key}">{title} <small>{address}</small>', HTML)
-        self.assertIn('<span id="locationLabel">Дача</span><small id="locationGroup">3</small>', HTML)
+    def test_public_location_aliases_do_not_disclose_private_addresses(self):
+        for key, label in [('dacha','Дача'),('home','Дім'),('solovky','Соловки'),('naumenky','Науменки')]:
+            self.assertIn(f'data-location="{key}">{label}</button>', HTML)
+        self.assertIn("const names={dacha:'Дача',home:'Дім',solovky:'Соловки',naumenky:'Науменки'}", HTML)
         self.assertIn("remember('dubechnya-selected-location',key)", HTML)
         self.assertIn("const c=activeLocation()", HTML)
-        refresh = ROOT.joinpath("scripts/refresh.py").read_text(encoding="utf-8")
-        self.assertIn("'group':'4.1'", refresh)
-        self.assertIn("'group':'10.1'", refresh)
+        self.assertNotIn('location-menu" id="locationMenu" hidden><button type="button" data-location="dacha">Дача <small>', HTML)
+        refresh=ROOT.joinpath("scripts/refresh.py").read_text(encoding="utf-8")
+        self.assertNotIn("'street':", refresh)
+        self.assertIn("'home': {'name':'Дім'", refresh)
+        self.assertIn("'solovky': {'name':'Соловки'", refresh)
+        self.assertIn("'naumenky': {'name':'Науменки'", refresh)
+        state=__import__('json').loads(ROOT.joinpath('state/state.json').read_text(encoding='utf-8'))
+        self.assertEqual(set(state['locations']),{'home','solovky','naumenky'})
+        for key, label in [('home','Дім'),('solovky','Соловки'),('naumenky','Науменки')]:
+            self.assertEqual(state['locations'][key]['name'],label)
+            self.assertTrue(state['locations'][key]['logs'])
+            self.assertTrue(state['locations'][key]['days'])
 
     def test_all_group_badges_display_main_number_only(self):
         # Front-end aliases only. Full source queues remain unchanged in refresh.py.
         self.assertIn("String(c?.group||'—').split('.')[0]", HTML)
-        self.assertNotIn("locationId==='azov28b'?'10':c?.group||'—'", HTML)
+        self.assertNotIn("locationId==='naumenky'?'10':c?.group||'—'", HTML)
         refresh = ROOT.joinpath("scripts/refresh.py").read_text(encoding="utf-8")
         self.assertIn("'group':'4.1'", refresh)
         self.assertIn("'group':'10.1'", refresh)

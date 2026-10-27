@@ -334,12 +334,9 @@ def make_log_event(now,target,old,new,message):
 CITY_KOLY = 'https://kolysvitlo.com/schedule/dtek_kyiv'
 CITY_BUDE = 'https://kolybude.com/kyiv'
 CITY_LOCATIONS = {
-    'obolonskyi54': {'name':'Оболонський проспект 54','group':'4.1','address_verified':False,
-                    'street':'https://bezsvitla.com.ua/kyiv/prosp-obolonskyi'},
-    'ivasiuka43': {'name':'Володимира Івасюка 43','group':'4.1','address_verified':False,
-                  'street':'https://bezsvitla.com.ua/kyiv/prosp-ivasyuka-volodymyra'},
-    'azov28b': {'name':'Героїв полку Азов 28Б','group':'10.1','address_verified':False,
-                'street':'https://bezsvitla.com.ua/kyiv/vul-heroyiv-polku-azov'}
+    'home': {'name':'Дім','group':'4.1','address_verified':False},
+    'solovky': {'name':'Соловки','group':'4.1','address_verified':False},
+    'naumenky': {'name':'Науменки','group':'10.1','address_verified':False}
 }
 
 def parse_city_bez(html, target, group):
@@ -495,7 +492,7 @@ def main():
     visible_days={k:v for k,v in old.get('days',{}).items()
                   if k==(today-timedelta(days=1)).isoformat()}
     visible_days.update(days)
-    payload={'updated_at':now.isoformat(timespec='seconds'),'today_date':today.isoformat(),'tomorrow_date':tomorrow.isoformat(),'days':visible_days,'logs':logs,'locations':{'dacha':{'name':'Квіткова 251 · Вища Дубечня','group':'3.1','address_verified':True,'days':visible_days,'logs':logs,'operator':'ДТЕК Київські регіональні електромережі'},**city},'source_health':{'dtek_reachable':official is not None,'issues':errors}}
+    payload={'updated_at':now.isoformat(timespec='seconds'),'today_date':today.isoformat(),'tomorrow_date':tomorrow.isoformat(),'days':visible_days,'logs':logs,'locations':{'dacha':{'name':'Дача','group':'3.1','address_verified':True,'days':visible_days,'logs':logs,'operator':'ДТЕК Київські регіональні електромережі'},**city},'source_health':{'dtek_reachable':official is not None,'issues':errors}}
     OUTPUT.parent.mkdir(exist_ok=True,parents=True)
     OUTPUT.write_text(json.dumps(payload,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
     print('Checked:',now.isoformat(timespec='minutes'),[(d,e['status'],e['outages']) for d,e in days.items()])

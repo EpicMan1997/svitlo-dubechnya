@@ -50,9 +50,9 @@ class Tests(unittest.TestCase):
   self.assertNotIn('Svitlo.live',result)
 
  def test_kyiv_address_groups(self):
-  self.assertEqual(CITY_LOCATIONS['obolonskyi54']['group'],'4.1')
-  self.assertEqual(CITY_LOCATIONS['ivasiuka43']['group'],'4.1')
-  self.assertEqual(CITY_LOCATIONS['azov28b']['group'],'10.1')
+  self.assertEqual(CITY_LOCATIONS['home']['group'],'4.1')
+  self.assertEqual(CITY_LOCATIONS['solovky']['group'],'4.1')
+  self.assertEqual(CITY_LOCATIONS['naumenky']['group'],'10.1')
  def test_kyiv_bez_queue(self):
   page='<h1>Графік у Києві на 24.10.2026</h1>Графік Черга 4.1 00:00 – 07:30 07:30 – 11:00 11:00 – 16:30 16:30 – 20:00 20:00 – 24:00 Зберегти підчергу'
   result=parse_city_bez(page,D,'4.1')
