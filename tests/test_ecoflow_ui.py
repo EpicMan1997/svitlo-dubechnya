@@ -23,11 +23,10 @@ class EcoFlowPreviewContract(unittest.TestCase):
         self.assertEqual(JS.count("capacityWh: 256"), 1)
         self.assertEqual(JS.count("capacityWh: 5000"), 1)
 
-    def test_demo_not_presented_as_live_telemetry(self):
-        self.assertIn("API не підключено", HTML)
-        self.assertIn("відсотки та вати вигадані для макета", HTML)
-        self.assertIn("Демо", JS)
-        self.assertIn("Не підключено", JS)
+    def test_disconnected_device_values_are_not_claimed_as_live(self):
+        self.assertIn("Не підключено", HTML)
+        self.assertIn("Відсотки та потужності поки не надходять", HTML)
+        self.assertNotRegex(HTML + JS, r"(?i)демо|демонстрац|макет|preview")
         self.assertNotRegex(JS, r"\bfetch\s*\(|XMLHttpRequest|WebSocket")
         self.assertIn("disabled", JS)
 
@@ -35,10 +34,10 @@ class EcoFlowPreviewContract(unittest.TestCase):
         self.assertIn('id="ecoAdminToggle"', HTML)
         self.assertIn('role="switch"', HTML)
         self.assertIn('aria-checked="false"', HTML)
-        self.assertIn("setAdminPreview(false)", JS)
+        self.assertIn("setAdminMode(false)", JS)
         self.assertIn("toggle.addEventListener('click'", JS)
-        self.assertIn("не виконує автентифікацію", HTML)
-        self.assertIn(".eco-shell.is-admin-preview", CSS)
+        self.assertIn("Захищене підключення ще не налаштоване", HTML)
+        self.assertIn(".eco-shell.is-admin-mode", CSS)
 
     def test_capacity_is_proportional_and_powerocean_is_known(self):
         self.assertIn("d.capacityWh / MAX_BATTERY_WH", JS)
@@ -88,6 +87,25 @@ class EcoFlowPreviewContract(unittest.TestCase):
         self.assertIn(".eco-pair-grid", CSS)
         self.assertIn("@media(max-width:760px)", CSS)
         self.assertIn("Параметри цього акумулятора керуються через основну станцію", JS)
+
+
+
+    def test_compact_location_and_space_mapping(self):
+        self.assertIn('id="eco-selected-location"', HTML)
+        self.assertIn('id="eco-space-name"', HTML)
+        self.assertIn("name: 'Дім', space: 'Квартира'", JS)
+        self.assertIn("$('eco-space-name').textContent = place.space;", JS)
+        self.assertIn("eco-context-arrow", HTML)
+        self.assertEqual(HTML.count('class="eco-status"'), 1)
+        self.assertIn(".eco-context-space strong{color:#a5e4db}", CSS)
+
+    def test_admin_stays_accessible_while_scrolling(self):
+        self.assertIn("function syncFloatingAdmin()", JS)
+        self.assertIn("window.addEventListener('scroll', syncFloatingAdmin", JS)
+        self.assertIn("adminHost.classList.toggle('is-floating'", JS)
+        self.assertIn("main > header .header-time.is-floating", CSS)
+        self.assertIn("position:fixed", CSS)
+        self.assertIn("z-index:150", CSS)
 
 
 
