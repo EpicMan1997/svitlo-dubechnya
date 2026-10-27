@@ -69,7 +69,7 @@ class VisualStatusContract(unittest.TestCase):
         self.assertIn("item.date===yesterday&&eventKind(item)==='changed'", HTML)
 
     def test_yesterday_compact_and_unknown_archive(self):
-        self.assertIn("'Зміни і графік '+yDate", HTML)
+        self.assertIn("$('previousTitle').textContent='Зміни і графік вчора'", HTML)
         self.assertIn("hoursAndMinutes(yMinutes)+' без світла'", HTML)
         self.assertIn(".yesterday-count.zero{color:#94a3b8}", HTML)
         self.assertIn("['normal','stale','suspended'].includes(saved.status)", HTML)
