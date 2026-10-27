@@ -206,18 +206,31 @@ class EcoFlowPreviewContract(unittest.TestCase):
         self.assertIn("@media(max-width:650px){main > nav.tabs{padding-right:14px}}", CSS)
         self.assertIn('main > nav.tabs > button[data-tab="tomorrow"]{justify-self:end;margin:0}', CSS)
 
-    def test_capacity_hover_and_focus_tooltip(self):
+    def test_capacity_details_centered_without_floating(self):
         self.assertIn('id="eco-capacity-tooltip"', HTML)
-        self.assertIn('role="tooltip" hidden', HTML)
+        self.assertIn('role="status" aria-live="polite"', HTML)
+        self.assertIn('data-active="false"', HTML)
         self.assertIn('data-eco-tooltip=', JS)
         self.assertIn("system.name + ' · ' + system.pct", JS)
         self.assertIn("const pct = Math.round((d.capacityWh * d.pct + linked.capacityWh * linked.pct) / wh)", JS)
         for event_name in ("pointerover", "pointerout", "focusin", "focusout", "click"):
             self.assertIn("capacityStrip.addEventListener('" + event_name + "'", JS)
-        self.assertIn(".eco-capacity-tooltip[hidden]{display:none!important}", CSS)
-        self.assertIn("hideCapacityTooltip()", JS)
+        self.assertIn("capacityTooltip.dataset.active = 'true'", JS)
+        self.assertIn("capacityTooltip.dataset.active = 'false'", JS)
+        self.assertIn("height:46px", CSS)
+        self.assertIn("position:static", CSS)
+        self.assertNotIn("const middle = position.left", JS)
 
-
+    def test_charge_arrows_and_resized_three_station_row(self):
+        self.assertIn("charging: { label: 'Заряджається', sign: '↑' }", JS)
+        self.assertIn("discharging: { label: 'Розряджається', sign: '↓' }", JS)
+        self.assertIn('@media(min-width:951px)', CSS)
+        self.assertIn('.eco-shell[data-location="dacha"] .eco-devices', CSS)
+        self.assertIn("grid-template-columns:repeat(24,minmax(0,1fr))", CSS)
+        self.assertIn(".eco-device.size-medium", CSS)
+        self.assertIn("grid-column:span 9", CSS)
+        self.assertIn(".eco-device.size-small", CSS)
+        self.assertIn("grid-column:span 6", CSS)
 
     def test_every_battery_has_explicit_operation_state(self):
         self.assertEqual(JS.count("operation: 'discharging'"), 8)
