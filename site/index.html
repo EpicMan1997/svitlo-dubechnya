@@ -143,8 +143,12 @@ h1{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 
 
 /* Compact daily change history: number of edits, chronological before/after, site-color confirmation */
-.change-count{display:inline-grid;place-items:center;min-width:23px;height:23px;padding:0 6px;margin-left:4px;
- border-radius:99px;border:1px solid #45607b;background:#223652;color:#dceaff;font-size:12px;font-weight:750;vertical-align:middle}
+.change-count{display:inline-grid;place-items:center;min-width:32px;height:32px;padding:0 8px;margin-left:4px;
+ border-radius:999px;border:2px solid #53657b;background:#263449;color:#cbd5e1;
+ font-size:18px;font-weight:850;line-height:1;font-variant-numeric:tabular-nums;vertical-align:middle}
+.change-count.zero{border-color:#53657b;background:#263449;color:#cbd5e1}
+.change-count.few{border-color:#eab308;background:#503b13;color:#fef08a}
+.change-count.many{border-color:#fb7185;background:#54202f;color:#ffe4e6}
 .changes-header strong{display:flex;align-items:center;gap:6px}
 .changes-brief{font-variant-numeric:tabular-nums}
 .changes-content{padding-top:0}
@@ -569,8 +573,11 @@ function events(){
  const all=loc?.logs||[];
  const logs=all.filter(item=>item.date===day);
  const edits=logs.filter(item=>eventKind(item)==='changed').length;
- $('changeDailyCount').textContent=String(edits);
- $('changeDailyCount').title=edits+' змін у графіку на '+day;
+ const changeCount=$('changeDailyCount');
+ changeCount.textContent=String(edits);
+ changeCount.classList.remove('zero','few','many');
+ changeCount.classList.add(edits===0?'zero':edits<=2?'few':'many');
+ changeCount.title=edits+' змін у графіку на '+day;
  $('dailyCountTooltip').textContent=edits+' змін графіка на '+day.split('-').reverse().join('.')+'. Враховуються лише зміни годин, а не перша публікація.';
  $('latest').innerHTML=logs.length?eventCard(logs[0]):'<p class="changes-none">За цю дату подій немає</p>';
  // The summary describes the schedule FOR yesterday; events are changes

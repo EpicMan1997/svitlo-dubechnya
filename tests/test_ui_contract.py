@@ -69,6 +69,15 @@ class VisualStatusContract(unittest.TestCase):
         self.assertIn("if(tab==='tomorrow'&&tomorrowFingerprint()){markTomorrowSeen();updateTomorrowTab()}", HTML)
         self.assertIn("setInterval(reload,30000)", HTML)
 
+    def test_daily_change_badge_high_contrast_and_color_thresholds(self):
+        self.assertIn("min-width:32px;height:32px", HTML)
+        self.assertIn("font-size:18px;font-weight:850", HTML)
+        self.assertIn(".change-count.zero{border-color:#53657b;background:#263449;color:#cbd5e1}", HTML)
+        self.assertIn(".change-count.few{border-color:#eab308;background:#503b13;color:#fef08a}", HTML)
+        self.assertIn(".change-count.many{border-color:#fb7185;background:#54202f;color:#ffe4e6}", HTML)
+        self.assertIn("changeCount.classList.remove('zero','few','many');", HTML)
+        self.assertIn("changeCount.classList.add(edits===0?'zero':edits<=2?'few':'many');", HTML)
+
     def test_historic_event_does_not_claim_unverified_first_signal(self):
         self.assertIn("Одне з джерел, що підтвердили зміну:", HTML)
         self.assertIn("const name=first||confirmed;", HTML)
