@@ -836,6 +836,7 @@ main > nav.tabs{width:100%;padding-left:0;padding-right:20px}
 .eco-operation-charging{--operation-border:#21794d;--operation-bg:#123a2b;--operation-text:#86efac}
 .eco-operation-discharging{--operation-border:#976029;--operation-bg:#3c2918;--operation-text:#fdba74}
 .eco-operation-holding{--operation-border:#3c78a8;--operation-bg:#1c334c;--operation-text:#93c5fd}
+.eco-operation-unknown{--operation-border:#64748b;--operation-bg:#293548;--operation-text:#cbd5e1}
 .eco-device-head .eco-operation{align-self:flex-start}
 .eco-system-part .eco-operation{margin-top:9px}
 .eco-system-part .eco-charge-track{margin-top:11px}
