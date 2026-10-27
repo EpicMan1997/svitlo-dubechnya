@@ -82,11 +82,11 @@ class VisualStatusContract(unittest.TestCase):
 
     def test_public_location_aliases_do_not_disclose_private_addresses(self):
         for key, label in [('dacha','Дача'),('home','Дім'),('solovky','Соловки'),('naumenky','Науменки')]:
-            self.assertIn(f'data-location="{key}">{label}</button>', HTML)
+            self.assertIn(f'data-location="{key}">{label} <small class="location-group-hint" hidden></small></button>', HTML)
         self.assertIn("const names={dacha:'Дача',home:'Дім',solovky:'Соловки',naumenky:'Науменки'}", HTML)
         self.assertIn("remember('dubechnya-selected-location',key)", HTML)
-        self.assertIn("const c=activeLocation()", HTML)
-        self.assertNotIn('location-menu" id="locationMenu" hidden><button type="button" data-location="dacha">Дача <small>', HTML)
+        self.assertNotIn('Квіткова 251', HTML)
+        self.assertNotIn('Оболонський проспект 54', HTML)
         refresh=ROOT.joinpath("scripts/refresh.py").read_text(encoding="utf-8")
         self.assertNotIn("'street':", refresh)
         self.assertIn("'home': {'name':'Дім'", refresh)
@@ -99,10 +99,13 @@ class VisualStatusContract(unittest.TestCase):
             self.assertTrue(state['locations'][key]['logs'])
             self.assertTrue(state['locations'][key]['days'])
 
-    def test_all_group_badges_display_main_number_only(self):
-        # Front-end aliases only. Full source queues remain unchanged in refresh.py.
-        self.assertIn("String(c?.group||'—').split('.')[0]", HTML)
-        self.assertNotIn("locationId==='naumenky'?'10':c?.group||'—'", HTML)
+    def test_group_only_in_location_menu_not_permanent_header(self):
+        # The full source queue is a detail on demand, not a persistent badge.
+        self.assertNotIn('id="locationGroup"', HTML)
+        self.assertIn("const group=data?.locations?.[b.dataset.location]?.group;", HTML)
+        self.assertIn("hint.textContent=group?'Група '+group:''", HTML)
+        self.assertIn("hint.hidden=!group", HTML)
+        self.assertIn('<span id="locationLabel">Дача</span><span class="location-chevron"', HTML)
         refresh = ROOT.joinpath("scripts/refresh.py").read_text(encoding="utf-8")
         self.assertIn("'group':'4.1'", refresh)
         self.assertIn("'group':'10.1'", refresh)
