@@ -111,6 +111,14 @@
     $('eco-demo-total').textContent = weighted === null ? '—' : weighted + '%';
     $('eco-demo-total').dataset.level = weighted === null ? 'unknown' : level(weighted);
     $('eco-demo-note').textContent = weighted === null ? 'Ємність PowerOcean ще невідома' : 'Приклад середньозваженого заряду';
+    // Here the segment width, unlike a card's layout size, is mathematically proportional to Wh.
+    $('eco-capacity-strip').innerHTML = allKnown
+      ? place.devices.map(d =>
+          '<span class="eco-cap-segment charge-' + level(d.pct) + '" style="flex-grow:' + d.capacityWh +
+          '" title="' + d.name + ': ' + niceWh(d.capacityWh) + ', демо заряд ' + d.pct + '%">' +
+          '<i style="width:' + d.pct + '%"></i></span>'
+        ).join('')
+      : '<span class="eco-cap-unknown">Ємність акумуляторів PowerOcean ще не уточнена (5 кВт - потужність інвертора)</span>';
     $('eco-devices').innerHTML = place.devices.map(deviceView).join('');
     $('eco-scale-note').textContent = allKnown ?
       'Площа карток приблизно відповідає ємності станцій: більше кВт·год = більша картка.' :
