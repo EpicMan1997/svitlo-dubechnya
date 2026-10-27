@@ -99,13 +99,12 @@ class VisualStatusContract(unittest.TestCase):
             self.assertTrue(state['locations'][key]['logs'])
             self.assertTrue(state['locations'][key]['days'])
 
-    def test_main_group_number_in_header_and_menu(self):
-        # Only the main group is visible; source queue precision stays internal.
-        self.assertIn('<span id="locationLabel">Дача</span><small id="locationGroup">3</small>', HTML)
-        self.assertIn("const c=activeLocation()", HTML)
-        self.assertIn("$('locationGroup').textContent=String(c?.group||'—').split('.')[0]", HTML)
+    def test_main_group_number_only_inside_location_menu(self):
+        # Main heading stays clean; menu labels show 3, 4, 4, 10 without .1.
+        self.assertIn('<span id="locationLabel">Дача</span><span class="location-chevron"', HTML)
+        self.assertNotIn('id="locationGroup"', HTML)
+        self.assertNotIn(".location-button #locationGroup{", HTML)
         self.assertIn("hint.textContent=group?'Група '+String(group).split('.')[0]:''", HTML)
-        self.assertIn(".location-button #locationGroup{flex:none", HTML)
         self.assertIn("hint.hidden=!group", HTML)
         refresh = ROOT.joinpath("scripts/refresh.py").read_text(encoding="utf-8")
         self.assertIn("'group':'4.1'", refresh)
