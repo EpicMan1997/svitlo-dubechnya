@@ -10,8 +10,8 @@
       devices: [
         { name: 'DELTA Pro 3', capacityWh: 4096, pct: 84, inputW: 0, outputW: 620, type: 'station', id: 'dp3' },
         { name: 'Додаткова батарея DELTA Pro 3', capacityWh: 4096, pct: 82, type: 'battery', parent: 'DELTA Pro 3', parentId: 'dp3', id: 'dp3eb' },
-        { name: 'DELTA 2', capacityWh: 1024, pct: 64, inputW: 0, outputW: 75, type: 'station', id: 'd2' },
         { name: 'DELTA 3 Plus', capacityWh: 1024, pct: 92, inputW: 120, outputW: 38, type: 'station', id: 'd3p' },
+        { name: 'DELTA 2', capacityWh: 1024, pct: 64, inputW: 0, outputW: 75, type: 'station', id: 'd2' },
         { name: 'RIVER 3 Plus Wireless', capacityWh: 286, pct: 29, inputW: 0, outputW: 12, type: 'station', id: 'r3pw' }
       ]
     },
@@ -91,7 +91,7 @@
       '<div class="eco-admin-controls"><label>Ліміт заряджання' +
       '<input type="range" min="50" max="100" value="90" disabled></label>' +
       '<button type="button" disabled>AC-вихід</button></div>' +
-      '<span>Доступ після захищеного підключення.</span></div>';
+      '</div>';
   }
 
   function deviceView(d) {
@@ -152,6 +152,124 @@
     }).join('');
   }
 
+  // Drafts are session-local UI state. No device commands or authentication exist yet.
+  const adminDraft = {
+    scope: 'current',
+    chargeLimit: 90,
+    selected: { limit: new Set(), ac: new Set(), speed: new Set() },
+    speeds: new Map()
+  };
+  let activeEcoLocation = 'dacha';
+
+  function selectableStations() {
+    const locIds = adminDraft.scope === 'all'
+      ? Object.keys(inventory) : [activeEcoLocation];
+    // Expansion batteries belong to the primary; PowerOcean requires separate verified commands.
+    return locIds.flatMap(loc => inventory[loc].devices
+      .filter(d => d.type === 'station')
+      .map(d => ({ key: loc + ':' + d.id, name: d.name, loc, place: inventory[loc].name })));
+  }
+
+  function targetRows(group, withSpeed) {
+    const stations = selectableStations();
+    const set = adminDraft.selected[group];
+    const rows = stations.map(station => {
+      const checked = set.has(station.key);
+      const rate = adminDraft.speeds.get(station.key) || '50';
+      const speedSelect = withSpeed
+        ? '<select class="eco-speed-select" data-eco-speed="' + station.key +
+          '" aria-label="Швидкість заряджання ' + station.name + '">' +
+          ['25', '50', '75', '100'].map(x =>
+            '<option value="' + x + '"' + (x === rate ? ' selected' : '') + '>' + x + '%</option>').join('') +
+          '</select>'
+        : '';
+      return '<div class="eco-target-row"><label class="eco-target-label">' +
+        '<input type="checkbox" data-eco-group="' + group + '" data-eco-target="' +
+        station.key + '"' + (checked ? ' checked' : '') + '>' +
+        '<span>' + station.name + (adminDraft.scope === 'all' ?
+          '<small>' + station.place + '</small>' : '') + '</span></label>' +
+        speedSelect + '</div>';
+    }).join('');
+    return '<div class="eco-target-top"><span>Станції: ' +
+      set.size + ' / ' + stations.length + '</span><span class="eco-target-actions">' +
+      '<button type="button" data-eco-select="all" data-eco-group="' + group + '">Усі</button>' +
+      '<button type="button" data-eco-select="none" data-eco-group="' + group + '">Жодної</button>' +
+      '</span></div><div class="eco-target-list">' +
+      (rows || '<p class="eco-target-empty">Немає сумісних переносних станцій у цій локації.</p>') +
+      '</div>';
+  }
+
+  function renderBulkPanel() {
+    const container = $('eco-bulk-content');
+    if (!container) return;
+    const selected = adminDraft.scope === 'all' ? 'Усі локації' : inventory[activeEcoLocation].name;
+    const scopePicker = '<label class="eco-bulk-scope">Локації <select id="eco-admin-scope">' +
+      '<option value="current"' + (adminDraft.scope === 'current' ? ' selected' : '') + '>Поточна: ' +
+        inventory[activeEcoLocation].name + '</option>' +
+      '<option value="all"' + (adminDraft.scope === 'all' ? ' selected' : '') + '>Усі локації</option></select></label>';
+    container.innerHTML =
+      '<div class="eco-bulk-toolbar">' + scopePicker +
+      '<span class="eco-bulk-scope-note">' + selected + '</span></div>' +
+      '<div class="eco-bulk-actions">' +
+      '<section class="eco-bulk-card"><h4>Ліміт заряджання</h4>' +
+      '<div class="eco-bulk-range"><input type="range" id="eco-bulk-limit" min="50" max="100" step="5" value="' +
+        adminDraft.chargeLimit + '" aria-label="Спільний ліміт заряджання">' +
+      '<output id="eco-bulk-limit-value" for="eco-bulk-limit">' + adminDraft.chargeLimit + '%</output></div>' +
+      targetRows('limit', false) +
+      '<button class="eco-bulk-apply" type="button" disabled>Застосувати ліміт</button></section>' +
+      '<section class="eco-bulk-card"><h4>AC-виходи</h4>' +
+      targetRows('ac', false) +
+      '<div class="eco-bulk-buttons"><button class="eco-bulk-apply" type="button" disabled>Увімкнути AC</button>' +
+      '<button class="eco-bulk-apply eco-bulk-danger" type="button" disabled>Вимкнути AC</button></div>' +
+      '</section>' +
+      '<section class="eco-bulk-card"><h4>Швидкість заряджання</h4>' +
+      '<p class="eco-bulk-subtitle">Частка максимальної AC-потужності кожної станції</p>' +
+      targetRows('speed', true) +
+      '<button class="eco-bulk-apply" type="button" disabled>Застосувати швидкості</button></section></div>';
+  }
+
+  const bulkContent = $('eco-bulk-content');
+  if (bulkContent) {
+    bulkContent.addEventListener('click', event => {
+      const button = event.target.closest('button[data-eco-select]');
+      if (!button) return;
+      const group = button.dataset.ecoGroup;
+      if (!Object.prototype.hasOwnProperty.call(adminDraft.selected, group)) return;
+      adminDraft.selected[group] = button.dataset.ecoSelect === 'all'
+        ? new Set(selectableStations().map(x => x.key))
+        : new Set();
+      renderBulkPanel();
+    });
+    bulkContent.addEventListener('input', event => {
+      const target = event.target;
+      if (target.id === 'eco-bulk-limit') {
+        $('eco-bulk-limit-value').textContent = target.value + '%';
+      }
+    });
+    bulkContent.addEventListener('change', event => {
+      const target = event.target;
+      if (target.id === 'eco-admin-scope') {
+        adminDraft.scope = target.value === 'all' ? 'all' : 'current';
+        Object.keys(adminDraft.selected).forEach(group => adminDraft.selected[group].clear());
+      } else if (target.id === 'eco-bulk-limit') {
+        adminDraft.chargeLimit = Math.max(50, Math.min(100, Number(target.value) || 90));
+      } else if (target.dataset.ecoTarget) {
+        const group = target.dataset.ecoGroup;
+        const key = target.dataset.ecoTarget;
+        if (!adminDraft.selected[group] || !selectableStations().some(st => st.key === key)) return;
+        if (target.checked) adminDraft.selected[group].add(key);
+        else adminDraft.selected[group].delete(key);
+      } else if (target.dataset.ecoSpeed) {
+        const key = target.dataset.ecoSpeed;
+        if (!selectableStations().some(st => st.key === key)) return;
+        const value = ['25', '50', '75', '100'].includes(target.value) ? target.value : '50';
+        adminDraft.speeds.set(key, value);
+        adminDraft.selected.speed.add(key);
+      } else return;
+      renderBulkPanel();
+    });
+  }
+
   function updateLocation(id) {
     if (!Object.prototype.hasOwnProperty.call(inventory, id)) return;
     const place = inventory[id];
@@ -160,6 +278,10 @@
     const weighted = allKnown && totalWh
       ? Math.round(place.devices.reduce((v, d) => v + d.capacityWh * d.pct, 0) / totalWh)
       : null;
+    if (adminDraft.scope === 'current' && activeEcoLocation !== id) {
+      Object.keys(adminDraft.selected).forEach(group => adminDraft.selected[group].clear());
+    }
+    activeEcoLocation = id;
     root.dataset.location = id;
     $('eco-selected-location').textContent = place.name;
     $('eco-space-name').textContent = place.space;
@@ -178,6 +300,7 @@
         ).join('')
       : '<span class="eco-cap-unknown">Ємність цієї батареї ще не уточнена</span>';
     $('eco-devices').innerHTML = renderDeviceGrid(place.devices);
+    renderBulkPanel();
   }
 
   // Admin controls stay disabled pending authenticated server access.
@@ -187,6 +310,7 @@
     toggle.setAttribute('aria-checked', String(enabled));
     toggle.title = enabled ? 'Вимкнути Admin' : 'Увімкнути Admin';
     $('eco-admin-mode-hint').hidden = !enabled;
+    $('eco-admin-bulk').hidden = !enabled;
   }
   toggle.addEventListener('click', function () {
     setAdminMode(toggle.getAttribute('aria-checked') !== 'true');
