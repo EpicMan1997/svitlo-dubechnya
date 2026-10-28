@@ -379,6 +379,126 @@
     });
   }
 
+
+  // Location metrics use the five physical battery packs, including expansions.
+  const detailArea = $('eco-metrics-area');
+  const detailPanel = $('eco-metric-detail');
+  const preciseWh = new Intl.NumberFormat('uk-UA', { maximumFractionDigits: 3 });
+  const percentValue = new Intl.NumberFormat('uk-UA', { maximumFractionDigits: 2 });
+  const textEscape = value => String(value).replace(/[&<>"']/g, char =>
+    ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]);
+  const exactCapacity = wh => wh >= 1000
+    ? preciseWh.format(wh / 1000) + ' кВт·год'
+    : preciseWh.format(wh) + ' Вт·год';
+  let metricOpen = null;
+  let metricPinned = null;
+
+  function metricBreakdown(kind) {
+    const devices = inventory[activeEcoLocation].devices;
+    const total = devices.reduce((sum, item) => sum + item.capacityWh, 0);
+    const stored = devices.reduce((sum, item) => sum + item.capacityWh * item.pct / 100, 0);
+    const weighted = total ? stored / total * 100 : 0;
+    const title = kind === 'capacity' ? 'Ємність кожного акумулятора'
+      : kind === 'charge' ? 'Як розраховано середній заряд'
+      : 'Станції та акумулятори в локації';
+
+    const rows = devices.map((device, i) => {
+      const name = textEscape(device.name);
+      const capacity = exactCapacity(device.capacityWh);
+      if (kind === 'count') {
+        const type = device.type === 'battery' ? 'Додаткова батарея'
+          : device.type === 'system' ? 'Домашня система' : 'Зарядна станція';
+        return '<div class="eco-detail-device"><span class="eco-detail-index">' + (i + 1) +
+          '</span><span class="eco-detail-device-name">' + name +
+          '<small>' + type + '</small></span><strong>' + device.pct + '%</strong></div>';
+      }
+      if (kind === 'capacity') {
+        const share = total ? device.capacityWh / total * 100 : 0;
+        return '<div class="eco-detail-device eco-detail-capacity">' +
+          '<span class="eco-detail-device-name">' + name + '</span><strong>' + capacity +
+          '</strong><div class="eco-detail-track"><i style="width:' + share + '%"></i></div></div>';
+      }
+      return '<div class="eco-detail-device eco-detail-charge">' +
+        '<span class="eco-detail-device-name">' + name + '</span>' +
+        '<strong class="eco-detail-percent" data-level="' + level(device.pct) + '">' + device.pct + '%</strong>' +
+        '<div class="eco-detail-track"><i style="width:' + device.pct +
+        '%" data-level="' + level(device.pct) + '"></i></div>' +
+        '<small>' + capacity + ' × ' + device.pct + '% = ' +
+        exactCapacity(device.capacityWh * device.pct / 100) + '</small></div>';
+    }).join('');
+
+    const formula = kind === 'capacity'
+      ? '<div class="eco-detail-total"><span>Усього</span><strong>' + exactCapacity(total) +
+        ' ≈ ' + niceWh(total) + '</strong></div>'
+      : kind === 'charge'
+        ? '<div class="eco-detail-formula"><span>Σ (ємність × заряд) / Σ ємностей</span>' +
+          '<strong>' + exactCapacity(stored) + ' / ' + exactCapacity(total) +
+          ' = ' + percentValue.format(weighted) + '% ≈ ' + Math.round(weighted) + '%</strong></div>'
+        : '<div class="eco-detail-total"><span>Усього пристроїв</span><strong>' +
+          devices.length + '</strong></div>';
+    return '<div class="eco-detail-heading"><strong>' + title +
+      '</strong><span>' + (kind === 'charge' ? 'З урахуванням ємності' :
+        kind === 'count' ? devices.length + ' пристроїв' : niceWh(total)) + '</span></div>' +
+      '<div class="eco-detail-grid">' + rows + '</div>' + formula;
+  }
+
+  function displayMetric(kind) {
+    if (!detailArea || !detailPanel || !['capacity', 'charge', 'count'].includes(kind)) return;
+    if (metricOpen !== kind) {
+      detailPanel.innerHTML = metricBreakdown(kind);
+      metricOpen = kind;
+    }
+    detailPanel.hidden = false;
+    detailArea.querySelectorAll('[data-eco-metric]').forEach(button => {
+      const selected = button.dataset.ecoMetric === kind;
+      button.classList.toggle('is-selected', selected);
+      button.setAttribute('aria-expanded', String(selected));
+    });
+  }
+  function clearMetric() {
+    if (!detailArea || !detailPanel) return;
+    metricOpen = null;
+    detailPanel.hidden = true;
+    detailArea.querySelectorAll('[data-eco-metric]').forEach(button => {
+      button.classList.remove('is-selected');
+      button.setAttribute('aria-expanded', 'false');
+    });
+  }
+  if (detailArea && detailPanel) {
+    detailArea.addEventListener('pointerover', event => {
+      const trigger = event.target.closest('[data-eco-metric]');
+      if (trigger && metricPinned === null) displayMetric(trigger.dataset.ecoMetric);
+    });
+    detailArea.addEventListener('pointerleave', () => {
+      if (metricPinned === null) clearMetric();
+    });
+    detailArea.addEventListener('focusin', event => {
+      const trigger = event.target.closest('[data-eco-metric]');
+      if (trigger) displayMetric(trigger.dataset.ecoMetric);
+    });
+    detailArea.addEventListener('focusout', event => {
+      if (metricPinned === null && !detailArea.contains(event.relatedTarget)) clearMetric();
+    });
+    detailArea.addEventListener('click', event => {
+      const trigger = event.target.closest('button[data-eco-metric]');
+      if (!trigger) return;
+      const kind = trigger.dataset.ecoMetric;
+      if (metricPinned === kind) {
+        metricPinned = null;
+        clearMetric();
+      } else {
+        metricPinned = kind;
+        displayMetric(kind);
+      }
+    });
+    document.addEventListener('pointerdown', event => {
+      if (!detailArea.contains(event.target)) {
+        metricPinned = null;
+        clearMetric();
+      }
+    });
+  }
+
   function updateLocation(id) {
     if (!Object.prototype.hasOwnProperty.call(inventory, id)) return;
     const place = inventory[id];
@@ -391,15 +511,15 @@
       Object.keys(adminDraft.selected).forEach(group => adminDraft.selected[group].clear());
     }
     activeEcoLocation = id;
+    metricPinned = null;
+    clearMetric();
     root.dataset.location = id;
     $('eco-selected-location').textContent = place.name;
     $('eco-space-name').textContent = place.space;
     $('eco-count').textContent = String(place.devices.length);
     $('eco-capacity').textContent = allKnown ? niceWh(totalWh) : 'Уточнюється';
-    $('eco-capacity-note').textContent = allKnown ? 'Сума номінальних ємностей батарей' : 'Ємність системи ще не уточнена';
     $('eco-demo-total').textContent = weighted === null ? '—' : weighted + '%';
     $('eco-demo-total').dataset.level = weighted === null ? 'unknown' : level(weighted);
-    $('eco-demo-note').textContent = weighted === null ? 'Ємність батарей ще невідома' : 'Зважений за ємністю';
     // Here the segment width, unlike a card's layout size, is mathematically proportional to Wh.
     const batteries = new Map(place.devices.filter(d => d.type === 'battery' && d.parentId).map(d => [d.parentId, d]));
     const mainIds = new Set(place.devices.map(d => d.id));
