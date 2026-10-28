@@ -419,16 +419,40 @@ class EcoFlowPreviewContract(unittest.TestCase):
         self.assertIn('Середня довжина інтервалу', HTML)
         self.assertIn('Днів від першого запису', HTML)
         self.assertIn('loc.tracked_change_days', HTML)
-        self.assertIn('class="season-extra"', HTML)
+        self.assertIn('class="season-extra-kpis"', HTML)
         self.assertIn('.season-extra-kpis', HTML)
         self.assertIn("function seasonCount(value){return Number.isFinite(value)?String(value).replace('.',','):'—'}", HTML)
         self.assertIn('Пропущені дні не вважаються днями без відключень', HTML)
+        self.assertIn('seasonHelpDescriptions', HTML)
+        self.assertIn('class="season-help-button"', HTML)
+        self.assertIn('class="season-all-toggle"', HTML)
+        self.assertIn('id="seasonAllMetrics"', HTML)
+        self.assertIn('seasonAllExpanded=!seasonAllExpanded', HTML)
+        self.assertIn('document.querySelectorAll(\'#seasonContent .season-extra-kpis\')', HTML)
+        self.assertNotIn('<details class="season-extra">', HTML)
+
+    def test_all_season_metrics_have_explanations_and_one_global_toggle(self):
+        for label in ('longest','maxDaily','dailyAverage','total','outageDays','zeroDays',
+                      'changesAverage','changesTotal','maxChanges','intervals',
+                      'avgInterval','daysSince','coverage','method'):
+            self.assertIn(label+':', HTML)
+        self.assertIn("seasonHelpButton(id,title)", HTML)
+        self.assertIn("seasonHelpButton('method','Методика підрахунку')", HTML)
+        self.assertIn("seasonHelpButton('coverage','Підтверджені дні')", HTML)
+        self.assertIn('id="seasonHelpPopover" class="season-help-popover" role="tooltip" hidden', HTML)
+        self.assertIn("aria-controls=\"seasonHelpPopover\"", HTML)
+        self.assertIn("String(report.season||'').replace(/^20(", HTML)
+        self.assertIn("if(seasonHelpTrigger===trigger&&!pop.hidden)", HTML)
+        self.assertIn("pop.style.left=Math.max(12", HTML)
+        self.assertIn("closeSeasonHelp(true)", HTML)
+        self.assertIn(".season-extra-kpis[hidden]{display:none!important}", HTML)
+        self.assertNotIn('class="season-subtitle"', HTML)
 
     def test_season_kpis_are_colored_by_daily_duration_not_total(self):
         self.assertIn("function seasonLevel(minutes)", HTML)
         self.assertIn("minutes<=240?'low':minutes<=480?'medium':'high'", HTML)
         self.assertIn("season-kpi level-", HTML)
-        self.assertIn("metric('Усього за період',loc.total_minutes,'Планові години',true)", HTML)
+        self.assertIn("metric('total','Разом без світла',loc.total_minutes,'За підтвердженими графіками',true)", HTML)
         self.assertIn('class="season-legend"', HTML)
         self.assertIn('.season-kpi.level-low', HTML)
         self.assertIn('.season-kpi.level-medium', HTML)
