@@ -321,7 +321,8 @@ class EcoFlowPreviewContract(unittest.TestCase):
 
     def test_ecoflow_branding_and_fresh_pwa_assets(self):
         self.assertIn('eco-title-monogram', HTML)
-        self.assertIn('stroke="#67E8F9"', HTML)
+        self.assertIn('<path d="M14 20H26" stroke="currentColor"', HTML)
+        self.assertNotIn('stroke="#67E8F9"', HTML)
         self.assertIn('href="./ecoflow.css?v=30"', HTML)
         self.assertIn('src="./ecoflow.js?v=29"', HTML)
         self.assertIn("updateViaCache:'none'", HTML)
