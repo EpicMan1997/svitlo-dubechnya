@@ -410,6 +410,20 @@ class EcoFlowPreviewContract(unittest.TestCase):
         self.assertIn('main > header .clock-view{grid-column:2', CSS)
         self.assertIn('main > header .clock-view{grid-column:1/-1;grid-row:2', CSS)
 
+    def test_season_detailed_metrics_respect_missing_data(self):
+        self.assertIn('Днів із відключеннями', HTML)
+        self.assertIn('Без планових відключень', HTML)
+        self.assertIn('Змін графіка на день', HTML)
+        self.assertIn('Найбільше змін за день', HTML)
+        self.assertIn('Інтервалів відключення', HTML)
+        self.assertIn('Середня довжина інтервалу', HTML)
+        self.assertIn('Днів від першого запису', HTML)
+        self.assertIn('loc.tracked_change_days', HTML)
+        self.assertIn('class="season-extra"', HTML)
+        self.assertIn('.season-extra-kpis', HTML)
+        self.assertIn("function seasonCount(value){return Number.isFinite(value)?String(value).replace('.',','):'—'}", HTML)
+        self.assertIn('Пропущені дні не вважаються днями без відключень', HTML)
+
     def test_season_kpis_are_colored_by_daily_duration_not_total(self):
         self.assertIn("function seasonLevel(minutes)", HTML)
         self.assertIn("minutes<=240?'low':minutes<=480?'medium':'high'", HTML)

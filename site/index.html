@@ -421,6 +421,15 @@ h1{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .season-kpi.level-medium{border-left-color:#facc15;background:#40381f}.season-kpi.level-medium strong{color:#fde68a}
 .season-kpi.level-high{border-left-color:#fb7185;background:#412a3a}.season-kpi.level-high strong{color:#fda4af}
 .season-kpi.level-total{border-left-color:#67e8f9;background:#19384b}.season-kpi.level-total strong{color:#a5f3fc}
+.season-kpi.level-neutral{border-left-color:#6e93b6;background:#23364b}.season-kpi.level-neutral strong{color:#dce9f8}
+.season-extra{margin-top:11px;border-top:1px solid #34506b;padding-top:8px}
+.season-extra>summary{display:flex;align-items:center;justify-content:space-between;color:#b8d8f5;font-size:12px;list-style:none;padding:8px 3px;cursor:pointer}
+.season-extra>summary::-webkit-details-marker{display:none}
+.season-extra>summary::after{content:'⌄';font-size:18px;color:#a8c5e4}
+.season-extra[open]>summary::after{content:'⌃'}
+.season-extra-kpis{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-top:6px}
+.season-extra-kpis .season-kpi strong{font-size:16px}
+@media(max-width:430px){.season-extra-kpis{gap:7px}}
 @media(max-width:700px){.season-grid{grid-template-columns:minmax(0,1fr)}}
 @media(max-width:430px){.season-panel{padding:12px}.season-location{padding:11px}.season-kpis{gap:7px}.season-kpi{padding:9px}.season-kpi strong{font-size:16px}}
 </style><link rel="stylesheet" href="./ecoflow.css?v=30">
@@ -966,6 +975,7 @@ function seasonMinutes(minutes){
  const h=Math.floor(minutes/60),m=minutes%60;
  return (h?h+' год':'')+(m?(h?' ':'')+m+' хв':'')||'0 год';
 }
+function seasonCount(value){return Number.isFinite(value)?String(value).replace('.',','):'—'}
 function seasonDate(iso){return /^\d{4}-\d\d-\d\d$/.test(iso||'')?iso.slice(8,10)+'.'+iso.slice(5,7):''}
 function seasonLevel(minutes){return !Number.isFinite(minutes)?'unknown':minutes<=240?'low':minutes<=480?'medium':'high'}
 function renderSeasonStats(report){
@@ -977,14 +987,28 @@ function renderSeasonStats(report){
   const max=loc.longest||{},daily=loc.max_daily||{};
   const period=max.interval?' · '+esc(max.interval.join('–')):'';
   const metric=(title,minutes,detail,total=false)=>'<div class="season-kpi level-'+(total?'total':seasonLevel(minutes))+'"><span>'+title+'</span><strong>'+seasonMinutes(minutes)+'</strong><small>'+detail+'</small></div>';
-  return '<article class="season-location"><h3>'+label+'</h3><p class="season-days">'+loc.recorded_days+' підтверджених днів</p><div class="season-kpis">'+
+  const countMetric=(title,count,detail,cls='neutral')=>'<div class="season-kpi level-'+cls+'"><span>'+title+'</span><strong>'+seasonCount(count)+'</strong><small>'+detail+'</small></div>';
+  const changeValue=loc.average_changes_per_tracked_day;
+  const dayLabel=loc.recorded_days+' підтверджених днів із '+loc.elapsed_days+' у сезоні';
+  const extras='<div class="season-extra-kpis">'+
+    countMetric('Днів із відключеннями',loc.outage_days,'З '+loc.recorded_days+' підтверджених',loc.outage_days>0?'high':'low')+
+    countMetric('Без планових відключень',loc.zero_outage_days,'За підтвердженими графіками','low')+
+    countMetric('Змін графіка на день',changeValue,'За '+loc.tracked_change_days+' днями спостереження',changeValue===null?'neutral':changeValue===0?'low':changeValue<2?'medium':'high')+
+    countMetric('Усього виявлено змін',loc.total_detected_changes,'Днів зі змінами: '+loc.days_with_changes,loc.total_detected_changes>0?'medium':'neutral')+
+    countMetric('Найбільше змін за день',loc.max_changes?.count??null,seasonDate(loc.max_changes?.date),'neutral')+
+    countMetric('Інтервалів відключення',loc.scheduled_intervals,'За збереженими графіками','neutral')+
+    metric('Середня довжина інтервалу',loc.average_interval_minutes,'За всіма інтервалами')+
+    countMetric('Днів від першого запису',loc.days_since_first_recorded_outage,
+        loc.first_recorded_outage?'Перший підтверджений: '+seasonDate(loc.first_recorded_outage):'Немає даних','neutral')+
+    '</div>';
+  return '<article class="season-location"><h3>'+label+'</h3><p class="season-days">'+dayLabel+'</p><div class="season-kpis">'+
    metric('Найдовше безперервно',max.minutes,seasonDate(max.date)+period)+
    metric('Найбільше за день',daily.minutes,seasonDate(daily.date))+
    metric('Середнє за день',loc.average_minutes,'За підтвердженими днями')+
    metric('Усього за період',loc.total_minutes,'Планові години',true)+
-   '</div></article>';
+   '</div><details class="season-extra"><summary>Більше показників</summary>'+extras+'</details></article>';
  }).join('');
- host.innerHTML='<h2>Сезон '+esc(report.season||'')+'</h2><p class="season-subtitle">Завершені дні з підтвердженим графіком. Це планові відключення, не фактичні вимірювання. Дні без даних не враховуються.</p><div class="season-legend" aria-label="Кольори добової тривалості"><span class="low"><i></i>до 4 год</span><span class="medium"><i></i>понад 4 до 8 год</span><span class="high"><i></i>понад 8 год</span></div><div class="season-grid">'+cards+'</div>';
+ host.innerHTML='<h2>Сезон '+esc(report.season||'')+'</h2><p class="season-subtitle">Завершені дні з підтвердженим графіком. Це планові відключення, не фактичні вимірювання. Пропущені дні не вважаються днями без відключень. Зміни рахуються тільки за днями, коли сайт зберігав історію спостережень.</p><div class="season-legend" aria-label="Кольори добової тривалості"><span class="low"><i></i>до 4 год</span><span class="medium"><i></i>понад 4 до 8 год</span><span class="high"><i></i>понад 8 год</span></div><div class="season-grid">'+cards+'</div>';
 }
 async function refreshSeasonStats(){
  try{

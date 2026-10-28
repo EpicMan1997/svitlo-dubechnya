@@ -488,7 +488,7 @@ def main():
     STATE.parent.mkdir(exist_ok=True,parents=True)
     content=json.dumps(save,ensure_ascii=False,indent=2,sort_keys=True)+'\n'
     if not STATE.exists() or STATE.read_text(encoding='utf-8')!=content:STATE.write_text(content,encoding='utf-8')
-    update_season(old, today)
+    update_season(save, today)
     # Publish an archived yesterday snapshot for the historic summary card.
     # The front end never treats yesterday's stored prediction as a live sensor.
     visible_days={k:v for k,v in old.get('days',{}).items()
