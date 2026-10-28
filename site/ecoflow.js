@@ -444,9 +444,7 @@
         exactCapacity(device.capacityWh * device.pct / 100) + '</small></div>';
     }).join('');
 
-    const formula = kind === 'capacity'
-      ? '<div class="eco-detail-total"><span>Усього</span><strong>' + exactCapacity(total) +
-        ' ≈ ' + niceWh(total) + '</strong></div>'
+    const formula = kind === 'capacity' ? ''
       : kind === 'charge'
         ? '<div class="eco-detail-formula"><span>Σ (ємність × заряд) / Σ ємностей</span>' +
           '<strong>' + exactCapacity(stored) + ' / ' + exactCapacity(total) +
@@ -455,7 +453,7 @@
           devices.length + '</strong></div>';
     return '<div class="eco-detail-heading"><strong>' + title +
       '</strong><span>' + (kind === 'charge' ? 'З урахуванням ємності' :
-        kind === 'count' ? devices.length + ' пристроїв' : niceWh(total)) + '</span></div>' +
+        kind === 'count' ? devices.length + ' пристроїв' : '') + '</span></div>' +
       '<div class="eco-detail-grid">' + rows + '</div>' + formula;
   }
 

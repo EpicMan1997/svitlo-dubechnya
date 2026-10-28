@@ -10,6 +10,7 @@ from zoneinfo import ZoneInfo
 
 import requests
 from bs4 import BeautifulSoup
+from season import update_season
 
 ROOT = Path(__file__).resolve().parents[1]
 STATE = ROOT / 'state' / 'state.json'
@@ -487,6 +488,7 @@ def main():
     STATE.parent.mkdir(exist_ok=True,parents=True)
     content=json.dumps(save,ensure_ascii=False,indent=2,sort_keys=True)+'\n'
     if not STATE.exists() or STATE.read_text(encoding='utf-8')!=content:STATE.write_text(content,encoding='utf-8')
+    update_season(old, today)
     # Publish an archived yesterday snapshot for the historic summary card.
     # The front end never treats yesterday's stored prediction as a live sensor.
     visible_days={k:v for k,v in old.get('days',{}).items()
