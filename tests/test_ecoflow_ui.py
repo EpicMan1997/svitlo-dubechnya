@@ -56,7 +56,7 @@ class EcoFlowPreviewContract(unittest.TestCase):
         self.assertIn("new CustomEvent('svitlo:location-change'", HTML)
         self.assertNotIn('href="#ecoflow"', HTML)
         self.assertIn('<section class="eco-shell"', HTML)
-        self.assertIn('"./ecoflow.css?v=29"', SW)
+        self.assertIn('"./ecoflow.css?v=30"', SW)
         self.assertIn('"./ecoflow.js?v=29"', SW)
 
 
@@ -320,10 +320,10 @@ class EcoFlowPreviewContract(unittest.TestCase):
     def test_ecoflow_branding_and_fresh_pwa_assets(self):
         self.assertIn('eco-title-monogram', HTML)
         self.assertIn('stroke="#67E8F9"', HTML)
-        self.assertIn('href="./ecoflow.css?v=29"', HTML)
+        self.assertIn('href="./ecoflow.css?v=30"', HTML)
         self.assertIn('src="./ecoflow.js?v=29"', HTML)
         self.assertIn("updateViaCache:'none'", HTML)
-        self.assertIn('nashe-svitlo-static-v29', SW)
+        self.assertIn('nashe-svitlo-static-v30', SW)
         self.assertIn('url.pathname.endsWith("/ecoflow.css")', SW)
         self.assertIn('url.pathname.endsWith("/ecoflow.js")', SW)
         self.assertIn('fetch(request, {cache: "no-store"})', SW)
@@ -381,25 +381,43 @@ class EcoFlowPreviewContract(unittest.TestCase):
 
 
 
-    def test_season_stats_use_independent_top_level_tab(self):
-        self.assertIn('class="view-tabs" role="tablist"', HTML)
-        self.assertIn('id="viewSchedule" aria-selected="true" aria-controls="scheduleLayout"', HTML)
-        self.assertIn('id="viewStats" aria-selected="false" aria-controls="seasonPanel"', HTML)
+    def test_header_clock_has_single_section_picker_and_no_top_level_tabs(self):
+        self.assertIn('class="clock-view"', HTML)
+        self.assertIn('id="clock" aria-label="Час у Києві"', HTML)
+        self.assertIn('id="viewMenuToggle" type="button"', HTML)
+        self.assertIn('id="viewMenuLabel">Графік</span>', HTML)
+        self.assertIn('id="viewMenu" class="view-menu" role="menu"', HTML)
+        self.assertIn('data-site-view="schedule"', HTML)
+        self.assertIn('data-site-view="statistics"', HTML)
+        self.assertNotIn('class="view-tabs"', HTML)
+        self.assertNotIn('id="viewSchedule"', HTML)
+        self.assertNotIn('id="viewStats"', HTML)
+        self.assertIn('id="scheduleLayout" role="region"', HTML)
+        self.assertIn('id="seasonPanel" class="season-panel" role="region"', HTML)
         self.assertIn('id="dayTabs"', HTML)
-        self.assertIn('id="scheduleLayout" role="tabpanel"', HTML)
-        self.assertIn('id="seasonPanel" class="season-panel" role="tabpanel"', HTML)
-        self.assertNotIn('id="seasonToggle"', HTML)
-        self.assertNotIn('class="season-actions"', HTML)
+        self.assertLess(HTML.index('id="clock"'), HTML.index('id="viewMenuToggle"'))
+        self.assertLess(HTML.index('id="viewMenuToggle"'), HTML.index('id="dayTabs"'))
         self.assertIn("function switchSiteView(next)", HTML)
         self.assertIn("$('dayTabs').hidden=stats;", HTML)
         self.assertIn("$('scheduleLayout').hidden=stats;", HTML)
         self.assertIn("$('ecoflow').hidden=stats;", HTML)
         self.assertIn("$('seasonPanel').hidden=!stats;", HTML)
-        self.assertIn("if(stats)refreshSeasonStats();", HTML)
+        self.assertIn("$('viewMenuLabel').textContent=stats?'Статистика':'Графік'", HTML)
         self.assertIn("remembered('nashe-svitlo-active-view')==='statistics'", HTML)
-        self.assertIn(".view-tabs button[aria-selected=\"true\"]", HTML)
-        self.assertLess(HTML.index('id="viewStats"'),HTML.index('id="dayTabs"'))
-        self.assertGreater(HTML.index('id="seasonPanel"'),HTML.index('id="ecoflow"'))
+        self.assertIn(".clock-view #viewMenuToggle", CSS)
+        self.assertIn('main > header .clock-view{grid-column:2', CSS)
+        self.assertIn('main > header .clock-view{grid-column:1/-1;grid-row:2', CSS)
+
+    def test_season_kpis_are_colored_by_daily_duration_not_total(self):
+        self.assertIn("function seasonLevel(minutes)", HTML)
+        self.assertIn("minutes<=240?'low':minutes<=480?'medium':'high'", HTML)
+        self.assertIn("season-kpi level-", HTML)
+        self.assertIn("metric('Усього за період',loc.total_minutes,'Планові години',true)", HTML)
+        self.assertIn('class="season-legend"', HTML)
+        self.assertIn('.season-kpi.level-low', HTML)
+        self.assertIn('.season-kpi.level-medium', HTML)
+        self.assertIn('.season-kpi.level-high', HTML)
+        self.assertIn('.season-kpi.level-total', HTML)
 
     def test_summary_bar_then_always_open_battery_overview(self):
         self.assertIn('class="eco-location-summary"', HTML)

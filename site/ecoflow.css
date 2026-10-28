@@ -1551,3 +1551,31 @@ main > nav.tabs > button[data-tab="tomorrow"]{justify-self:end;margin-right:0;ma
   .eco-overview-content{padding:13px 10px 13px}
 }
 }
+ 
+/* Header view switch: a single dropdown directly below the Kyiv clock. */
+main > header .clock-view{grid-column:2;grid-row:1;justify-self:center;align-self:center;min-width:0;
+ display:flex;align-items:center;flex-direction:column;gap:3px;position:relative;z-index:90}
+main > header .clock-view #clock{grid-column:auto;grid-row:auto;justify-self:auto;align-self:center;
+ min-height:43px;line-height:1.1}
+.clock-view .view-switch{position:relative;display:flex;justify-content:center}
+.clock-view #viewMenuToggle{display:inline-flex;align-items:center;justify-content:center;gap:11px;min-width:112px;
+ min-height:35px;padding:6px 13px;border:1px solid #496b8e;border-radius:11px;
+ background:#223852;color:#e4efff;font:750 13px system-ui;cursor:pointer}
+.clock-view #viewMenuToggle:hover,.clock-view #viewMenuToggle[aria-expanded="true"]{background:#2b4b6a;border-color:#85b0da}
+.clock-view #viewMenuToggle:focus-visible,.clock-view .view-menu button:focus-visible{outline:2px solid #facc15;outline-offset:2px}
+.clock-view .view-switch-arrow{width:8px;height:8px;border-right:2px solid #b9d2ed;border-bottom:2px solid #b9d2ed;
+ transform:rotate(45deg);margin-top:-4px}
+.clock-view #viewMenuToggle[aria-expanded="true"] .view-switch-arrow{transform:rotate(225deg);margin-top:4px}
+.clock-view .view-menu{position:absolute;z-index:120;top:calc(100% + 5px);left:50%;transform:translateX(-50%);
+ min-width:154px;border:1px solid #557799;border-radius:12px;padding:5px;
+ background:#192c43;box-shadow:0 12px 28px #020917b3}
+.clock-view .view-menu[hidden]{display:none!important}
+.clock-view .view-menu button{display:block;width:100%;text-align:left;border:0;border-radius:8px;cursor:pointer;
+ padding:11px 13px;background:transparent;color:#d8e6f8;font:700 13px system-ui}
+.clock-view .view-menu button[aria-checked="true"]{background:#284969;color:#fff}
+.clock-view .view-menu button:hover{background:#304c68}
+@media(max-width:650px){
+ main > header .clock-view{grid-column:1/-1;grid-row:2;justify-self:center;gap:4px}
+ main > header .clock-view #clock{grid-column:auto;grid-row:auto;min-height:39px;font-size:27px}
+ main > header .clock-view #viewMenuToggle{min-height:35px}
+}

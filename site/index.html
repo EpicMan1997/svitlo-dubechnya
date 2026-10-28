@@ -397,15 +397,8 @@ h1{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .yesterday-ranges{margin-top:9px}
 
 /* Seasonal outage schedules: explicitly expandable, separate from the daily forecast. */
-/* Navigation between the daily dashboard and a separate seasonal statistics view. */
-.view-tabs{display:flex;align-items:center;gap:10px;margin:17px 0 3px;padding-bottom:11px;border-bottom:1px solid #31455e}
-.view-tabs button{border:1px solid #36506d;border-radius:11px;background:#1a293e;color:#b4c7df;padding:11px 20px;
- font:750 14px system-ui;cursor:pointer;min-height:42px}
-.view-tabs button[aria-selected="true"]{background:#2a486b;border-color:#6c99c9;color:#f8fafc}
-.view-tabs button:hover{border-color:#80a9d0}
-.view-tabs button:focus-visible{outline:2px solid #facc15;outline-offset:2px}
-#dayTabs[hidden],#scheduleLayout[hidden],#ecoflow[hidden],#seasonPanel[hidden]{display:none!important}
-@media(max-width:480px){.view-tabs{gap:7px;margin-top:14px}.view-tabs button{flex:1;padding:10px 12px}}
+/* Full-screen section selection sits in the header, below the Kyiv clock. */
+#dayTabs[hidden],#scheduleLayout[hidden],#ecoflow[hidden],#seasonPanel[hidden],#viewMenu[hidden]{display:none!important}
 .season-panel{margin:17px 0 18px;background:#142238;border:1px solid #395573;border-radius:15px;padding:16px}
 .season-panel[hidden]{display:none!important}
 .season-panel h2{font-size:18px;margin:0 0 4px}
@@ -419,18 +412,32 @@ h1{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .season-kpi span{display:block;color:#aec4de;font-size:11px;line-height:1.3}
 .season-kpi strong{display:block;margin-top:5px;font-size:18px;font-weight:850;font-variant-numeric:tabular-nums;color:#f1f5f9}
 .season-kpi small{display:block;margin-top:4px;padding:0;background:none;color:#a4b7cf;font-size:11px;line-height:1.4}
+.season-legend{display:flex;gap:8px 15px;flex-wrap:wrap;margin:1px 0 14px;color:#b3c6dd;font-size:11px;font-weight:650}
+.season-legend span{display:inline-flex;align-items:center;gap:6px}
+.season-legend i{display:inline-block;width:8px;height:8px;border-radius:99px}
+.season-legend .low i{background:#4ade80}.season-legend .medium i{background:#facc15}.season-legend .high i{background:#fb7185}
+.season-kpi{border:1px solid #35516e;border-left:3px solid #6d98ba}
+.season-kpi.level-low{border-left-color:#4ade80;background:#1b3935}.season-kpi.level-low strong{color:#86efac}
+.season-kpi.level-medium{border-left-color:#facc15;background:#40381f}.season-kpi.level-medium strong{color:#fde68a}
+.season-kpi.level-high{border-left-color:#fb7185;background:#412a3a}.season-kpi.level-high strong{color:#fda4af}
+.season-kpi.level-total{border-left-color:#67e8f9;background:#19384b}.season-kpi.level-total strong{color:#a5f3fc}
 @media(max-width:700px){.season-grid{grid-template-columns:minmax(0,1fr)}}
 @media(max-width:430px){.season-panel{padding:12px}.season-location{padding:11px}.season-kpis{gap:7px}.season-kpi{padding:9px}.season-kpi strong{font-size:16px}}
-</style><link rel="stylesheet" href="./ecoflow.css?v=29">
-<div id="pullRefresh" class="pull-refresh" role="status" aria-live="polite"><span class="pull-refresh-icon" aria-hidden="true"></span><span id="pullRefreshText">Потягни вниз для оновлення</span></div><main><header><div class="location-shell"><h1><img class="head-icon" src="./favicon.svg" alt="" aria-hidden="true"><button class="location-button" id="locationButton" type="button" aria-expanded="false"><span id="locationLabel">Дача</span><span class="location-chevron" aria-hidden="true"></span></button></h1><div class="location-menu" id="locationMenu" hidden><button type="button" data-location="dacha">Дача <small class="location-group-hint" hidden></small></button><button type="button" data-location="home">Дім <small class="location-group-hint" hidden></small></button><button type="button" data-location="solovky">Соловки <small class="location-group-hint" hidden></small></button><button type="button" data-location="naumenky">Науменки <small class="location-group-hint" hidden></small></button></div></div><div class="site-clock" id="clock" aria-label="Час у Києві">--:--:--</div><div class="header-time"><button id="ecoAdminToggle" class="eco-admin-toggle" type="button" role="switch" aria-checked="false" aria-label="Admin: показати додаткові параметри" title="Admin: елементи керування заблоковані до підключення"><svg class="eco-admin-shield" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.5 20 6v6c0 5-3.2 8.1-8 10-4.8-1.9-8-5-8-10V6l8-3.5Z"/><path d="m9 12 2 2 4-4"/></svg><span class="eco-admin-toggle-label">Admin</span><span class="eco-switch-track" aria-hidden="true"><i></i></span></button></div></header>
-<nav class="view-tabs" role="tablist" aria-label="Розділи сайту">
-  <button type="button" role="tab" id="viewSchedule" aria-selected="true" aria-controls="scheduleLayout">Графік</button>
-  <button type="button" role="tab" id="viewStats" aria-selected="false" aria-controls="seasonPanel">Статистика</button>
-</nav>
+</style><link rel="stylesheet" href="./ecoflow.css?v=30">
+<div id="pullRefresh" class="pull-refresh" role="status" aria-live="polite"><span class="pull-refresh-icon" aria-hidden="true"></span><span id="pullRefreshText">Потягни вниз для оновлення</span></div><main><header><div class="location-shell"><h1><img class="head-icon" src="./favicon.svg" alt="" aria-hidden="true"><button class="location-button" id="locationButton" type="button" aria-expanded="false"><span id="locationLabel">Дача</span><span class="location-chevron" aria-hidden="true"></span></button></h1><div class="location-menu" id="locationMenu" hidden><button type="button" data-location="dacha">Дача <small class="location-group-hint" hidden></small></button><button type="button" data-location="home">Дім <small class="location-group-hint" hidden></small></button><button type="button" data-location="solovky">Соловки <small class="location-group-hint" hidden></small></button><button type="button" data-location="naumenky">Науменки <small class="location-group-hint" hidden></small></button></div></div><div class="clock-view">
+  <div class="site-clock" id="clock" aria-label="Час у Києві">--:--:--</div>
+  <div class="view-switch">
+    <button id="viewMenuToggle" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="viewMenu" aria-label="Вибрати розділ"><span id="viewMenuLabel">Графік</span><span class="view-switch-arrow" aria-hidden="true"></span></button>
+    <div id="viewMenu" class="view-menu" role="menu" aria-labelledby="viewMenuToggle" hidden>
+      <button type="button" role="menuitemradio" data-site-view="schedule" aria-checked="true">Графік</button>
+      <button type="button" role="menuitemradio" data-site-view="statistics" aria-checked="false">Статистика</button>
+    </div>
+  </div>
+</div><div class="header-time"><button id="ecoAdminToggle" class="eco-admin-toggle" type="button" role="switch" aria-checked="false" aria-label="Admin: показати додаткові параметри" title="Admin: елементи керування заблоковані до підключення"><svg class="eco-admin-shield" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.5 20 6v6c0 5-3.2 8.1-8 10-4.8-1.9-8-5-8-10V6l8-3.5Z"/><path d="m9 12 2 2 4-4"/></svg><span class="eco-admin-toggle-label">Admin</span><span class="eco-switch-track" aria-hidden="true"><i></i></span></button></div></header>
 <nav class="tabs" id="dayTabs"><button data-tab="today" aria-selected="true">Сьогодні</button><button data-tab="tomorrow" aria-selected="false" class="tomorrow-tab unavailable">Завтра<span class="new-dot" id="tomorrowUnread" hidden aria-label="Новий графік">●</span></button></nav>
 
 
-<div class="layout" id="scheduleLayout" role="tabpanel" aria-labelledby="viewSchedule"><section class="card schedule-card"><div id="display"></div><aside class="history history-inline"><details class="changes" id="changes"><summary><span class="changes-header"><strong>Зміни графіка <span class="count-control" id="changeCountControl"><span class="change-count" id="changeDailyCount" role="button" tabindex="0" aria-label="Кількість змін графіка за вибрану добу" aria-describedby="dailyCountTooltip">0</span><span class="count-tooltip" id="dailyCountTooltip" role="tooltip">Кількість змін графіка за вибрану добу (публікація першого графіка не враховується)</span></span></strong></span><span class="changes-arrow" aria-hidden="true"></span></summary><div class="changes-content"><div id="latest"></div><details id="more" class="older"><summary><span class="yesterday-summary-label"><span id="previousTitle">Зміни і графік вчора</span><span class="yesterday-summary-short" id="yesterdayShort"><b class="yesterday-count zero" id="yesterdayCount">0</b> <span id="yesterdayCountWord">змін</span> · <span id="yesterdayOutageTotal">—</span></span></span><span class="archive-arrow" aria-hidden="true"></span></summary><div id="older"></div></details></div></details></aside><div id="scheduleDetailsHost"></div></section></div><section class="eco-shell" id="ecoflow" aria-labelledby="eco-title">
+<div class="layout" id="scheduleLayout" role="region" aria-label="Графік відключень"><section class="card schedule-card"><div id="display"></div><aside class="history history-inline"><details class="changes" id="changes"><summary><span class="changes-header"><strong>Зміни графіка <span class="count-control" id="changeCountControl"><span class="change-count" id="changeDailyCount" role="button" tabindex="0" aria-label="Кількість змін графіка за вибрану добу" aria-describedby="dailyCountTooltip">0</span><span class="count-tooltip" id="dailyCountTooltip" role="tooltip">Кількість змін графіка за вибрану добу (публікація першого графіка не враховується)</span></span></strong></span><span class="changes-arrow" aria-hidden="true"></span></summary><div class="changes-content"><div id="latest"></div><details id="more" class="older"><summary><span class="yesterday-summary-label"><span id="previousTitle">Зміни і графік вчора</span><span class="yesterday-summary-short" id="yesterdayShort"><b class="yesterday-count zero" id="yesterdayCount">0</b> <span id="yesterdayCountWord">змін</span> · <span id="yesterdayOutageTotal">—</span></span></span><span class="archive-arrow" aria-hidden="true"></span></summary><div id="older"></div></details></div></details></aside><div id="scheduleDetailsHost"></div></section></div><section class="eco-shell" id="ecoflow" aria-labelledby="eco-title">
   <div class="eco-head">
     <h2 class="eco-title" id="eco-title"><span class="eco-title-icon eco-title-monogram" aria-hidden="true"><svg viewBox="0 0 40 40" width="28" height="28" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 8V32" stroke="currentColor" stroke-width="5.8" stroke-linecap="square"/><path d="M14 8H29M14 32H29" stroke="currentColor" stroke-width="5.8" stroke-linecap="square"/><path d="M14 20H26" stroke="#67E8F9" stroke-width="5.8" stroke-linecap="square"/></svg></span><span id="eco-section-title">EcoFlow</span></h2>
     <span class="eco-status" role="status" title="З'єднання з EcoFlow відсутнє. Відсотки та потужності поки не надходять від пристроїв."><i aria-hidden="true"></i>Не підключено</span>
@@ -494,7 +501,7 @@ h1{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
     </article>
   </div>
 </section>
-<section id="seasonPanel" class="season-panel" role="tabpanel" aria-labelledby="viewStats" aria-label="Статистика відключень за сезон" hidden>
+<section id="seasonPanel" class="season-panel" role="region" aria-label="Статистика відключень за сезон" hidden>
   <div id="seasonContent" aria-live="polite"><p class="muted">Завантаження статистики…</p></div>
 </section>
 </main>
@@ -960,6 +967,7 @@ function seasonMinutes(minutes){
  return (h?h+' год':'')+(m?(h?' ':'')+m+' хв':'')||'0 год';
 }
 function seasonDate(iso){return /^\d{4}-\d\d-\d\d$/.test(iso||'')?iso.slice(8,10)+'.'+iso.slice(5,7):''}
+function seasonLevel(minutes){return !Number.isFinite(minutes)?'unknown':minutes<=240?'low':minutes<=480?'medium':'high'}
 function renderSeasonStats(report){
  const host=$('seasonContent');if(!host)return;
  if(!report||!report.locations){host.textContent='Статистика поки недоступна';return}
@@ -968,15 +976,15 @@ function renderSeasonStats(report){
   if(!loc||!loc.recorded_days)return '<article class="season-location"><h3>'+label+'</h3><p class="season-days">Поки немає завершених днів із підтвердженим графіком</p></article>';
   const max=loc.longest||{},daily=loc.max_daily||{};
   const period=max.interval?' · '+esc(max.interval.join('–')):'';
-  const metric=(title,value,detail)=>'<div class="season-kpi"><span>'+title+'</span><strong>'+value+'</strong><small>'+detail+'</small></div>';
+  const metric=(title,minutes,detail,total=false)=>'<div class="season-kpi level-'+(total?'total':seasonLevel(minutes))+'"><span>'+title+'</span><strong>'+seasonMinutes(minutes)+'</strong><small>'+detail+'</small></div>';
   return '<article class="season-location"><h3>'+label+'</h3><p class="season-days">'+loc.recorded_days+' підтверджених днів</p><div class="season-kpis">'+
-   metric('Найдовше безперервно',seasonMinutes(max.minutes),seasonDate(max.date)+period)+
-   metric('Найбільше за день',seasonMinutes(daily.minutes),seasonDate(daily.date))+
-   metric('Середнє за день',seasonMinutes(loc.average_minutes),'За підтвердженими днями')+
-   metric('Усього за період',seasonMinutes(loc.total_minutes),'Планові години')+
+   metric('Найдовше безперервно',max.minutes,seasonDate(max.date)+period)+
+   metric('Найбільше за день',daily.minutes,seasonDate(daily.date))+
+   metric('Середнє за день',loc.average_minutes,'За підтвердженими днями')+
+   metric('Усього за період',loc.total_minutes,'Планові години',true)+
    '</div></article>';
  }).join('');
- host.innerHTML='<h2>Сезон '+esc(report.season||'')+'</h2><p class="season-subtitle">Завершені дні з підтвердженим графіком. Це планові відключення, не фактичні вимірювання. Дні без даних не враховуються.</p><div class="season-grid">'+cards+'</div>';
+ host.innerHTML='<h2>Сезон '+esc(report.season||'')+'</h2><p class="season-subtitle">Завершені дні з підтвердженим графіком. Це планові відключення, не фактичні вимірювання. Дні без даних не враховуються.</p><div class="season-legend" aria-label="Кольори добової тривалості"><span class="low"><i></i>до 4 год</span><span class="medium"><i></i>понад 4 до 8 год</span><span class="high"><i></i>понад 8 год</span></div><div class="season-grid">'+cards+'</div>';
 }
 async function refreshSeasonStats(){
  try{
@@ -985,17 +993,39 @@ async function refreshSeasonStats(){
   const payload=await response.json();seasonResponse=payload;renderSeasonStats(payload);
  }catch(e){if(!seasonResponse)$('seasonContent').textContent='Статистику не вдалося отримати. Спробуйте ще раз.'}
 }
+function closeViewMenu(focus=false){
+ $('viewMenu').hidden=true;
+ $('viewMenuToggle').setAttribute('aria-expanded','false');
+ if(focus)$('viewMenuToggle').focus();
+}
 function switchSiteView(next){
  const stats=next==='statistics';
  $('dayTabs').hidden=stats;
  $('scheduleLayout').hidden=stats;
  $('ecoflow').hidden=stats;
  $('seasonPanel').hidden=!stats;
- $('viewSchedule').setAttribute('aria-selected',String(!stats));
- $('viewStats').setAttribute('aria-selected',String(stats));
+ $('viewMenuLabel').textContent=stats?'Статистика':'Графік';
+ document.querySelectorAll('[data-site-view]').forEach(b=>b.setAttribute('aria-checked',String(b.dataset.siteView===next)));
+ closeViewMenu();
  remember('nashe-svitlo-active-view',stats?'statistics':'schedule');
  if(stats)refreshSeasonStats();
 }
-$('viewSchedule').addEventListener('click',()=>switchSiteView('schedule'));
-$('viewStats').addEventListener('click',()=>switchSiteView('statistics'));
+$('viewMenuToggle').addEventListener('click',()=>{
+ const menu=$('viewMenu'),open=menu.hidden;
+ menu.hidden=!open;
+ $('viewMenuToggle').setAttribute('aria-expanded',String(open));
+ if(open)menu.querySelector('[aria-checked="true"]')?.focus();
+});
+document.querySelectorAll('[data-site-view]').forEach(b=>b.addEventListener('click',()=>{
+ switchSiteView(b.dataset.siteView);
+ $('viewMenuToggle').focus();
+}));
+document.addEventListener('click',e=>{if(!e.target.closest('.view-switch'))closeViewMenu()});
+document.addEventListener('keydown',e=>{
+ if(e.key==='Escape'&&!$('viewMenu').hidden)closeViewMenu(true);
+ if(!$('viewMenu').hidden&&['ArrowDown','ArrowUp'].includes(e.key)&&e.target.matches('[data-site-view]')){
+  e.preventDefault();const options=[...document.querySelectorAll('[data-site-view]')];
+  options[(options.indexOf(e.target)+(e.key==='ArrowDown'?1:options.length-1))%options.length].focus();
+ }
+});
 $('locationButton').onclick=()=>{const menu=$('locationMenu');menu.hidden=!menu.hidden;$('locationButton').setAttribute('aria-expanded',String(!menu.hidden))};document.querySelectorAll('[data-location]').forEach(b=>b.onclick=()=>selectLocation(b.dataset.location));document.addEventListener('click',e=>{if(!e.target.closest('.location-shell'))closeLocationMenu()});document.addEventListener('keydown',e=>{if(e.key==='Escape')closeLocationMenu()});const restored=remembered('dubechnya-selected-location');if(['dacha','home','solovky','naumenky'].includes(restored))locationId=restored;document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{tab=b.dataset.tab;if(tab==='tomorrow')markTomorrowSeen();paint();events()});dayShown=now().iso;if(remembered('nashe-svitlo-active-view')==='statistics')switchSiteView('statistics');tick();reload();installPullToRefresh();installDailyCounterTooltip();installMetricInfoTooltip();setInterval(tick,1000);setInterval(reload,30000);document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'){reload()}else{remember('dubechnya-selected-location',locationId)}});window.addEventListener('pagehide',()=>remember('dubechnya-selected-location',locationId));if('serviceWorker' in navigator){navigator.serviceWorker.register('./sw.js',{updateViaCache:'none'}).then(r=>r.update()).catch(e=>console.warn('Offline shell unavailable',e))}})();</script><script src="./ecoflow.js?v=29" defer></script></html>
