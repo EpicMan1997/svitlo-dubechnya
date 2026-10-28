@@ -45,8 +45,8 @@ class EcoFlowPreviewContract(unittest.TestCase):
     def test_capacity_is_proportional_and_powerocean_is_known(self):
         self.assertIn("flex-grow:' + system.wh", JS)
         self.assertIn("capacityWh: 5000, inverterKw: 6, systemPowerKw: 3, twoBatterySystemKw: 6, batteryCount: 1", JS)
-        self.assertIn("Інвертор ", JS)
-        self.assertIn("d.systemPowerKw", JS)
+        self.assertIn("function powerOceanView(d)", JS)
+        self.assertIn("powerOceanAdmin(d)", JS)
         self.assertIn('id="eco-capacity-strip"', HTML)
 
     def test_location_changer_and_pwa_integration(self):
@@ -54,8 +54,8 @@ class EcoFlowPreviewContract(unittest.TestCase):
         self.assertIn("new CustomEvent('svitlo:location-change'", HTML)
         self.assertNotIn('href="#ecoflow"', HTML)
         self.assertIn('<section class="eco-shell"', HTML)
-        self.assertIn('"./ecoflow.css?v=19"', SW)
-        self.assertIn('"./ecoflow.js?v=19"', SW)
+        self.assertIn('"./ecoflow.css?v=20"', SW)
+        self.assertIn('"./ecoflow.js?v=20"', SW)
 
 
     def test_device_section_first_and_header_rearranged(self):
@@ -82,7 +82,7 @@ class EcoFlowPreviewContract(unittest.TestCase):
         self.assertIn("function renderDeviceGrid(devices)", JS)
         self.assertIn("const addons = new Map(", JS)
         self.assertIn("ids.has(d.parentId)", JS)
-        self.assertIn("return addon ? systemView(d, addon) : deviceView(d);", JS)
+        self.assertIn("return addon ? systemView(d, addon) : d.type === 'system' ? powerOceanView(d) : deviceView(d);", JS)
         self.assertIn('class="eco-system eco-system-paired', JS)
         self.assertIn('class="eco-system-parts"', JS)
         self.assertIn("batteryPart(main, 'Основна')", JS)
@@ -169,9 +169,9 @@ class EcoFlowPreviewContract(unittest.TestCase):
         self.assertIn('id="eco-admin-bulk"', HTML)
         self.assertIn('id="eco-bulk-content"', HTML)
         self.assertIn("'eco-admin-bulk').hidden = !enabled", JS)
-        for group in ("limit", "ac", "speed"):
+        for group in ("reserve", "ac", "speed"):
             self.assertIn("targetRows('" + group + "'", JS)
-        for action in ("Застосувати ліміт", "Увімкнути AC", "Вимкнути AC", "Застосувати швидкості"):
+        for action in ("Застосувати резерв", "Увімкнути AC", "Вимкнути AC", "Застосувати швидкості"):
             self.assertIn(action, JS)
         self.assertIn("data-eco-target", JS)
         self.assertIn("data-eco-speed", JS)
@@ -246,18 +246,36 @@ class EcoFlowPreviewContract(unittest.TestCase):
             self.assertIn(".eco-operation-" + classname, CSS)
         self.assertIn(".eco-system-part .eco-operation", CSS)
 
-    def test_individual_charge_limit_presets_are_not_slider(self):
-        self.assertIn("const individualLimitPresets = [100, 80, 50, 5]", JS)
+    def test_reserve_presets_replaced_charge_limit(self):
+        self.assertIn("const reservePresets = [0, 5, 20, 50, 80, 100]", JS)
+        self.assertIn("const individualReserves = new Map()", JS)
         self.assertIn("function adminControls(device)", JS)
         self.assertIn("adminControls(d)", JS)
         self.assertIn("adminControls(main)", JS)
-        self.assertIn("const individualChargeLimits = new Map()", JS)
-        self.assertIn("data-eco-individual-limit", JS)
-        self.assertIn("individualChargeLimits.set(key, value)", JS)
-        self.assertIn("aria-pressed", JS)
-        self.assertNotIn('<input type="range" min="50" max="100" value="90" disabled>', JS)
-        self.assertIn(".eco-limit-presets", CSS)
-        self.assertIn(".eco-limit-preset.is-active", CSS)
+        self.assertIn("data-eco-reserve", JS)
+        self.assertIn("individualReserves.set(key, value)", JS)
+        self.assertNotIn("Ліміт заряджання", JS)
+        self.assertIn("Резерв заряду", JS)
+        self.assertIn(".eco-reserve-presets", CSS)
+        self.assertIn(".eco-reserve-option.is-active", CSS)
+
+    def test_powerocean_wide_with_separate_energy_flow_and_controls(self):
+        self.assertIn("function powerOceanView(d)", JS)
+        self.assertIn('class="eco-powerocean charge-', JS)
+        self.assertIn("eco-ocean-body", JS)
+        self.assertIn("eco-ocean-energy", JS)
+        self.assertIn("powerOceanAdmin(d)", JS)
+        self.assertIn("powerOceanDraft = { reserve: 0, selfPowered: true, allDay: true", JS)
+        self.assertIn("chargeW: 3000", JS)
+        self.assertIn("data-eco-ocean-watts", JS)
+        self.assertIn('min="100" max="3000" step="100"', JS)
+        self.assertIn("data-eco-ocean-allday", JS)
+        self.assertIn("data-eco-ocean-self-powered", JS)
+        self.assertIn("data-eco-ocean-time", JS)
+        self.assertIn(".eco-powerocean{", CSS)
+        self.assertIn('grid-column:1/-1!important', CSS)
+        self.assertIn(".eco-ocean-controls{", CSS)
+        self.assertNotIn("Інвертор ' + d.inverterKw", JS)
 
     def test_river_three_plus_quiet_is_eighty_watts(self):
         self.assertIn("r3pw: { quiet: 80, balanced: 200, fast: 380 }", JS)
@@ -289,10 +307,10 @@ class EcoFlowPreviewContract(unittest.TestCase):
     def test_ecoflow_branding_and_fresh_pwa_assets(self):
         self.assertIn('eco-title-monogram', HTML)
         self.assertIn('stroke="#67E8F9"', HTML)
-        self.assertIn('href="./ecoflow.css?v=19"', HTML)
-        self.assertIn('src="./ecoflow.js?v=19"', HTML)
+        self.assertIn('href="./ecoflow.css?v=20"', HTML)
+        self.assertIn('src="./ecoflow.js?v=20"', HTML)
         self.assertIn("updateViaCache:'none'", HTML)
-        self.assertIn('nashe-svitlo-static-v19', SW)
+        self.assertIn('nashe-svitlo-static-v20', SW)
         self.assertIn('url.pathname.endsWith("/ecoflow.css")', SW)
         self.assertIn('url.pathname.endsWith("/ecoflow.js")', SW)
         self.assertIn('fetch(request, {cache: "no-store"})', SW)
