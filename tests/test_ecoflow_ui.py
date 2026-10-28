@@ -381,6 +381,26 @@ class EcoFlowPreviewContract(unittest.TestCase):
 
 
 
+    def test_season_stats_use_independent_top_level_tab(self):
+        self.assertIn('class="view-tabs" role="tablist"', HTML)
+        self.assertIn('id="viewSchedule" aria-selected="true" aria-controls="scheduleLayout"', HTML)
+        self.assertIn('id="viewStats" aria-selected="false" aria-controls="seasonPanel"', HTML)
+        self.assertIn('id="dayTabs"', HTML)
+        self.assertIn('id="scheduleLayout" role="tabpanel"', HTML)
+        self.assertIn('id="seasonPanel" class="season-panel" role="tabpanel"', HTML)
+        self.assertNotIn('id="seasonToggle"', HTML)
+        self.assertNotIn('class="season-actions"', HTML)
+        self.assertIn("function switchSiteView(next)", HTML)
+        self.assertIn("$('dayTabs').hidden=stats;", HTML)
+        self.assertIn("$('scheduleLayout').hidden=stats;", HTML)
+        self.assertIn("$('ecoflow').hidden=stats;", HTML)
+        self.assertIn("$('seasonPanel').hidden=!stats;", HTML)
+        self.assertIn("if(stats)refreshSeasonStats();", HTML)
+        self.assertIn("remembered('nashe-svitlo-active-view')==='statistics'", HTML)
+        self.assertIn(".view-tabs button[aria-selected=\"true\"]", HTML)
+        self.assertLess(HTML.index('id="viewStats"'),HTML.index('id="dayTabs"'))
+        self.assertGreater(HTML.index('id="seasonPanel"'),HTML.index('id="ecoflow"'))
+
     def test_summary_bar_then_always_open_battery_overview(self):
         self.assertIn('class="eco-location-summary"', HTML)
         self.assertIn('<section class="eco-overview-details" id="eco-overview-details" aria-labelledby="eco-overview-heading">', HTML)
