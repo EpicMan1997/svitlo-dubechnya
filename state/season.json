@@ -118,6 +118,90 @@
       "end": "2027-03-31",
       "locations": {
         "dacha": {
+          "2026-10-22": {
+            "longest_interval": [
+              "14:00",
+              "18:00"
+            ],
+            "longest_minutes": 240,
+            "origin": "historical_publications",
+            "outages": [
+              [
+                "06:00",
+                "07:30"
+              ],
+              [
+                "14:00",
+                "18:00"
+              ]
+            ],
+            "source_urls": [
+              "https://kyivshchyna.info/hrafik-vidkliuchen-svitla-kyivshchyna-22-zhovtnia-2026/",
+              "https://kreschatic.kiev.ua/kyyiv/2026/10/22/grafiky-vidklyuchennya-elektroenergiyi-u-kyyevi-ta-oblasti-22-zhovtnya.html"
+            ],
+            "total_minutes": 330
+          },
+          "2026-10-23": {
+            "longest_interval": [
+              "11:00",
+              "15:00"
+            ],
+            "longest_minutes": 240,
+            "origin": "historical_publications",
+            "outages": [
+              [
+                "11:00",
+                "15:00"
+              ]
+            ],
+            "source_urls": [
+              "https://kyivshchyna.info/hrafik-vidkliuchen-svitla-kyivshchyna-23-zhovtnia-2026/",
+              "https://bezsvitla.com.ua/novyny-oblenergo/7771"
+            ],
+            "total_minutes": 240
+          },
+          "2026-10-24": {
+            "longest_interval": [
+              "08:00",
+              "12:00"
+            ],
+            "longest_minutes": 240,
+            "origin": "historical_publications",
+            "outages": [
+              [
+                "08:00",
+                "12:00"
+              ],
+              [
+                "18:30",
+                "22:30"
+              ]
+            ],
+            "source_urls": [
+              "https://kyivshchyna.info/hrafik-vidkliuchen-svitla-kyivshchyna-24-zhovtnia-2026/",
+              "https://iz.com.ua/grafik-vidklyuchen-svitla-u-kyyevi-ta-oblasti-24-zhovtnya-2026-roku-godyny-za-chergamy/"
+            ],
+            "total_minutes": 480
+          },
+          "2026-10-25": {
+            "longest_interval": [
+              "16:00",
+              "19:30"
+            ],
+            "longest_minutes": 210,
+            "origin": "historical_publications",
+            "outages": [
+              [
+                "16:00",
+                "19:30"
+              ]
+            ],
+            "source_urls": [
+              "https://kyivshchyna.info/hrafik-vidkliuchen-svitla-kyivshchyna-25-zhovtnia-2026/",
+              "https://app.svitlochas.care/grafik-vidkliuchen-svitla/kyiv-region"
+            ],
+            "total_minutes": 210
+          },
           "2026-10-26": {
             "longest_interval": [
               "12:30",
@@ -152,6 +236,75 @@
           }
         },
         "home": {
+          "2026-10-23": {
+            "longest_interval": [
+              "10:30",
+              "14:00"
+            ],
+            "longest_minutes": 210,
+            "origin": "historical_publications",
+            "outages": [
+              [
+                "10:30",
+                "14:00"
+              ],
+              [
+                "17:30",
+                "21:00"
+              ]
+            ],
+            "source_urls": [
+              "https://kyiv.info/article/yak-budut-vidklyuchaty-svitlo-u-kyyevi-ta-na-kyyivshchyni-23-zhovtnya",
+              "https://bezsvitla.com.ua/kyiv/cherha-4-1/grafik-na-2026-10-23"
+            ],
+            "total_minutes": 420
+          },
+          "2026-10-24": {
+            "longest_interval": [
+              "07:30",
+              "11:00"
+            ],
+            "longest_minutes": 210,
+            "origin": "historical_publications",
+            "outages": [
+              [
+                "07:30",
+                "11:00"
+              ],
+              [
+                "16:30",
+                "20:00"
+              ]
+            ],
+            "source_urls": [
+              "https://kyiv.info/article/hrafik-vidklyuchennya-svitla-dlya-kyyeva-ta-kyyivshchyny-na-24-zhovtnya-2026",
+              "https://kreschatic.kiev.ua/kyyiv/2026/10/23/grafiky-vidklyuchennya-elektroenergiyi-u-kyyevi-ta-oblasti-24-zhovtnya.html"
+            ],
+            "total_minutes": 420
+          },
+          "2026-10-25": {
+            "longest_interval": [
+              "09:00",
+              "12:30"
+            ],
+            "longest_minutes": 210,
+            "origin": "historical_publications",
+            "outages": [
+              [
+                "09:00",
+                "12:30"
+              ],
+              [
+                "22:00",
+                "24:00"
+              ]
+            ],
+            "source_urls": [
+              "https://kyiv.info/article/hrafik-vidklyuchennya-svitla-dlya-kyyeva-ta-kyyivshchyny-na-25-zhovtnya-2026",
+              "https://bezsvitla.com.ua/kyiv/grafik-na-2026-10-25"
+            ],
+            "total_minutes": 330
+          },
           "2026-10-26": {
             "longest_interval": [
               "12:00",
@@ -190,6 +343,75 @@
           }
         },
         "naumenky": {
+          "2026-10-23": {
+            "longest_interval": [
+              "07:30",
+              "11:00"
+            ],
+            "longest_minutes": 210,
+            "origin": "historical_publications",
+            "outages": [
+              [
+                "07:30",
+                "11:00"
+              ],
+              [
+                "14:00",
+                "17:30"
+              ]
+            ],
+            "source_urls": [
+              "https://kyiv.info/article/yak-budut-vidklyuchaty-svitlo-u-kyyevi-ta-na-kyyivshchyni-23-zhovtnya",
+              "https://bezsvitla.com.ua/kyiv/grafik-na-2026-10-23"
+            ],
+            "total_minutes": 420
+          },
+          "2026-10-24": {
+            "longest_interval": [
+              "00:00",
+              "03:30"
+            ],
+            "longest_minutes": 210,
+            "origin": "historical_publications",
+            "outages": [
+              [
+                "00:00",
+                "03:30"
+              ],
+              [
+                "12:00",
+                "15:30"
+              ],
+              [
+                "22:00",
+                "24:00"
+              ]
+            ],
+            "source_urls": [
+              "https://kyiv.info/article/hrafik-vidklyuchennya-svitla-dlya-kyyeva-ta-kyyivshchyny-na-24-zhovtnya-2026",
+              "https://kreschatic.kiev.ua/kyyiv/2026/10/23/grafiky-vidklyuchennya-elektroenergiyi-u-kyyevi-ta-oblasti-24-zhovtnya.html"
+            ],
+            "total_minutes": 540
+          },
+          "2026-10-25": {
+            "longest_interval": [
+              "15:00",
+              "19:00"
+            ],
+            "longest_minutes": 240,
+            "origin": "historical_publications",
+            "outages": [
+              [
+                "15:00",
+                "19:00"
+              ]
+            ],
+            "source_urls": [
+              "https://kyiv.info/article/hrafik-vidklyuchennya-svitla-dlya-kyyeva-ta-kyyivshchyny-na-25-zhovtnya-2026",
+              "https://bezsvitla.com.ua/kyiv/grafik-na-2026-10-25"
+            ],
+            "total_minutes": 240
+          },
           "2026-10-26": {
             "longest_interval": [
               "15:30",
@@ -236,6 +458,75 @@
           }
         },
         "solovky": {
+          "2026-10-23": {
+            "longest_interval": [
+              "10:30",
+              "14:00"
+            ],
+            "longest_minutes": 210,
+            "origin": "historical_publications",
+            "outages": [
+              [
+                "10:30",
+                "14:00"
+              ],
+              [
+                "17:30",
+                "21:00"
+              ]
+            ],
+            "source_urls": [
+              "https://kyiv.info/article/yak-budut-vidklyuchaty-svitlo-u-kyyevi-ta-na-kyyivshchyni-23-zhovtnya",
+              "https://bezsvitla.com.ua/kyiv/cherha-4-1/grafik-na-2026-10-23"
+            ],
+            "total_minutes": 420
+          },
+          "2026-10-24": {
+            "longest_interval": [
+              "07:30",
+              "11:00"
+            ],
+            "longest_minutes": 210,
+            "origin": "historical_publications",
+            "outages": [
+              [
+                "07:30",
+                "11:00"
+              ],
+              [
+                "16:30",
+                "20:00"
+              ]
+            ],
+            "source_urls": [
+              "https://kyiv.info/article/hrafik-vidklyuchennya-svitla-dlya-kyyeva-ta-kyyivshchyny-na-24-zhovtnya-2026",
+              "https://kreschatic.kiev.ua/kyyiv/2026/10/23/grafiky-vidklyuchennya-elektroenergiyi-u-kyyevi-ta-oblasti-24-zhovtnya.html"
+            ],
+            "total_minutes": 420
+          },
+          "2026-10-25": {
+            "longest_interval": [
+              "09:00",
+              "12:30"
+            ],
+            "longest_minutes": 210,
+            "origin": "historical_publications",
+            "outages": [
+              [
+                "09:00",
+                "12:30"
+              ],
+              [
+                "22:00",
+                "24:00"
+              ]
+            ],
+            "source_urls": [
+              "https://kyiv.info/article/hrafik-vidklyuchennya-svitla-dlya-kyyeva-ta-kyyivshchyny-na-25-zhovtnya-2026",
+              "https://bezsvitla.com.ua/kyiv/grafik-na-2026-10-25"
+            ],
+            "total_minutes": 330
+          },
           "2026-10-26": {
             "longest_interval": [
               "12:00",
