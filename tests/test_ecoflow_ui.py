@@ -346,5 +346,24 @@ class EcoFlowPreviewContract(unittest.TestCase):
         self.assertIn("@media(max-width:700px)", CSS)
 
 
+    def test_zero_reserve_only_on_powerocean(self):
+        self.assertIn("reservePresets.filter(percent => powerOcean || percent >= 5)", JS)
+        self.assertIn("if (!device || (device.type !== 'system' && value < 5)) return;", JS)
+        self.assertIn("powerOceanDraft = { reserve: 0", JS)
+        self.assertIn("reserveOptions(device, key, powerOceanDraft.reserve, true)", JS)
+        self.assertIn("    reserve: 5,", JS)
+        self.assertIn('id="eco-bulk-reserve" min="5" max="100" step="5"', JS)
+        self.assertIn("Math.max(5, Math.min(100", JS)
+
+    def test_reserve_buttons_fit_small_river_card(self):
+        self.assertIn(".eco-admin-controls .eco-reserve-presets > button.eco-reserve-option{", CSS)
+        self.assertIn("min-width:0", CSS)
+        self.assertIn("box-sizing:border-box", CSS)
+        self.assertIn(".eco-device.size-small .eco-admin-controls{", CSS)
+        self.assertIn("flex-direction:column", CSS)
+        self.assertIn(".eco-device.size-small .eco-admin-controls > button[disabled]{", CSS)
+
+
+
 if __name__ == "__main__":
     unittest.main()
