@@ -134,7 +134,7 @@
       list.map(time => '<option value="' + time + '"' + (value === time ? ' selected' : '') + '>' +
       time + '</option>').join('') + '</select>';
     return '<section class="eco-admin-only eco-ocean-admin eco-device-admin"><div class="eco-ocean-admin-heading"><strong>Керування PowerOcean</strong>' +
-      '<span>Режим: Самозабезпечення</span></div>' +
+      '<span>Режим: ' + (powerOceanDraft.selfPowered ? 'Самозабезпечення' : 'Вимкнено') + '</span></div>' +
       '<label class="eco-ocean-selfpowered"><input type="checkbox" data-eco-ocean-self-powered' +
       (powerOceanDraft.selfPowered ? ' checked' : '') + '> Самозабезпечення</label>' +
       '<div class="eco-ocean-controls">' +
