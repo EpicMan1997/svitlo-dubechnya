@@ -240,10 +240,6 @@
           "fingerprint": "[[\"09:00\", \"10:30\"], [\"17:00\", \"21:00\"]]",
           "first_seen": "2026-10-27T21:50+02:00"
         },
-        "Карта світла": {
-          "fingerprint": "[[\"09:00\", \"10:30\"], [\"17:00\", \"21:00\"]]",
-          "first_seen": "2026-10-27T21:50+02:00"
-        },
         "Київщина.info": {
           "fingerprint": "[[\"09:00\", \"10:30\"], [\"17:00\", \"21:00\"]]",
           "first_seen": "2026-10-28T00:01+02:00"
@@ -274,6 +270,7 @@
           "url": "https://alerts.energy/kyivska-oblast"
         },
         "Карта світла": {
+          "fetch_failed": false,
           "outages": [
             [
               "09:00",
@@ -285,7 +282,7 @@
             ]
           ],
           "partial": [],
-          "status": "match",
+          "status": "old",
           "url": "https://mapasvitla.com.ua/kyivska-oblast/dtek-krem/3.1"
         },
         "Київщина.info": {
@@ -337,7 +334,6 @@
       "source_updated": "",
       "sources": [
         "Alerts Energy",
-        "Карта світла",
         "Київщина.info",
         "КолиБуде",
         "КолиСвітло"
@@ -347,7 +343,7 @@
     },
     "2026-10-29": {
       "date": "2026-10-29",
-      "detail": "Графік ще не опубліковано",
+      "detail": "Немає підтверджених даних",
       "outages": [],
       "source_observations": {},
       "source_reports": {
