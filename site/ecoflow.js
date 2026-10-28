@@ -109,7 +109,7 @@
 
   function reserveOptions(device, key, selected, powerOcean = false) {
     return '<div class="eco-reserve-presets" role="group" aria-label="Резерв заряду ' + device.name + '">' +
-      reservePresets.map(percent =>
+      reservePresets.filter(percent => powerOcean || percent >= 5).map(percent =>
         '<button type="button" class="eco-reserve-option' + (selected === percent ? ' is-active' : '') +
         '" data-eco-reserve="' + percent + '" data-eco-device="' + key +
         '" aria-pressed="' + String(selected === percent) + '">' + percent + '%</button>'
@@ -230,7 +230,7 @@
   // Drafts are session-local UI state. No device commands or authentication exist yet.
   const adminDraft = {
     scope: 'current',
-    reserve: 0,
+    reserve: 5,
     selected: { reserve: new Set(), ac: new Set(), speed: new Set() },
     speeds: new Map(),
     speedPreset: 'balanced'
@@ -305,7 +305,7 @@
       '<span class="eco-bulk-scope-note">' + selected + '</span></div>' +
       '<div class="eco-bulk-actions">' +
       '<section class="eco-bulk-card"><h4>Резерв заряду</h4>' +
-      '<div class="eco-bulk-range"><input type="range" id="eco-bulk-reserve" min="0" max="100" step="5" value="' +
+      '<div class="eco-bulk-range"><input type="range" id="eco-bulk-reserve" min="5" max="100" step="5" value="' +
         adminDraft.reserve + '" aria-label="Спільний резерв заряду">' +
       '<output id="eco-bulk-reserve-value" for="eco-bulk-reserve">' + adminDraft.reserve + '%</output></div>' +
       targetRows('reserve', false) +
@@ -361,7 +361,7 @@
         adminDraft.scope = target.value === 'all' ? 'all' : 'current';
         Object.keys(adminDraft.selected).forEach(group => adminDraft.selected[group].clear());
       } else if (target.id === 'eco-bulk-reserve') {
-        adminDraft.reserve = Math.max(0, Math.min(100, Number(target.value) || 0));
+        adminDraft.reserve = Math.max(5, Math.min(100, Number(target.value) || 5));
       } else if (target.dataset.ecoTarget) {
         const group = target.dataset.ecoGroup;
         const key = target.dataset.ecoTarget;
@@ -434,7 +434,7 @@
     if (!key.startsWith(activeEcoLocation + ':')) return;
     const device = inventory[activeEcoLocation].devices.find(d =>
       d.type !== 'battery' && (activeEcoLocation + ':' + d.id) === key);
-    if (!device) return;
+    if (!device || (device.type !== 'system' && value < 5)) return;
     if (device.type === 'system') powerOceanDraft.reserve = value;
     else individualReserves.set(key, value);
     const group = button.closest('.eco-reserve-presets');
