@@ -484,7 +484,8 @@ class EcoFlowPreviewContract(unittest.TestCase):
         self.assertIn('id="eco-overview-details"', HTML)
         self.assertIn("$('eco-location-summary').hidden = empty", JS)
         self.assertIn("$('eco-overview-details').hidden = empty", JS)
-        self.assertIn("$('eco-overview-details').open = false", JS)
+        self.assertIn("if (!empty) displayMetric('capacity');", JS)
+        self.assertNotIn("eco-overview-details').open", JS)
         self.assertIn("У цій локації немає EcoFlow", JS)
         self.assertIn(".eco-empty-state", CSS)
 
