@@ -1443,3 +1443,72 @@ main > nav.tabs > button[data-tab="tomorrow"]{justify-self:end;margin-right:0;ma
 @media(min-width:651px) and (max-width:850px){
   .eco-detail-grid{grid-template-columns:minmax(0,1fr)}
 }
+
+
+/* Backup source selection for Dacha; EcoFlow is deliberately kept even when empty. */
+.eco-power-tabs{display:flex;align-items:center;gap:8px;margin:14px 0 13px}
+.eco-power-tab{
+  cursor:pointer;
+  padding:10px 16px;
+  min-height:42px;
+  background:#20314a;
+  border:1px solid #405a76;
+  border-radius:10px;
+  color:#bad0e9;
+  font:800 13px/1.2 system-ui;
+}
+.eco-power-tab:hover{background:#2b4261}
+.eco-power-tab.is-active{background:#31557a;color:#f8fafc;border-color:#7392b4}
+.eco-power-tab:focus-visible{outline:2px solid #facc15;outline-offset:2px}
+#eco-tab-ecoflow[hidden],#eco-tab-generator[hidden],#eco-select-generator[hidden],
+#eco-overview-heading[hidden],#eco-metrics-area[hidden],#eco-capacity-map[hidden]{display:none!important}
+.eco-empty-state{grid-column:1/-1;display:flex;flex-direction:column;align-items:center;text-align:center;justify-content:center;min-height:135px;gap:8px;padding:18px;border:1px dashed #4e6681;border-radius:13px;background:#17263a;color:#adc5dd}
+.eco-empty-state strong{color:#f1f5f9;font-size:16px}
+.eco-empty-state span{font-size:12px;max-width:490px;line-height:1.5}
+
+/* Dacha petrol generator: static verified specifications; no live state claims. */
+.eco-generator{
+  padding:20px;
+  border:1px solid #70593b;
+  background:linear-gradient(130deg,#272b32,#1b2b40);
+  border-radius:16px;
+  color:#e9f1fb;
+}
+.eco-generator-header{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.eco-generator-kicker{font-size:11px;color:#d5b781;letter-spacing:.07em;font-weight:800;text-transform:uppercase}
+.eco-generator-header h3{margin:6px 0 4px;font-size:26px;line-height:1.2}
+.eco-generator-header p{margin:0;color:#b9cadd;font-size:13px}
+.eco-generator-status{flex:none;border:1px solid #8e733f;border-radius:30px;background:#3b3326;color:#f5cb79;padding:7px 10px;font-size:11px;font-weight:800}
+.eco-generator-specs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:20px}
+.eco-generator-specs>div{min-width:0;display:flex;flex-direction:column;gap:8px;padding:13px 15px;background:#1b2d41;border:1px solid #3d536d;border-radius:11px}
+.eco-generator-specs span{font-size:11px;color:#9eb9d4}
+.eco-generator-specs strong{font-size:20px;line-height:1.2;color:#f4f7fb;font-weight:830}
+.eco-generator-note{margin:17px 0 0;font-size:12px;line-height:1.6;color:#c0cee1}
+.eco-generator-source{display:inline-block;margin-top:12px;color:#9dd5ef;font-size:12px}
+.eco-generator-source:hover{color:#d1edff}
+
+/* Home: a prominent full-width PowerOcean with two station cards below it. */
+@media(min-width:781px){
+  .eco-shell[data-location="home"] .eco-devices{
+    grid-template-columns:repeat(24,minmax(0,1fr));
+  }
+  .eco-shell[data-location="home"] .eco-devices>.eco-powerocean{
+    grid-column:span 24!important;
+  }
+  .eco-shell[data-location="home"] .eco-devices>.eco-device{
+    grid-column:span 12;
+  }
+}
+@media(max-width:780px){
+  .eco-shell[data-location="home"] .eco-devices{grid-template-columns:minmax(0,1fr)}
+  .eco-shell[data-location="home"] .eco-devices>.eco-device{grid-column:1/-1}
+}
+@media(max-width:650px){
+  .eco-power-tabs{margin:12px 0}
+  .eco-power-tab{min-height:40px;padding:10px 13px}
+  .eco-generator{padding:14px}
+  .eco-generator-specs{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+  .eco-generator-specs>div{padding:11px}
+  .eco-generator-specs strong{font-size:18px}
+}
+@media(max-width:375px){.eco-generator-specs{grid-template-columns:minmax(0,1fr)}}
