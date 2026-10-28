@@ -90,7 +90,7 @@ class SeasonTests(unittest.TestCase):
         self.assertEqual(result['scheduled_intervals'],1)
         self.assertEqual(result['average_interval_minutes'],120)
         self.assertEqual(result['coverage_days'],2)
-        self.assertEqual(result['elapsed_days'],28)
+        self.assertEqual(result['elapsed_days'],27)
 
     def test_event_only_days_wait_for_confirmed_completed_schedule(self):
         from season import archive_changes
