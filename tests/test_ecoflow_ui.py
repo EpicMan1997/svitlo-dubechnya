@@ -401,9 +401,31 @@ class EcoFlowPreviewContract(unittest.TestCase):
         self.assertIn(".eco-metric-detail[hidden]{display:none!important}", CSS)
         self.assertIn(".eco-detail-grid{", CSS)
         self.assertIn(".eco-detail-track{", CSS)
-        self.assertIn("position:absolute", CSS)
-        self.assertIn("position:relative;top:auto", CSS)
+        detail_style = CSS.split(".eco-metric-detail{", 1)[1].split("}", 1)[0]
+        self.assertIn("position:static", detail_style)
+        self.assertIn("display:block", detail_style)
+        self.assertIn("width:100%", detail_style)
+        self.assertIn("margin:12px 0 0", detail_style)
+        self.assertNotIn("position:absolute", detail_style)
+        self.assertNotIn("top:calc(100% + 8px)", detail_style)
+        self.assertNotIn("position:relative;top:auto", CSS)
+        self.assertIn(".eco-detail-grid{", CSS)
+        self.assertIn("grid-template-columns:minmax(0,1fr)", CSS)
 
+
+
+    def test_expanded_metric_detail_never_overlaps_capacity_strip(self):
+        detail_style = CSS.split(".eco-metric-detail{", 1)[1].split("}", 1)[0]
+        self.assertIn("position:static", detail_style)
+        self.assertIn("box-sizing:border-box", detail_style)
+        self.assertIn("max-width:100%", detail_style)
+        self.assertIn("min-width:0", detail_style)
+        self.assertIn("overflow-wrap:anywhere", detail_style)
+        self.assertNotIn("position:absolute", detail_style)
+        self.assertIn('id="eco-metric-detail"', HTML)
+        self.assertLess(HTML.index('id="eco-metric-detail"'), HTML.index('class="eco-capacity-map"'))
+        self.assertIn(".eco-metric-detail[hidden]{display:none!important}", CSS)
+        self.assertIn(".eco-detail-formula strong{", CSS)
 
 
 if __name__ == "__main__":
