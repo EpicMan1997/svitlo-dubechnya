@@ -228,8 +228,8 @@
   // Drafts are session-local UI state. No device commands or authentication exist yet.
   const adminDraft = {
     scope: 'current',
-    chargeLimit: 90,
-    selected: { limit: new Set(), ac: new Set(), speed: new Set() },
+    reserve: 0,
+    selected: { reserve: new Set(), ac: new Set(), speed: new Set() },
     speeds: new Map(),
     speedPreset: 'balanced'
   };
@@ -302,12 +302,12 @@
       '<div class="eco-bulk-toolbar">' + scopePicker +
       '<span class="eco-bulk-scope-note">' + selected + '</span></div>' +
       '<div class="eco-bulk-actions">' +
-      '<section class="eco-bulk-card"><h4>Ліміт заряджання</h4>' +
-      '<div class="eco-bulk-range"><input type="range" id="eco-bulk-limit" min="50" max="100" step="5" value="' +
-        adminDraft.chargeLimit + '" aria-label="Спільний ліміт заряджання">' +
-      '<output id="eco-bulk-limit-value" for="eco-bulk-limit">' + adminDraft.chargeLimit + '%</output></div>' +
-      targetRows('limit', false) +
-      '<button class="eco-bulk-apply" type="button" disabled>Застосувати ліміт</button></section>' +
+      '<section class="eco-bulk-card"><h4>Резерв заряду</h4>' +
+      '<div class="eco-bulk-range"><input type="range" id="eco-bulk-reserve" min="0" max="100" step="5" value="' +
+        adminDraft.reserve + '" aria-label="Спільний резерв заряду">' +
+      '<output id="eco-bulk-reserve-value" for="eco-bulk-reserve">' + adminDraft.reserve + '%</output></div>' +
+      targetRows('reserve', false) +
+      '<button class="eco-bulk-apply" type="button" disabled>Застосувати резерв</button></section>' +
       '<section class="eco-bulk-card"><h4>AC-виходи</h4>' +
       targetRows('ac', false) +
       '<div class="eco-bulk-buttons"><button class="eco-bulk-apply" type="button" disabled>Увімкнути AC</button>' +
@@ -349,8 +349,8 @@
     });
     bulkContent.addEventListener('input', event => {
       const target = event.target;
-      if (target.id === 'eco-bulk-limit') {
-        $('eco-bulk-limit-value').textContent = target.value + '%';
+      if (target.id === 'eco-bulk-reserve') {
+        $('eco-bulk-reserve-value').textContent = target.value + '%';
       }
     });
     bulkContent.addEventListener('change', event => {
@@ -358,8 +358,8 @@
       if (target.id === 'eco-admin-scope') {
         adminDraft.scope = target.value === 'all' ? 'all' : 'current';
         Object.keys(adminDraft.selected).forEach(group => adminDraft.selected[group].clear());
-      } else if (target.id === 'eco-bulk-limit') {
-        adminDraft.chargeLimit = Math.max(50, Math.min(100, Number(target.value) || 90));
+      } else if (target.id === 'eco-bulk-reserve') {
+        adminDraft.reserve = Math.max(0, Math.min(100, Number(target.value) || 0));
       } else if (target.dataset.ecoTarget) {
         const group = target.dataset.ecoGroup;
         const key = target.dataset.ecoTarget;
@@ -422,25 +422,48 @@
     renderBulkPanel();
   }
 
-  // Individual limit presets affect only the displayed draft, never the EcoFlow devices.
+  // Read-only draft controls; no configuration reaches any EcoFlow device.
   root.addEventListener('click', event => {
-    const button = event.target.closest('button[data-eco-individual-limit]');
+    const button = event.target.closest('button[data-eco-reserve]');
     if (!button || !root.contains(button)) return;
-    const value = Number(button.dataset.ecoIndividualLimit);
+    const value = Number(button.dataset.ecoReserve);
     const key = button.dataset.ecoDevice;
-    if (!individualLimitPresets.includes(value)) return;
+    if (!reservePresets.includes(value)) return;
     if (!key.startsWith(activeEcoLocation + ':')) return;
-    const allowed = inventory[activeEcoLocation].devices.some(d =>
+    const device = inventory[activeEcoLocation].devices.find(d =>
       d.type !== 'battery' && (activeEcoLocation + ':' + d.id) === key);
-    if (!allowed) return;
-    individualChargeLimits.set(key, value);
-    const group = button.closest('.eco-limit-presets');
+    if (!device) return;
+    if (device.type === 'system') powerOceanDraft.reserve = value;
+    else individualReserves.set(key, value);
+    const group = button.closest('.eco-reserve-presets');
     if (!group) return;
-    group.querySelectorAll('button[data-eco-individual-limit]').forEach(option => {
-      const active = Number(option.dataset.ecoIndividualLimit) === value;
+    group.querySelectorAll('button[data-eco-reserve]').forEach(option => {
+      const active = Number(option.dataset.ecoReserve) === value;
       option.classList.toggle('is-active', active);
       option.setAttribute('aria-pressed', String(active));
     });
+  });
+
+  root.addEventListener('input', event => {
+    const target = event.target;
+    if (!target.matches?.('[data-eco-ocean-watts]')) return;
+    const watts = Math.max(100, Math.min(3000, Math.round(Number(target.value) / 100) * 100 || 100));
+    powerOceanDraft.chargeW = watts;
+    const output = target.closest('.eco-ocean-watts')?.querySelector('output');
+    if (output) output.textContent = watts + ' Вт';
+  });
+  root.addEventListener('change', event => {
+    const target = event.target;
+    if (target.matches?.('[data-eco-ocean-allday]')) {
+      powerOceanDraft.allDay = target.checked;
+    } else if (target.matches?.('[data-eco-ocean-time]')) {
+      const field = target.dataset.ecoOceanTime;
+      if (field !== 'start' && field !== 'end') return;
+      if (![...timeSteps, '24:00'].includes(target.value)) return;
+      powerOceanDraft[field] = target.value;
+      if (powerOceanDraft.end <= powerOceanDraft.start) powerOceanDraft.end = '24:00';
+    } else return;
+    $('eco-devices').innerHTML = renderDeviceGrid(inventory[activeEcoLocation].devices);
   });
 
   // Persistent, centered detail row. It does not reposition when the hovered bar changes.
