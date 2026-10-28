@@ -417,7 +417,7 @@ h1{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
   </section>
   <div class="eco-section-heading"><h3>Станції та акумулятори</h3></div>
   <div class="eco-devices" id="eco-devices" aria-live="polite"></div>
-  <div class="eco-section-heading"><h3>Огляд батарей</h3></div>
+  <div class="eco-section-heading" id="eco-overview-heading"><h3>Огляд батарей</h3></div>
   <div class="eco-metrics-area" id="eco-metrics-area">
   <div class="eco-metrics">
     <button type="button" class="eco-metric" data-eco-metric="capacity" aria-expanded="false" aria-controls="eco-metric-detail"><span class="eco-metric-label">Ємність локації</span><strong class="eco-metric-value" id="eco-capacity">—</strong><span class="eco-metric-more" aria-hidden="true">Детальніше <span>ⓘ</span></span></button>
@@ -426,7 +426,7 @@ h1{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
   </div>
   <div class="eco-metric-detail" id="eco-metric-detail" aria-live="polite" hidden></div>
   </div>
-  <div class="eco-capacity-map" aria-label="Розподіл номінальної ємності"><div class="eco-capacity-map-heading"><strong>Розподіл ємності</strong></div><div class="eco-capacity-strip" id="eco-capacity-strip"></div><div class="eco-capacity-tooltip" id="eco-capacity-tooltip" role="status" aria-live="polite" aria-atomic="true" data-active="false"></div></div>
+  <div class="eco-capacity-map" id="eco-capacity-map" aria-label="Розподіл номінальної ємності"><div class="eco-capacity-map-heading"><strong>Розподіл ємності</strong></div><div class="eco-capacity-strip" id="eco-capacity-strip"></div><div class="eco-capacity-tooltip" id="eco-capacity-tooltip" role="status" aria-live="polite" aria-atomic="true" data-active="false"></div></div>
   </div>
   <div id="eco-tab-generator" class="eco-generator-tab" role="tabpanel" aria-labelledby="eco-select-generator" hidden>
     <article class="eco-generator">
