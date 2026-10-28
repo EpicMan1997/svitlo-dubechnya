@@ -1250,3 +1250,57 @@ main > nav.tabs > button[data-tab="tomorrow"]{justify-self:end;margin-right:0;ma
 
 .eco-ocean-selfpowered{display:inline-flex;align-items:center;gap:10px;margin:0 0 12px;padding:10px 12px;border:1px solid #397865;border-radius:10px;background:#183c37;color:#a5f3d0;font-size:13px;font-weight:790;cursor:pointer}
 .eco-ocean-selfpowered input{accent-color:#22c55e;width:18px;height:18px}
+
+
+/* Reserve button sizing: override legacy .eco-admin-controls button minimum width. */
+.eco-admin-controls{min-width:0;max-width:100%}
+.eco-admin-controls .eco-individual-limit{
+  width:100%;
+  max-width:100%;
+  min-width:0;
+  box-sizing:border-box;
+}
+.eco-admin-controls .eco-reserve-presets{
+  display:grid;
+  width:100%;
+  min-width:0;
+  max-width:100%;
+  box-sizing:border-box;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:5px;
+}
+.eco-admin-controls .eco-reserve-presets > button.eco-reserve-option{
+  display:block;
+  width:100%;
+  max-width:100%;
+  min-width:0;
+  min-height:34px;
+  box-sizing:border-box;
+  flex:none;
+  margin:0;
+  padding:7px 2px;
+  cursor:pointer;
+  font:780 11px/1.1 system-ui;
+  white-space:nowrap;
+  text-align:center;
+}
+.eco-admin-controls .eco-reserve-presets > button.eco-reserve-option.is-active{
+  background:#544222;
+  border-color:#d3a742;
+  color:#fff0ac;
+}
+.eco-device.size-small .eco-admin-controls{
+  flex-direction:column;
+  align-items:stretch;
+}
+.eco-device.size-small .eco-admin-controls .eco-individual-limit{
+  flex:0 1 auto;
+  padding:10px;
+}
+.eco-device.size-small .eco-admin-controls > button[disabled]{
+  width:100%;
+  max-width:100%;
+  min-width:0;
+  box-sizing:border-box;
+  flex:0 0 auto;
+}
