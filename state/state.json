@@ -272,6 +272,10 @@
           "fingerprint": "[[\"06:00\", \"07:30\"], [\"14:00\", \"18:00\"]]",
           "first_seen": "2026-10-29T00:01+02:00"
         },
+        "КолиБуде": {
+          "fingerprint": "[[\"06:00\", \"07:30\"], [\"14:00\", \"18:00\"]]",
+          "first_seen": "2026-10-29T01:10+02:00"
+        },
         "КолиСвітло": {
           "fingerprint": "[[\"06:00\", \"07:30\"], [\"14:00\", \"18:00\"]]",
           "first_seen": "2026-10-29T00:01+02:00"
@@ -324,7 +328,6 @@
           "url": "https://kyivshchyna.info/hrafik-vidkliuchen-svitla-kyivska-oblast/"
         },
         "КолиБуде": {
-          "fetch_failed": false,
           "outages": [
             [
               "06:00",
@@ -336,7 +339,7 @@
             ]
           ],
           "partial": [],
-          "status": "old",
+          "status": "match",
           "url": "https://kolybude.com/kyiv-oblast"
         },
         "КолиСвітло": {
@@ -360,6 +363,7 @@
         "Alerts Energy",
         "Карта світла",
         "Київщина.info",
+        "КолиБуде",
         "КолиСвітло"
       ],
       "status": "normal",
