@@ -58,9 +58,11 @@
   if (!root || !toggle) return;
 
   const $ = id => document.getElementById(id);
-  const uk = new Intl.NumberFormat('uk-UA', { maximumFractionDigits: 1 });
+  // Display convention requested for UI: small values as Вт, large as кВт.
+  // Underlying capacityWh remains in watt-hours for accurate capacity arithmetic.
+  const uk = new Intl.NumberFormat('uk-UA', { maximumFractionDigits: 2 });
   function niceWh(wh) {
-    return wh >= 1000 ? uk.format(wh / 1000) + ' кВт·год' : uk.format(wh) + ' Вт·год';
+    return wh >= 2000 ? uk.format(wh / 1000) + ' кВт' : uk.format(wh) + ' Вт';
   }
   function capClass(wh) {
     if (wh === null) return 'size-unknown';
@@ -403,9 +405,9 @@
   const percentValue = new Intl.NumberFormat('uk-UA', { maximumFractionDigits: 2 });
   const textEscape = value => String(value).replace(/[&<>"']/g, char =>
     ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]);
-  const exactCapacity = wh => wh >= 1000
-    ? preciseWh.format(wh / 1000) + ' кВт·год'
-    : preciseWh.format(wh) + ' Вт·год';
+  const exactCapacity = wh => wh >= 2000
+    ? preciseWh.format(wh / 1000) + ' кВт'
+    : preciseWh.format(wh) + ' Вт';
   let metricOpen = null;
   let metricPinned = null;
 
