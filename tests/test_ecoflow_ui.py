@@ -54,8 +54,8 @@ class EcoFlowPreviewContract(unittest.TestCase):
         self.assertIn("new CustomEvent('svitlo:location-change'", HTML)
         self.assertNotIn('href="#ecoflow"', HTML)
         self.assertIn('<section class="eco-shell"', HTML)
-        self.assertIn('"./ecoflow.css?v=18"', SW)
-        self.assertIn('"./ecoflow.js?v=18"', SW)
+        self.assertIn('"./ecoflow.css?v=19"', SW)
+        self.assertIn('"./ecoflow.js?v=19"', SW)
 
 
     def test_device_section_first_and_header_rearranged(self):
@@ -289,16 +289,42 @@ class EcoFlowPreviewContract(unittest.TestCase):
     def test_ecoflow_branding_and_fresh_pwa_assets(self):
         self.assertIn('eco-title-monogram', HTML)
         self.assertIn('stroke="#67E8F9"', HTML)
-        self.assertIn('href="./ecoflow.css?v=18"', HTML)
-        self.assertIn('src="./ecoflow.js?v=18"', HTML)
+        self.assertIn('href="./ecoflow.css?v=19"', HTML)
+        self.assertIn('src="./ecoflow.js?v=19"', HTML)
         self.assertIn("updateViaCache:'none'", HTML)
-        self.assertIn('nashe-svitlo-static-v18', SW)
+        self.assertIn('nashe-svitlo-static-v19', SW)
         self.assertIn('url.pathname.endsWith("/ecoflow.css")', SW)
         self.assertIn('url.pathname.endsWith("/ecoflow.js")', SW)
         self.assertIn('fetch(request, {cache: "no-store"})', SW)
         self.assertIn('caches.match(request)', SW)
         self.assertIn(".eco-title-monogram{", CSS)
 
+
+
+    def test_capacity_detail_is_only_short_name_and_percentage(self):
+        self.assertIn("d.name + ' + батарея'", JS)
+        self.assertIn("' data-eco-tooltip=\\\"' + system.name + ' · ' + system.pct + '%", JS)
+        self.assertNotIn("system.pct + '% · ' + niceWh(system.wh)", JS)
+
+    def test_mobile_eco_cards_full_width_and_admin_switch_within_track(self):
+        self.assertIn('.eco-shell[data-location="dacha"] .eco-devices > .eco-device,', CSS)
+        self.assertIn("grid-template-columns:minmax(0,1fr)", CSS)
+        self.assertIn("grid-column:1/-1!important", CSS)
+        self.assertIn('main > header .eco-admin-toggle .eco-switch-track{', CSS)
+        self.assertIn("overflow:hidden", CSS)
+        self.assertIn("transform:translateX(18px)", CSS)
+        self.assertIn("transform:translateX(16px)", CSS)
+        self.assertIn("max-width:calc(100vw - 16px)", CSS)
+
+    def test_long_outages_have_responsive_duration_labels(self):
+        self.assertIn("function outageDurationText(minutes)", HTML)
+        self.assertIn("function outageDurationCompact(minutes)", HTML)
+        self.assertIn("length>120?", HTML)
+        self.assertIn('class="outage-duration"', HTML)
+        self.assertIn('duration-full', HTML)
+        self.assertIn('duration-short', HTML)
+        self.assertIn(".outage-duration .duration-short{display:none}", CSS)
+        self.assertIn("@media(max-width:700px)", CSS)
 
 
 if __name__ == "__main__":
