@@ -24,7 +24,7 @@
         { name: 'DELTA Pro 3', capacityWh: 4096, pct: 84, inputW: 0, outputW: 620, type: 'station', id: 'dp3', operation: 'discharging' },
         { name: 'DELTA 2', capacityWh: 1024, pct: 54, inputW: 0, outputW: 125, type: 'station', id: 'd2', operation: 'discharging' },
         { name: 'Додаткова батарея DELTA 2', capacityWh: 1024, pct: 49, type: 'battery', parent: 'DELTA 2', parentId: 'd2', id: 'd2eb', operation: 'discharging' },
-        { name: 'DELTA 2', capacityWh: 1024, pct: 64, inputW: 0, outputW: 75, type: 'station', id: 'd2second', operation: 'discharging' },
+        { name: 'DELTA 2 №2', capacityWh: 1024, pct: 64, inputW: 0, outputW: 75, type: 'station', id: 'd2second', operation: 'discharging' },
         { name: 'RIVER 2', capacityWh: 256, pct: 18, inputW: 0, outputW: 26, type: 'station', id: 'r2', operation: 'discharging' }
       ]
     },
@@ -514,6 +514,22 @@
     });
   }
 
+  let backupTab = 'ecoflow';
+  function selectBackupTab(name) {
+    const generatorAvailable = activeEcoLocation === 'dacha';
+    backupTab = generatorAvailable && name === 'generator' ? 'generator' : 'ecoflow';
+    $('eco-tab-ecoflow').hidden = backupTab !== 'ecoflow';
+    $('eco-tab-generator').hidden = backupTab !== 'generator';
+    ['ecoflow', 'generator'].forEach(tab => {
+      const button = $('eco-select-' + tab);
+      button.setAttribute('aria-selected', String(backupTab === tab));
+      button.classList.toggle('is-active', backupTab === tab);
+    });
+  }
+  ['ecoflow', 'generator'].forEach(tab => {
+    $('eco-select-' + tab).addEventListener('click', () => selectBackupTab(tab));
+  });
+
   function updateLocation(id) {
     if (!Object.prototype.hasOwnProperty.call(inventory, id)) return;
     const place = inventory[id];
@@ -530,10 +546,17 @@
     metricPinned = null;
     clearMetric();
     root.dataset.location = id;
+    const empty = place.devices.length === 0;
+    $('eco-select-generator').hidden = id !== 'dacha';
+    $('eco-overview-heading').hidden = empty;
+    $('eco-metrics-area').hidden = empty;
+    $('eco-capacity-map').hidden = empty;
+    // Generator is the useful default for Dacha; EcoFlow remains an available empty tab.
+    selectBackupTab(id === 'dacha' ? 'generator' : 'ecoflow');
     $('eco-selected-location').textContent = place.name;
     $('eco-space-name').textContent = place.space;
     $('eco-count').textContent = String(packs.length);
-    $('eco-capacity').textContent = allKnown ? niceWh(totalWh) : 'Уточнюється';
+    $('eco-capacity').textContent = !packs.length ? '—' : allKnown ? niceWh(totalWh) : 'Уточнюється';
     $('eco-demo-total').textContent = weighted === null ? '—' : weighted + '%';
     $('eco-demo-total').dataset.level = weighted === null ? 'unknown' : level(weighted);
     // Here the segment width, unlike a card's layout size, is mathematically proportional to Wh.
