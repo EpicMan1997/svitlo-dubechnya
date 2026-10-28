@@ -470,5 +470,18 @@ class EcoFlowPreviewContract(unittest.TestCase):
         self.assertIn(".eco-empty-state", CSS)
 
 
+    def test_capacity_labels_have_compact_units_and_preserve_wh_calculations(self):
+        self.assertIn("wh >= 2000 ? uk.format(wh / 1000) + ' кВт'", JS)
+        self.assertIn("uk.format(wh) + ' Вт'", JS)
+        self.assertIn("const exactCapacity = wh => wh >= 2000", JS)
+        self.assertIn("preciseWh.format(wh / 1000) + ' кВт'", JS)
+        self.assertIn("preciseWh.format(wh) + ' Вт'", JS)
+        self.assertNotIn("кВт·год", JS)
+        self.assertNotIn("Вт·год", JS)
+        self.assertIn("maximumFractionDigits: 2", JS)
+        self.assertIn("device.capacityWh * device.pct / 100", JS)
+        self.assertIn("const weighted = total ? stored / total * 100", JS)
+
+
 if __name__ == "__main__":
     unittest.main()
