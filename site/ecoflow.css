@@ -1246,3 +1246,7 @@ main > nav.tabs > button[data-tab="tomorrow"]{justify-self:end;margin-right:0;ma
 }
 /* Reserves are more useful than an arbitrary charging ceiling in the shared controls. */
 .eco-bulk-card .eco-bulk-range input{accent-color:#facc15}
+
+
+.eco-ocean-selfpowered{display:inline-flex;align-items:center;gap:10px;margin:0 0 12px;padding:10px 12px;border:1px solid #397865;border-radius:10px;background:#183c37;color:#a5f3d0;font-size:13px;font-weight:790;cursor:pointer}
+.eco-ocean-selfpowered input{accent-color:#22c55e;width:18px;height:18px}
