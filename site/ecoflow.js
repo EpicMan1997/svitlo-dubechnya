@@ -409,7 +409,6 @@
     ? preciseWh.format(wh / 1000) + ' кВт'
     : preciseWh.format(wh) + ' Вт';
   let metricOpen = null;
-  let metricPinned = null;
 
   function metricBreakdown(kind) {
     const devices = physicalDevices(inventory[activeEcoLocation].devices);
@@ -482,38 +481,12 @@
       button.setAttribute('aria-expanded', 'false');
     });
   }
+  // Keep the battery overview visible. Switch breakdowns only on explicit tap/click.
+  // Automatic hover or outside-click dismissal caused the section to jump on iPhone/desktop.
   if (detailArea && detailPanel) {
-    detailArea.addEventListener('pointerover', event => {
-      const trigger = event.target.closest('[data-eco-metric]');
-      if (trigger && metricPinned === null) displayMetric(trigger.dataset.ecoMetric);
-    });
-    detailArea.addEventListener('pointerleave', () => {
-      if (metricPinned === null) clearMetric();
-    });
-    detailArea.addEventListener('focusin', event => {
-      const trigger = event.target.closest('[data-eco-metric]');
-      if (trigger) displayMetric(trigger.dataset.ecoMetric);
-    });
-    detailArea.addEventListener('focusout', event => {
-      if (metricPinned === null && !detailArea.contains(event.relatedTarget)) clearMetric();
-    });
     detailArea.addEventListener('click', event => {
       const trigger = event.target.closest('button[data-eco-metric]');
-      if (!trigger) return;
-      const kind = trigger.dataset.ecoMetric;
-      if (metricPinned === kind) {
-        metricPinned = null;
-        clearMetric();
-      } else {
-        metricPinned = kind;
-        displayMetric(kind);
-      }
-    });
-    document.addEventListener('pointerdown', event => {
-      if (!detailArea.contains(event.target)) {
-        metricPinned = null;
-        clearMetric();
-      }
+      if (trigger) displayMetric(trigger.dataset.ecoMetric);
     });
   }
 
@@ -548,14 +521,12 @@
       Object.keys(adminDraft.selected).forEach(group => adminDraft.selected[group].clear());
     }
     activeEcoLocation = id;
-    metricPinned = null;
     clearMetric();
     root.dataset.location = id;
     const empty = place.devices.length === 0;
     $('eco-select-generator').hidden = id !== 'dacha';
     $('eco-location-summary').hidden = empty;
     $('eco-overview-details').hidden = empty;
-    $('eco-overview-details').open = false;
     // Generator is the useful default for Dacha; EcoFlow remains an available empty tab.
     selectBackupTab(id === 'dacha' ? 'generator' : 'ecoflow');
     $('eco-selected-location').textContent = place.name;
@@ -577,6 +548,7 @@
       overallTrack.setAttribute('aria-valuetext', weighted + ' відсотків');
     }
     $('eco-devices').innerHTML = place.devices.length ? renderDeviceGrid(place.devices) : '<div class="eco-empty-state"><strong>У цій локації немає EcoFlow</strong><span>Резервне живлення дачі забезпечує генератор. Його характеристики є в сусідній вкладці.</span></div>';
+    if (!empty) displayMetric('capacity');
     renderBulkPanel();
   }
 

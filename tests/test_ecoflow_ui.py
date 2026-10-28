@@ -56,8 +56,8 @@ class EcoFlowPreviewContract(unittest.TestCase):
         self.assertIn("new CustomEvent('svitlo:location-change'", HTML)
         self.assertNotIn('href="#ecoflow"', HTML)
         self.assertIn('<section class="eco-shell"', HTML)
-        self.assertIn('"./ecoflow.css?v=28"', SW)
-        self.assertIn('"./ecoflow.js?v=28"', SW)
+        self.assertIn('"./ecoflow.css?v=29"', SW)
+        self.assertIn('"./ecoflow.js?v=29"', SW)
 
 
     def test_device_section_first_and_header_rearranged(self):
@@ -320,10 +320,10 @@ class EcoFlowPreviewContract(unittest.TestCase):
     def test_ecoflow_branding_and_fresh_pwa_assets(self):
         self.assertIn('eco-title-monogram', HTML)
         self.assertIn('stroke="#67E8F9"', HTML)
-        self.assertIn('href="./ecoflow.css?v=28"', HTML)
-        self.assertIn('src="./ecoflow.js?v=28"', HTML)
+        self.assertIn('href="./ecoflow.css?v=29"', HTML)
+        self.assertIn('src="./ecoflow.js?v=29"', HTML)
         self.assertIn("updateViaCache:'none'", HTML)
-        self.assertIn('nashe-svitlo-static-v28', SW)
+        self.assertIn('nashe-svitlo-static-v29', SW)
         self.assertIn('url.pathname.endsWith("/ecoflow.css")', SW)
         self.assertIn('url.pathname.endsWith("/ecoflow.js")', SW)
         self.assertIn('fetch(request, {cache: "no-store"})', SW)
@@ -381,16 +381,17 @@ class EcoFlowPreviewContract(unittest.TestCase):
 
 
 
-    def test_summary_bar_is_primary_and_overview_requires_explicit_disclosure(self):
+    def test_summary_bar_then_always_open_battery_overview(self):
         self.assertIn('class="eco-location-summary"', HTML)
-        self.assertIn('<details class="eco-overview-details" id="eco-overview-details">', HTML)
-        self.assertIn('<summary>Детальніше про батареї', HTML)
-        self.assertNotIn('<details class="eco-overview-details" id="eco-overview-details" open', HTML)
+        self.assertIn('<section class="eco-overview-details" id="eco-overview-details" aria-labelledby="eco-overview-heading">', HTML)
+        self.assertNotIn('<summary>Детальніше про батареї', HTML)
         self.assertIn('class="eco-overview-content"', HTML)
         self.assertIn('role="progressbar" aria-label="Середній заряд локації"', HTML)
         self.assertLess(HTML.index('id="eco-location-summary"'), HTML.index('id="eco-overview-heading"'))
-        self.assertIn('.eco-overview-details[open] .eco-overview-chevron', CSS)
         self.assertIn('.eco-location-summary[hidden],.eco-overview-details[hidden]', CSS)
+        self.assertIn("if (!empty) displayMetric('capacity');", JS)
+        self.assertNotIn("eco-overview-details').open", JS)
+        self.assertNotIn('.eco-overview-details[open]', CSS)
 
     def test_location_metrics_have_compact_labels_and_accessible_details(self):
         self.assertIn('Ємність локації', HTML)
@@ -418,12 +419,13 @@ class EcoFlowPreviewContract(unittest.TestCase):
         self.assertIn("exactCapacity(total)", JS)
         self.assertIn("devices.length + ' пристроїв'", JS)
 
-    def test_metric_explanations_support_hover_click_and_keyboard(self):
-        for event_name in ("pointerover", "pointerleave", "focusin", "focusout", "click"):
-            self.assertIn("detailArea.addEventListener('" + event_name + "'", JS)
+    def test_metric_explanations_change_only_on_explicit_click(self):
+        self.assertIn("detailArea.addEventListener('click', event => {", JS)
+        self.assertIn("if (trigger) displayMetric(trigger.dataset.ecoMetric);", JS)
+        self.assertNotIn("detailArea.addEventListener('pointerover'", JS)
+        self.assertNotIn("detailArea.addEventListener('pointerleave'", JS)
+        self.assertNotIn("metricPinned", JS)
         self.assertIn("detailArea.querySelectorAll('[data-eco-metric]')", JS)
-        self.assertIn("metricPinned = kind", JS)
-        self.assertIn("metricPinned = null;", JS)
         self.assertIn("aria-expanded", JS)
         self.assertIn(".eco-metric-detail[hidden]{display:none!important}", CSS)
         self.assertIn(".eco-detail-grid{", CSS)
