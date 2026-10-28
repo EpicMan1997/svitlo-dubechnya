@@ -518,6 +518,8 @@
   function selectBackupTab(name) {
     const generatorAvailable = activeEcoLocation === 'dacha';
     backupTab = generatorAvailable && name === 'generator' ? 'generator' : 'ecoflow';
+    root.classList.toggle('is-generator-tab', backupTab === 'generator');
+    $('eco-section-title').textContent = backupTab === 'generator' ? 'Генератор' : 'EcoFlow';
     $('eco-tab-ecoflow').hidden = backupTab !== 'ecoflow';
     $('eco-tab-generator').hidden = backupTab !== 'generator';
     ['ecoflow', 'generator'].forEach(tab => {
