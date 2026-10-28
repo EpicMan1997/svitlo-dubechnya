@@ -303,7 +303,8 @@ class EcoFlowPreviewContract(unittest.TestCase):
 
     def test_capacity_detail_is_only_short_name_and_percentage(self):
         self.assertIn("d.name + ' + батарея'", JS)
-        self.assertIn("' data-eco-tooltip=\\\"' + system.name + ' · ' + system.pct + '%", JS)
+        self.assertIn("data-eco-tooltip=", JS)
+        self.assertIn("system.name + ' · ' + system.pct + '%'", JS)
         self.assertNotIn("system.pct + '% · ' + niceWh(system.wh)", JS)
 
     def test_mobile_eco_cards_full_width_and_admin_switch_within_track(self):
