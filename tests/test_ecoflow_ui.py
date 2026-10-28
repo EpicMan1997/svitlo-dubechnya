@@ -332,11 +332,14 @@ class EcoFlowPreviewContract(unittest.TestCase):
 
 
 
-    def test_capacity_detail_is_only_short_name_and_percentage(self):
-        self.assertIn("d.name + ' + батарея'", JS)
-        self.assertIn("data-eco-tooltip=", JS)
-        self.assertIn("system.name + ' · ' + system.pct", JS)
-        self.assertNotIn("system.pct + '% · ' + niceWh(system.wh)", JS)
+    def test_expanded_overview_retains_per_battery_charge_and_capacity(self):
+        self.assertIn('id="eco-overview-details"', HTML)
+        self.assertIn("function metricBreakdown(kind)", JS)
+        self.assertIn("device.capacityWh * device.pct / 100", JS)
+        self.assertIn("'<strong class=\"eco-detail-percent\" data-level=\"' + level(device.pct)", JS)
+        self.assertIn("'<div class=\"eco-detail-grid\">' + rows", JS)
+        self.assertNotIn("data-eco-tooltip=", JS)
+        self.assertNotIn("eco-capacity-strip", JS)
 
     def test_mobile_eco_cards_full_width_and_admin_switch_within_track(self):
         self.assertIn('.eco-shell[data-location="home"] .eco-devices', CSS)
