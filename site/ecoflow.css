@@ -1170,3 +1170,79 @@ main > nav.tabs > button[data-tab="tomorrow"]{justify-self:end;margin-right:0;ma
   main > header .location-shell .location-button{flex:1 1 0;width:0;min-width:0;max-width:none;gap:4px;padding:4px 2px}
   main > header .location-shell .location-button #locationLabel{flex:1 1 0;min-width:0}
 }
+
+
+/* PowerOcean is a home energy system, not a portable station. */
+.eco-shell[data-location="home"] .eco-devices{grid-template-columns:minmax(0,1fr);width:100%}
+.eco-powerocean{
+  --charge:#84cc16;
+  grid-column:1/-1!important;
+  width:100%;
+  max-width:100%;
+  min-width:0;
+  box-sizing:border-box;
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+  padding:21px;
+  border:1px solid #457b87;
+  border-radius:17px;
+  background:linear-gradient(125deg,#1b3442 0%,#172b3d 48%,#1a2b41 100%);
+}
+.eco-powerocean.charge-high{--charge:#22c55e}
+.eco-powerocean.charge-good{--charge:#84cc16}
+.eco-powerocean.charge-medium{--charge:#eab308}
+.eco-powerocean.charge-low{--charge:#f97316}
+.eco-powerocean.charge-critical{--charge:#ef4444}
+.eco-ocean-top{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:14px}
+.eco-ocean-overline{font-size:11px;font-weight:800;color:#8bd5df;letter-spacing:.055em;text-transform:uppercase}
+.eco-ocean-top h3{font-size:24px;line-height:1.2;margin:6px 0 5px;color:#fff}
+.eco-ocean-cap{font-size:12px;color:#b8cce2}
+.eco-ocean-body{display:grid;grid-template-columns:minmax(180px,1fr) minmax(220px,1.4fr);gap:13px;align-items:stretch}
+.eco-ocean-battery{padding:16px;border:1px solid #36546b;background:#162a3e;border-radius:12px;min-width:0}
+.eco-ocean-label{font-size:12px;font-weight:730;color:#b3cbe0}
+.eco-ocean-battery .eco-battery{margin:9px 0 6px}
+.eco-ocean-battery .eco-battery-percent{font-size:40px;color:var(--charge)}
+.eco-ocean-battery .eco-charge-track{margin:9px 0 10px;background:#33475d}
+.eco-ocean-battery>span:last-child{font-size:12px;font-weight:760;color:#d9e7f5}
+.eco-ocean-energy{display:grid;grid-template-columns:minmax(0,1fr) 36px minmax(0,1fr);gap:8px;align-items:center;padding:15px;border:1px solid #36546b;border-radius:12px;background:#192f43}
+.eco-ocean-energy>div:not(.eco-ocean-flow){display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;min-width:0}
+.eco-ocean-energy span{font-size:12px;color:#b4d0e7}
+.eco-ocean-energy strong{font-size:clamp(17px,2.4vw,25px);color:#fff;font-variant-numeric:tabular-nums}
+.eco-ocean-flow{border:1px solid #447f8c;background:#254959;border-radius:50%;display:grid;place-items:center;color:#78d8e7;font-size:21px;width:34px;height:34px}
+.eco-ocean-autonomy{display:flex;align-items:center;justify-content:space-between;gap:12px;border-radius:11px;padding:13px 16px;background:#1a3a43;color:#aed5df;font-size:12px}
+.eco-ocean-autonomy strong{color:#9bf3c3;font-size:20px;font-variant-numeric:tabular-nums}
+.eco-ocean-admin{border-top:1px dashed #55758e;padding-top:18px}
+.eco-ocean-admin-heading{display:flex;align-items:baseline;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:13px}
+.eco-ocean-admin-heading strong{font-size:15px}
+.eco-ocean-admin-heading span{font-size:12px;color:#8de4c2}
+.eco-ocean-controls{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px}
+.eco-ocean-setting{min-width:0;display:flex;flex-direction:column;gap:10px;padding:14px;border:1px solid #42617b;border-radius:11px;background:#1c344b}
+.eco-ocean-setting>span{font-size:12px;font-weight:790;color:#dceafa}
+.eco-ocean-setting small{color:#94b3ca;font-size:11px}
+.eco-reserve-presets{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}
+.eco-reserve-option{cursor:pointer;min-width:0;min-height:36px;padding:7px 3px;background:#2a4059;color:#d9e8f7;border:1px solid #4b6580;border-radius:8px;font:780 12px system-ui;white-space:nowrap}
+.eco-reserve-option.is-active{background:#544222;border-color:#d3a742;color:#fff0ac}
+.eco-reserve-option:hover{border-color:#9ab6d2}
+.eco-reserve-option:focus-visible,.eco-ocean-setting input:focus-visible,.eco-ocean-setting select:focus-visible{outline:2px solid #facc15;outline-offset:2px}
+.eco-individual-limit .eco-reserve-presets{grid-template-columns:repeat(3,minmax(0,1fr))}
+.eco-ocean-watts{display:flex;align-items:center;gap:9px;margin-top:8px}
+.eco-ocean-watts input{flex:1;min-width:30px;accent-color:#facc15}
+.eco-ocean-watts output{font-size:14px;font-weight:850;color:#fde68a;min-width:60px;text-align:right;font-variant-numeric:tabular-nums}
+.eco-ocean-allday{display:flex;align-items:center;gap:9px;color:#d5e9fa;font-size:12px;font-weight:710;cursor:pointer}
+.eco-ocean-allday input{width:17px;height:17px;accent-color:#eab308}
+.eco-ocean-clock{min-height:32px;display:flex;align-items:center;gap:7px;flex-wrap:wrap;color:#e4f0fc;font-size:13px}
+.eco-ocean-clock strong{font-size:17px;font-variant-numeric:tabular-nums}
+.eco-ocean-clock select{min-width:0;max-width:110px;padding:6px 7px;background:#263f58;color:#e2edf9;border:1px solid #52718f;border-radius:8px}
+@media(max-width:1000px){.eco-ocean-controls{grid-template-columns:repeat(2,minmax(0,1fr))}.eco-ocean-setting:last-child{grid-column:1/-1}}
+@media(max-width:650px){
+  .eco-powerocean{padding:13px;gap:11px}
+  .eco-ocean-top h3{font-size:22px}
+  .eco-ocean-body{grid-template-columns:minmax(0,1fr)}
+  .eco-ocean-energy{min-height:86px}
+  .eco-ocean-controls{grid-template-columns:minmax(0,1fr)}
+  .eco-ocean-setting:last-child{grid-column:auto}
+  .eco-ocean-autonomy strong{font-size:17px}
+}
+/* Reserves are more useful than an arbitrary charging ceiling in the shared controls. */
+.eco-bulk-card .eco-bulk-range input{accent-color:#facc15}
