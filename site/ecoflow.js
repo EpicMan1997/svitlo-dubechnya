@@ -135,6 +135,8 @@
       time + '</option>').join('') + '</select>';
     return '<section class="eco-admin-only eco-ocean-admin eco-device-admin"><div class="eco-ocean-admin-heading"><strong>Керування PowerOcean</strong>' +
       '<span>Режим: Самозабезпечення</span></div>' +
+      '<label class="eco-ocean-selfpowered"><input type="checkbox" data-eco-ocean-self-powered' +
+      (powerOceanDraft.selfPowered ? ' checked' : '') + '> Самозабезпечення</label>' +
       '<div class="eco-ocean-controls">' +
       '<div class="eco-ocean-setting"><span>Резерв заряду</span>' +
       reserveOptions(device, key, powerOceanDraft.reserve, true) + '</div>' +
@@ -454,7 +456,9 @@
   });
   root.addEventListener('change', event => {
     const target = event.target;
-    if (target.matches?.('[data-eco-ocean-allday]')) {
+    if (target.matches?.('[data-eco-ocean-self-powered]')) {
+      powerOceanDraft.selfPowered = target.checked;
+    } else if (target.matches?.('[data-eco-ocean-allday]')) {
       powerOceanDraft.allDay = target.checked;
     } else if (target.matches?.('[data-eco-ocean-time]')) {
       const field = target.dataset.ecoOceanTime;
