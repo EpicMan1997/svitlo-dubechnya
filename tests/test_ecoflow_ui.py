@@ -449,6 +449,11 @@ class EcoFlowPreviewContract(unittest.TestCase):
         self.assertIn(".season-extra-kpis[hidden]{display:none!important}", HTML)
         self.assertNotIn('class="season-subtitle"', HTML)
 
+    def test_season_extra_metrics_have_spacing_without_divider(self):
+        self.assertIn('.season-extra-kpis{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-top:14px}', HTML)
+        self.assertNotIn('.season-extra-kpis{margin-top:12px;border-top:', HTML)
+        self.assertNotIn('.season-extra-kpis{border-top:', HTML)
+
     def test_season_kpis_are_colored_by_daily_duration_not_total(self):
         self.assertIn("function seasonLevel(minutes)", HTML)
         self.assertIn("minutes<=240?'low':minutes<=480?'medium':'high'", HTML)
