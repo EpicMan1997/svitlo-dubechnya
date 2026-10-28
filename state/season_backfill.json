@@ -1,4 +1,186 @@
 {
+  "2026-10-07": {
+    "dacha": {
+      "outages": [
+        [
+          "17:00",
+          "21:00"
+        ]
+      ],
+      "sources": [
+        "https://bezsvitla.com.ua/kyivska-oblast/cherha-3-1/grafik-na-2026-10-07",
+        "https://u7.com.ua/vidklyuchennya-svitla-7-zhovtnya-kyyiv-i-oblast/"
+      ]
+    }
+  },
+  "2026-10-11": {
+    "dacha": {
+      "outages": [
+        [
+          "17:00",
+          "19:30"
+        ]
+      ],
+      "sources": [
+        "https://bezsvitla.com.ua/kyivska-oblast/cherha-3-1/grafik-na-2026-10-11",
+        "https://kreschatic.kiev.ua/kyyiv/2026/10/10/obmezhennya-na-elektropostachannya-v-kyyevi-ta-oblasti-11-zhovtnya-grafik-vidklyuchennya.html"
+      ]
+    }
+  },
+  "2026-10-12": {
+    "dacha": {
+      "outages": [
+        [
+          "12:30",
+          "16:30"
+        ]
+      ],
+      "sources": [
+        "https://bezsvitla.com.ua/kyivska-oblast/cherha-3-1/grafik-na-2026-10-12",
+        "https://proslav.info/vidkliuchennia-svitla-na-kyivshchyni-12-zhovtnia-detalnyj-hrafik-dtek-za-cherhamy/"
+      ]
+    }
+  },
+  "2026-10-13": {
+    "dacha": {
+      "outages": [
+        [
+          "20:00",
+          "24:00"
+        ]
+      ],
+      "sources": [
+        "https://bezsvitla.com.ua/kyivska-oblast/cherha-3-1/grafik-na-2026-10-13",
+        "https://kyiv.info/article/vidklyuchennya-svitla-na-kyyivshchyni-hrafik-na-13-zhovtnya-2026"
+      ]
+    }
+  },
+  "2026-10-14": {
+    "dacha": {
+      "outages": [
+        [
+          "06:30",
+          "10:30"
+        ],
+        [
+          "17:00",
+          "21:00"
+        ]
+      ],
+      "sources": [
+        "https://bezsvitla.com.ua/kyivska-oblast/grafik-na-2026-10-14",
+        "https://mykyivregion.com.ua/news/na-kiyivshhini-14-zovtnya-diyatimut-grafiki-vidklyucennya-svitla-infografika"
+      ]
+    }
+  },
+  "2026-10-16": {
+    "dacha": {
+      "outages": [
+        [
+          "11:00",
+          "15:00"
+        ],
+        [
+          "22:00",
+          "24:00"
+        ]
+      ],
+      "sources": [
+        "https://bezsvitla.com.ua/kyivska-oblast/cherha-3-1/grafik-na-2026-10-16",
+        "https://kyivshchyna.info/hrafik-vidkliuchen-svitla-kyivshchyna-16-zhovtnia-2026/"
+      ]
+    }
+  },
+  "2026-10-17": {
+    "dacha": {
+      "outages": [
+        [
+          "00:00",
+          "02:00"
+        ],
+        [
+          "08:30",
+          "12:00"
+        ],
+        [
+          "18:30",
+          "19:00"
+        ]
+      ],
+      "sources": [
+        "https://bezsvitla.com.ua/kyivska-oblast/cherha-3-1/grafik-na-2026-10-17",
+        "https://kyivshchyna.info/hrafik-vidkliuchen-svitla-kyivshchyna-17-zhovtnia-2026/"
+      ]
+    }
+  },
+  "2026-10-18": {
+    "dacha": {
+      "outages": [
+        [
+          "10:30",
+          "11:00"
+        ],
+        [
+          "15:30",
+          "21:30"
+        ]
+      ],
+      "sources": [
+        "https://bezsvitla.com.ua/kyivska-oblast/cherha-3-1/grafik-na-2026-10-18",
+        "https://kyivshchyna.info/hrafik-vidkliuchen-svitla-kyivshchyna-18-zhovtnia-2026/"
+      ]
+    }
+  },
+  "2026-10-19": {
+    "dacha": {
+      "outages": [
+        [
+          "12:30",
+          "16:30"
+        ]
+      ],
+      "sources": [
+        "https://bezsvitla.com.ua/kyivska-oblast/cherha-3-1/grafik-na-2026-10-19",
+        "https://kyivshchyna.info/hrafik-vidkliuchen-svitla-kyivshchyna-19-zhovtnia-2026/"
+      ]
+    }
+  },
+  "2026-10-20": {
+    "dacha": {
+      "outages": [
+        [
+          "10:00",
+          "13:00"
+        ],
+        [
+          "20:00",
+          "22:00"
+        ]
+      ],
+      "sources": [
+        "https://bezsvitla.com.ua/kyivska-oblast/cherha-3-1/grafik-na-2026-10-20",
+        "https://kyivshchyna.info/hrafik-vidkliuchen-svitla-kyivshchyna-20-zhovtnia-2026/"
+      ]
+    }
+  },
+  "2026-10-21": {
+    "dacha": {
+      "outages": [
+        [
+          "08:00",
+          "11:00"
+        ],
+        [
+          "17:00",
+          "21:00"
+        ]
+      ],
+      "sources": [
+        "https://bezsvitla.com.ua/kyivska-oblast/cherha-3-1/grafik-na-2026-10-21",
+        "https://kyivshchyna.info/hrafik-vidkliuchen-svitla-kyivshchyna-21-zhovtnia-2026/"
+      ]
+    }
+  },
   "2026-10-22": {
     "dacha": {
       "outages": [

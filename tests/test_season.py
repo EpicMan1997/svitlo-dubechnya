@@ -92,6 +92,22 @@ class SeasonTests(unittest.TestCase):
         self.assertEqual(result['coverage_days'],2)
         self.assertEqual(result['elapsed_days'],27)
 
+    def test_historic_october_backfill_has_earlier_verified_dacha_days(self):
+        import json
+        source=json.loads(Path(__file__).resolve().parents[1].joinpath(
+            'state/season_backfill.json').read_text(encoding='utf-8'))
+        dates=('2026-10-07','2026-10-11','2026-10-12','2026-10-13','2026-10-14',
+               '2026-10-16','2026-10-17','2026-10-18','2026-10-19','2026-10-20','2026-10-21')
+        for d in dates:
+            entry=source[d]['dacha']
+            self.assertEqual(len(set(entry['sources'])),2)
+            self.assertIn('bezsvitla.com.ua',entry['sources'][0])
+            self.assertTrue(entry['outages'])
+        self.assertEqual(source['2026-10-17']['dacha']['outages'],
+                         [['00:00','02:00'],['08:30','12:00'],['18:30','19:00']])
+        self.assertEqual(source['2026-10-20']['dacha']['outages'],
+                         [['10:00','13:00'],['20:00','22:00']])
+
     def test_historic_backfill_does_not_override_automatically_observed_days(self):
         from season import archive_external, archive_completed
         iso='2026-10-24'
