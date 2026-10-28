@@ -365,5 +365,46 @@ class EcoFlowPreviewContract(unittest.TestCase):
 
 
 
+    def test_location_metrics_have_compact_labels_and_accessible_details(self):
+        self.assertIn('Ємність локації', HTML)
+        self.assertIn('Середній заряд локації', HTML)
+        self.assertIn('Кількість акумуляторів та станцій', HTML)
+        self.assertNotIn('Сума номінальних ємностей батарей', HTML + JS)
+        self.assertNotIn('Зважений за ємністю', HTML)
+        self.assertNotIn('eco-capacity-note', HTML + JS)
+        self.assertNotIn('eco-demo-note', HTML + JS)
+        self.assertIn('id="eco-metrics-area"', HTML)
+        self.assertIn('id="eco-metric-detail"', HTML)
+        for kind in ('capacity', 'charge', 'count'):
+            self.assertIn('data-eco-metric="' + kind + '"', HTML)
+        self.assertIn('aria-controls="eco-metric-detail"', HTML)
+        self.assertIn("function metricBreakdown(kind)", JS)
+        self.assertIn("function displayMetric(kind)", JS)
+        self.assertIn("function clearMetric()", JS)
+        self.assertIn("kind === 'capacity'", JS)
+        self.assertIn("kind === 'charge'", JS)
+        self.assertIn("kind === 'count'", JS)
+        self.assertIn("const stored = devices.reduce", JS)
+        self.assertIn("const weighted = total ? stored / total * 100", JS)
+        self.assertIn("device.capacityWh * device.pct / 100", JS)
+        self.assertIn("Σ (ємність × заряд) / Σ ємностей", JS)
+        self.assertIn("exactCapacity(total)", JS)
+        self.assertIn("devices.length + ' пристроїв'", JS)
+
+    def test_metric_explanations_support_hover_click_and_keyboard(self):
+        for event_name in ("pointerover", "pointerleave", "focusin", "focusout", "click"):
+            self.assertIn("detailArea.addEventListener('" + event_name + "'", JS)
+        self.assertIn("detailArea.querySelectorAll('[data-eco-metric]')", JS)
+        self.assertIn("metricPinned = kind", JS)
+        self.assertIn("metricPinned = null;", JS)
+        self.assertIn("aria-expanded", JS)
+        self.assertIn(".eco-metric-detail[hidden]{display:none!important}", CSS)
+        self.assertIn(".eco-detail-grid{", CSS)
+        self.assertIn(".eco-detail-track{", CSS)
+        self.assertIn("position:absolute", CSS)
+        self.assertIn("position:relative;top:auto", CSS)
+
+
+
 if __name__ == "__main__":
     unittest.main()
