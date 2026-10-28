@@ -92,6 +92,27 @@ class SeasonTests(unittest.TestCase):
         self.assertEqual(result['coverage_days'],2)
         self.assertEqual(result['elapsed_days'],27)
 
+    def test_historic_backfill_does_not_override_automatically_observed_days(self):
+        from season import archive_external, archive_completed
+        iso='2026-10-24'
+        first={'days':{iso:day(iso,[['08:00','12:00']])}}
+        archive=archive_completed({'seasons':{}},first,date(2026,10,28))
+        archive_external(archive,{iso:{'dacha':{
+          'outages':[['09:00','12:00']],
+          'sources':['https://example.org/a','https://example.com/b']}}},date(2026,10,28))
+        stats=season_payload(archive,date(2026,10,28))['locations']['dacha']
+        self.assertEqual(stats['total_minutes'],240)
+        self.assertEqual(stats['historical_days'],0)
+        other={'2026-10-23':{'dacha':{'outages':[['10:00','12:00']],
+                                     'sources':['https://example.org/a','https://example.com/b']}}}
+        archive_external(archive,other,date(2026,10,28))
+        stats=season_payload(archive,date(2026,10,28))['locations']['dacha']
+        self.assertEqual(stats['historical_days'],1)
+        self.assertEqual(stats['total_minutes'],360)
+        self.assertIsNone(stats['average_changes_per_tracked_day'])
+        archive_completed(archive,first,date(2026,10,28))
+        self.assertEqual(season_payload(archive,date(2026,10,28))['locations']['dacha']['recorded_days'],2)
+
     def test_event_only_days_wait_for_confirmed_completed_schedule(self):
         from season import archive_changes
         archive={'seasons':{}}

@@ -11,6 +11,7 @@ ROOT = Path(__file__).resolve().parents[1]
 STATE_PATH = ROOT / 'state' / 'season.json'
 OUTPUT_PATH = ROOT / 'site' / 'season.json'
 LOCATIONS = {'dacha': 'Дача', 'home': 'Дім', 'solovky': 'Соловки', 'naumenky': 'Науменки'}
+HISTORIC_PATH = ROOT / 'state' / 'season_backfill.json'
 
 
 def season_for(day):
@@ -108,6 +109,36 @@ def archive_changes(archive, old_state, today):
     return archive
 
 
+def archive_external(archive, history, today):
+    """Two cross-checked historical publications; NEVER overwrite monitored days."""
+    seasons=archive.setdefault('seasons', {})
+    for iso, locations in history.items():
+        try:
+            day=date.fromisoformat(iso)
+        except (TypeError, ValueError):
+            continue
+        if day >= today or not isinstance(locations, dict):
+            continue
+        season_id, start, end=season_for(day)
+        season=seasons.setdefault(season_id, {'start':start.isoformat(), 'end':end.isoformat(), 'locations':{}})
+        for key, entry in locations.items():
+            if key not in LOCATIONS or not isinstance(entry, dict):
+                continue
+            references=entry.get('sources')
+            if not isinstance(references, list) or len(set(references)) < 2:
+                continue
+            if not all(isinstance(url,str) and url.startswith('https://') for url in references):
+                continue
+            record=confirmed_record(iso, {
+                'date':iso, 'status':'normal', 'outages':entry.get('outages'), 'sources':references})
+            if record is None:
+                continue
+            record['origin']='historical_publications'
+            record['source_urls']=references
+            season.setdefault('locations', {}).setdefault(key, {}).setdefault(iso, record)
+    return archive
+
+
 def archive_completed(archive, old_state, today):
     """Idempotently upsert verified completed days before the short state history expires."""
     seasons = archive.setdefault('seasons', {})
@@ -148,7 +179,7 @@ def location_summary(records, change_history=None, season_start=None, through=No
             'scheduled_intervals': 0, 'average_interval_minutes': None,
             'days_with_changes': 0, 'total_detected_changes': 0,
             'tracked_change_days': 0, 'average_changes_per_tracked_day': None,
-            'max_changes': None, 'coverage_days': 0, 'elapsed_days': 0
+            'max_changes': None, 'coverage_days': 0, 'elapsed_days': 0, 'historical_days': 0
         }
     total = sum(records[d]['total_minutes'] for d in days)
     interval_count = sum(len(records[d]['outages']) for d in days)
@@ -181,10 +212,12 @@ def location_summary(records, change_history=None, season_start=None, through=No
             if tracked_days else None,
         'max_changes': {'date': max_change_day, 'count': counted[max_change_day]} if max_change_day else None,
         'coverage_days': len(days),
+        'historical_days': sum(records[d].get('origin') == 'historical_publications' for d in days),
         'elapsed_days': elapsed,
         'days': {d: {'total_minutes': records[d]['total_minutes'],
                     'longest_minutes': records[d]['longest_minutes'],
                     'intervals': len(records[d]['outages']),
+                    'historical': records[d].get('origin') == 'historical_publications',
                     'detected_changes': counted.get(d)} for d in days}
     }
 
@@ -211,6 +244,9 @@ def update_season(old_state, today):
     except FileNotFoundError:
         archive = {'seasons': {}}
     # Corrupt archives must halt refresh, not silently erase historical statistics.
+    # Backfill only older days, then prefer the saved collector snapshot if present.
+    if HISTORIC_PATH.exists():
+        archive_external(archive, json.loads(HISTORIC_PATH.read_text(encoding='utf-8')), today)
     archive_completed(archive, old_state, today)
     content = json.dumps(archive, ensure_ascii=False, indent=2, sort_keys=True) + '\n'
     STATE_PATH.parent.mkdir(exist_ok=True, parents=True)
