@@ -17,11 +17,11 @@ class EcoFlowPreviewContract(unittest.TestCase):
         for name in ("DELTA Pro 3", "DELTA 3 Plus", "RIVER 3 Plus Wireless",
                      "PowerOcean", "RIVER 2", "Додаткова батарея DELTA 2"):
             self.assertIn(name, JS)
-        self.assertEqual(JS.count("capacityWh: 4096"), 2)
+        self.assertEqual(JS.count("capacityWh: 4096"), 1)
         self.assertEqual(JS.count("capacityWh: 1024"), 5)
         self.assertEqual(JS.count("capacityWh: 286"), 1)
         self.assertEqual(JS.count("capacityWh: 256"), 1)
-        self.assertEqual(JS.count("capacityWh: 5000"), 1)
+        self.assertEqual(JS.count("capacityWh: 10000"), 1)
 
     def test_disconnected_device_values_are_not_claimed_as_live(self):
         self.assertIn("Не підключено", HTML)
@@ -44,7 +44,7 @@ class EcoFlowPreviewContract(unittest.TestCase):
 
     def test_capacity_is_proportional_and_powerocean_is_known(self):
         self.assertIn("flex-grow:' + system.wh", JS)
-        self.assertIn("capacityWh: 5000, inverterKw: 6, systemPowerKw: 3, twoBatterySystemKw: 6, batteryCount: 1", JS)
+        self.assertIn("capacityWh: 10000, inverterKw: 6, systemPowerKw: 6, batteryCount: 2", JS)
         self.assertIn("function powerOceanView(d)", JS)
         self.assertIn("powerOceanAdmin(d)", JS)
         self.assertIn('id="eco-capacity-strip"', HTML)
@@ -77,7 +77,7 @@ class EcoFlowPreviewContract(unittest.TestCase):
         self.assertIn(".eco-admin-toggle[aria-checked=\"true\"]", CSS)
 
     def test_expansion_batteries_are_one_system_card(self):
-        self.assertIn("parentId: 'dp3'", JS)
+        self.assertNotIn("parentId: 'dp3'", JS)
         self.assertIn("parentId: 'd2'", JS)
         self.assertIn("function renderDeviceGrid(devices)", JS)
         self.assertIn("const addons = new Map(", JS)
@@ -127,9 +127,24 @@ class EcoFlowPreviewContract(unittest.TestCase):
 
 
 
-    def test_dacha_delta_three_plus_before_delta_two(self):
+    def test_new_device_allocation_and_no_dacha_ecoflow(self):
         dacha = JS.split("dacha: {", 1)[1].split("home: {", 1)[0]
-        self.assertLess(dacha.index("name: 'DELTA 3 Plus'"), dacha.index("name: 'DELTA 2'"))
+        home = JS.split("home: {", 1)[1].split("solovky: {", 1)[0]
+        solovky = JS.split("solovky: {", 1)[1].split("naumenky: {", 1)[0]
+        self.assertIn("devices: []", dacha)
+        self.assertIn("capacityWh: 10000", home)
+        self.assertIn("batteryCount: 2", home)
+        self.assertIn("inverterKw: 6", home)
+        self.assertIn("name: 'DELTA 3 Plus'", home)
+        self.assertIn("name: 'RIVER 3 Plus Wireless'", home)
+        self.assertIn("name: 'DELTA Pro 3'", solovky)
+        self.assertNotIn("Додаткова батарея DELTA Pro 3", JS)
+        self.assertIn("name: 'Додаткова батарея DELTA 2'", solovky)
+        self.assertIn("id: 'd2second'", solovky)
+        self.assertEqual(solovky.count("capacityWh: 1024"), 3)
+        self.assertIn("function physicalDevices(devices)", JS)
+        self.assertIn("batteryCount", JS)
+        self.assertIn("selectBackupTab(id === 'dacha' ? 'generator' : 'ecoflow')", JS)
 
     def test_full_width_chart_with_inline_change_history(self):
         self.assertIn('class="card schedule-card"', HTML)
@@ -221,19 +236,16 @@ class EcoFlowPreviewContract(unittest.TestCase):
         self.assertIn("position:static", CSS)
         self.assertNotIn("const middle = position.left", JS)
 
-    def test_charge_arrows_and_resized_three_station_row(self):
+    def test_charge_arrows_and_home_layout(self):
         self.assertIn("charging: { label: 'Заряджається', sign: '↑' }", JS)
         self.assertIn("discharging: { label: 'Розряджається', sign: '↓' }", JS)
-        self.assertIn('@media(min-width:951px)', CSS)
-        self.assertIn('.eco-shell[data-location="dacha"] .eco-devices', CSS)
+        self.assertIn('.eco-shell[data-location="home"] .eco-devices', CSS)
+        self.assertIn(".eco-shell[data-location=\"home\"] .eco-devices>.eco-powerocean", CSS)
         self.assertIn("grid-template-columns:repeat(24,minmax(0,1fr))", CSS)
-        self.assertIn(".eco-device.size-medium", CSS)
-        self.assertIn("grid-column:span 9", CSS)
-        self.assertIn(".eco-device.size-small", CSS)
-        self.assertIn("grid-column:span 6", CSS)
+        self.assertIn("grid-column:span 12", CSS)
 
     def test_every_battery_has_explicit_operation_state(self):
-        self.assertEqual(JS.count("operation: 'discharging'"), 8)
+        self.assertEqual(JS.count("operation: 'discharging'"), 7)
         self.assertEqual(JS.count("operation: 'charging'"), 1)
         self.assertEqual(JS.count("operation: 'holding'"), 1)
         self.assertIn("charging: { label: 'Заряджається'", JS)
@@ -326,7 +338,7 @@ class EcoFlowPreviewContract(unittest.TestCase):
         self.assertNotIn("system.pct + '% · ' + niceWh(system.wh)", JS)
 
     def test_mobile_eco_cards_full_width_and_admin_switch_within_track(self):
-        self.assertIn('.eco-shell[data-location="dacha"] .eco-devices > .eco-device,', CSS)
+        self.assertIn('.eco-shell[data-location="home"] .eco-devices', CSS)
         self.assertIn("grid-template-columns:minmax(0,1fr)", CSS)
         self.assertIn("grid-column:1/-1!important", CSS)
         self.assertIn('main > header .eco-admin-toggle .eco-switch-track{', CSS)
@@ -426,6 +438,35 @@ class EcoFlowPreviewContract(unittest.TestCase):
         self.assertLess(HTML.index('id="eco-metric-detail"'), HTML.index('class="eco-capacity-map"'))
         self.assertIn(".eco-metric-detail[hidden]{display:none!important}", CSS)
         self.assertIn(".eco-detail-formula strong{", CSS)
+
+
+    def test_generator_tab_and_verified_specs(self):
+        self.assertIn('id="eco-select-ecoflow"', HTML)
+        self.assertIn('id="eco-select-generator"', HTML)
+        self.assertIn('id="eco-tab-ecoflow"', HTML)
+        self.assertIn('id="eco-tab-generator"', HTML)
+        self.assertIn('EDON PT-3000', HTML)
+        self.assertIn('2,8 кВт', HTML)
+        self.assertIn('3 кВт', HTML)
+        self.assertIn('15 л', HTML)
+        self.assertIn('Ручний', HTML)
+        self.assertIn('Без онлайн-моніторингу', HTML)
+        self.assertIn("selectBackupTab(name)", JS)
+        self.assertIn("id !== 'dacha'", JS)
+        self.assertIn(".eco-generator-specs", CSS)
+        self.assertIn("#eco-tab-generator[hidden]", CSS)
+
+    def test_dacha_empty_state_and_physical_pack_counts(self):
+        self.assertIn("physicalDevices(place.devices)", JS)
+        self.assertIn("physicalDevices(inventory[activeEcoLocation].devices)", JS)
+        self.assertIn("device.batteryCount <= 1", JS)
+        self.assertIn("device.capacityWh / device.batteryCount", JS)
+        self.assertIn('id="eco-overview-heading"', HTML)
+        self.assertIn('id="eco-capacity-map"', HTML)
+        self.assertIn("$('eco-overview-heading').hidden = empty", JS)
+        self.assertIn("$('eco-metrics-area').hidden = empty", JS)
+        self.assertIn("У цій локації немає EcoFlow", JS)
+        self.assertIn(".eco-empty-state", CSS)
 
 
 if __name__ == "__main__":
