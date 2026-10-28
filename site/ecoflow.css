@@ -1512,3 +1512,18 @@ main > nav.tabs > button[data-tab="tomorrow"]{justify-self:end;margin-right:0;ma
   .eco-generator-specs strong{font-size:18px}
 }
 @media(max-width:375px){.eco-generator-specs{grid-template-columns:minmax(0,1fr)}}
+
+
+/* Generator tab has its own identity and does not claim EcoFlow cloud connectivity. */
+.eco-shell.is-generator-tab .eco-title-monogram{
+  border-color:#8c7247;
+  color:#ffe1a0;
+  background:linear-gradient(145deg,#493a22,#2c2c33);
+}
+.eco-shell.is-generator-tab .eco-title-monogram svg{display:none}
+.eco-shell.is-generator-tab .eco-title-monogram::after{
+  content:"G";
+  display:block;
+  font:850 24px/1 system-ui;
+}
+.eco-shell.is-generator-tab .eco-head .eco-status{display:none}
