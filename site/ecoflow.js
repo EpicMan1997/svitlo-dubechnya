@@ -267,6 +267,7 @@
     dp3: { quiet: 500, balanced: 1000, fast: 2900 },
     d3p: { quiet: 200, balanced: 500, fast: 1500 },
     d2: { quiet: 200, balanced: 500, fast: 1200 },
+    d2second: { quiet: 200, balanced: 500, fast: 1200 },
     r3pw: { quiet: 80, balanced: 200, fast: 380 },
     r2: { quiet: 100, balanced: 200, fast: 360 }
   };
