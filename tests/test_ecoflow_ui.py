@@ -141,6 +141,7 @@ class EcoFlowPreviewContract(unittest.TestCase):
         self.assertNotIn("Додаткова батарея DELTA Pro 3", JS)
         self.assertIn("name: 'Додаткова батарея DELTA 2'", solovky)
         self.assertIn("id: 'd2second'", solovky)
+        self.assertIn("d2second: { quiet: 200, balanced: 500, fast: 1200 }", JS)
         self.assertEqual(solovky.count("capacityWh: 1024"), 3)
         self.assertIn("function physicalDevices(devices)", JS)
         self.assertIn("batteryCount", JS)
