@@ -363,13 +363,13 @@
       if (!linked) return [{ name: d.name, wh: d.capacityWh, pct: d.pct }];
       const wh = d.capacityWh + linked.capacityWh;
       const pct = Math.round((d.capacityWh * d.pct + linked.capacityWh * linked.pct) / wh);
-      return [{ name: d.name + ' + додаткова батарея', wh, pct }];
+      return [{ name: d.name + ' + батарея', wh, pct }];
     });
     $('eco-capacity-strip').innerHTML = allKnown
       ? systems.map(system =>
           '<span class="eco-cap-segment charge-' + level(system.pct) + '" style="flex-grow:' + system.wh +
           '" tabindex="0" role="img" aria-label="' + system.name + ', заряд ' + system.pct + ' відсотків"' +
-          ' data-eco-tooltip="' + system.name + ' · ' + system.pct + '% · ' + niceWh(system.wh) + '">' +
+          ' data-eco-tooltip="' + system.name + ' · ' + system.pct + '%">' +
           '<i style="width:' + system.pct + '%"></i></span>'
         ).join('')
       : '<span class="eco-cap-unknown">Ємність цієї батареї ще не уточнена</span>';
