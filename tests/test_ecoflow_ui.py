@@ -42,20 +42,22 @@ class EcoFlowPreviewContract(unittest.TestCase):
         self.assertNotIn("eco-admin-mode-hint", JS)
         self.assertIn(".eco-shell.is-admin-mode", CSS)
 
-    def test_capacity_is_proportional_and_powerocean_is_known(self):
-        self.assertIn("flex-grow:' + system.wh", JS)
+    def test_capacity_average_is_weighted_and_powerocean_is_known(self):
         self.assertIn("capacityWh: 10000, inverterKw: 6, systemPowerKw: 6, batteryCount: 2", JS)
         self.assertIn("function powerOceanView(d)", JS)
         self.assertIn("powerOceanAdmin(d)", JS)
-        self.assertIn('id="eco-capacity-strip"', HTML)
+        self.assertIn("const packs = physicalDevices(place.devices)", JS)
+        self.assertIn("Math.round(packs.reduce((v, d) => v + d.capacityWh * d.pct, 0) / totalWh)", JS)
+        self.assertIn('id="eco-location-charge-track"', HTML)
+        self.assertNotIn('id="eco-capacity-strip"', HTML)
 
     def test_location_changer_and_pwa_integration(self):
         self.assertIn("svitlo:location-change", JS)
         self.assertIn("new CustomEvent('svitlo:location-change'", HTML)
         self.assertNotIn('href="#ecoflow"', HTML)
         self.assertIn('<section class="eco-shell"', HTML)
-        self.assertIn('"./ecoflow.css?v=27"', SW)
-        self.assertIn('"./ecoflow.js?v=27"', SW)
+        self.assertIn('"./ecoflow.css?v=28"', SW)
+        self.assertIn('"./ecoflow.js?v=28"', SW)
 
 
     def test_device_section_first_and_header_rearranged(self):
@@ -174,12 +176,13 @@ class EcoFlowPreviewContract(unittest.TestCase):
         self.assertNotIn("['25', '50', '75', '100']", JS)
         self.assertIn(".eco-speed-preset{", CSS)
 
-    def test_capacity_strip_groups_extra_battery_with_parent(self):
-        self.assertIn("const batteries = new Map(", JS)
-        self.assertIn("const systems = place.devices.flatMap(", JS)
-        self.assertIn("linked.capacityWh", JS)
-        self.assertIn("linked.pct", JS)
-        self.assertIn("flex-grow:' + system.wh", JS)
+    def test_average_includes_all_physical_batteries(self):
+        self.assertIn("function physicalDevices(devices)", JS)
+        self.assertIn("device.capacityWh / device.batteryCount", JS)
+        self.assertIn("const packs = physicalDevices(place.devices)", JS)
+        self.assertIn("const totalWh = packs.reduce", JS)
+        self.assertIn("d.capacityWh * d.pct", JS)
+        self.assertNotIn("flex-grow:' + system.wh", JS)
 
     def test_admin_shared_actions_and_independent_targets(self):
         self.assertIn('id="eco-admin-bulk"', HTML)
@@ -222,20 +225,17 @@ class EcoFlowPreviewContract(unittest.TestCase):
         self.assertIn("@media(max-width:650px){main > nav.tabs{padding-right:14px}}", CSS)
         self.assertIn('main > nav.tabs > button[data-tab="tomorrow"]{justify-self:end;margin:0}', CSS)
 
-    def test_capacity_details_centered_without_floating(self):
-        self.assertIn('id="eco-capacity-tooltip"', HTML)
-        self.assertIn('role="status" aria-live="polite"', HTML)
-        self.assertIn('data-active="false"', HTML)
-        self.assertIn('data-eco-tooltip=', JS)
-        self.assertIn("system.name + ' · ' + system.pct", JS)
-        self.assertIn("const pct = Math.round((d.capacityWh * d.pct + linked.capacityWh * linked.pct) / wh)", JS)
-        for event_name in ("pointerover", "pointerout", "focusin", "focusout", "click"):
-            self.assertIn("capacityStrip.addEventListener('" + event_name + "'", JS)
-        self.assertIn("capacityTooltip.dataset.active = 'true'", JS)
-        self.assertIn("capacityTooltip.dataset.active = 'false'", JS)
-        self.assertIn("height:46px", CSS)
-        self.assertIn("position:static", CSS)
-        self.assertNotIn("const middle = position.left", JS)
+    def test_overall_charge_replaces_capacity_distribution(self):
+        self.assertNotIn("Розподіл ємності", HTML)
+        self.assertNotIn('id="eco-capacity-tooltip"', HTML)
+        self.assertNotIn("capacityStrip.addEventListener", JS)
+        self.assertIn('id="eco-location-charge-value"', HTML)
+        self.assertIn('id="eco-location-charge-fill"', HTML)
+        self.assertIn("overallTrack.dataset.level = weighted === null ? 'unknown' : level(weighted)", JS)
+        self.assertIn("overallTrack.setAttribute('aria-valuenow', String(weighted))", JS)
+        self.assertIn("overallTrack.removeAttribute('aria-valuenow')", JS)
+        self.assertIn("weighted === null ? '0%' : weighted + '%'", JS)
+        self.assertIn('.eco-location-charge-track[data-level="good"]', CSS)
 
     def test_charge_arrows_and_home_layout(self):
         self.assertIn("charging: { label: 'Заряджається', sign: '↑' }", JS)
@@ -320,10 +320,10 @@ class EcoFlowPreviewContract(unittest.TestCase):
     def test_ecoflow_branding_and_fresh_pwa_assets(self):
         self.assertIn('eco-title-monogram', HTML)
         self.assertIn('stroke="#67E8F9"', HTML)
-        self.assertIn('href="./ecoflow.css?v=27"', HTML)
-        self.assertIn('src="./ecoflow.js?v=27"', HTML)
+        self.assertIn('href="./ecoflow.css?v=28"', HTML)
+        self.assertIn('src="./ecoflow.js?v=28"', HTML)
         self.assertIn("updateViaCache:'none'", HTML)
-        self.assertIn('nashe-svitlo-static-v27', SW)
+        self.assertIn('nashe-svitlo-static-v28', SW)
         self.assertIn('url.pathname.endsWith("/ecoflow.css")', SW)
         self.assertIn('url.pathname.endsWith("/ecoflow.js")', SW)
         self.assertIn('fetch(request, {cache: "no-store"})', SW)
@@ -377,6 +377,17 @@ class EcoFlowPreviewContract(unittest.TestCase):
         self.assertIn(".eco-device.size-small .eco-admin-controls > button[disabled]{", CSS)
 
 
+
+    def test_summary_bar_is_primary_and_overview_requires_explicit_disclosure(self):
+        self.assertIn('class="eco-location-summary"', HTML)
+        self.assertIn('<details class="eco-overview-details" id="eco-overview-details">', HTML)
+        self.assertIn('<summary>Детальніше про батареї', HTML)
+        self.assertNotIn('<details class="eco-overview-details" id="eco-overview-details" open', HTML)
+        self.assertIn('class="eco-overview-content"', HTML)
+        self.assertIn('role="progressbar" aria-label="Середній заряд локації"', HTML)
+        self.assertLess(HTML.index('id="eco-location-summary"'), HTML.index('id="eco-overview-heading"'))
+        self.assertIn('.eco-overview-details[open] .eco-overview-chevron', CSS)
+        self.assertIn('.eco-location-summary[hidden],.eco-overview-details[hidden]', CSS)
 
     def test_location_metrics_have_compact_labels_and_accessible_details(self):
         self.assertIn('Ємність локації', HTML)
@@ -436,7 +447,8 @@ class EcoFlowPreviewContract(unittest.TestCase):
         self.assertIn("overflow-wrap:anywhere", detail_style)
         self.assertNotIn("position:absolute", detail_style)
         self.assertIn('id="eco-metric-detail"', HTML)
-        self.assertLess(HTML.index('id="eco-metric-detail"'), HTML.index('class="eco-capacity-map"'))
+        self.assertLess(HTML.index('id="eco-location-summary"'), HTML.index('id="eco-overview-details"'))
+        self.assertLess(HTML.index('id="eco-overview-details"'), HTML.index('id="eco-metric-detail"'))
         self.assertIn(".eco-metric-detail[hidden]{display:none!important}", CSS)
         self.assertIn(".eco-detail-formula strong{", CSS)
 
@@ -463,9 +475,11 @@ class EcoFlowPreviewContract(unittest.TestCase):
         self.assertIn("device.batteryCount <= 1", JS)
         self.assertIn("device.capacityWh / device.batteryCount", JS)
         self.assertIn('id="eco-overview-heading"', HTML)
-        self.assertIn('id="eco-capacity-map"', HTML)
-        self.assertIn("$('eco-overview-heading').hidden = empty", JS)
-        self.assertIn("$('eco-metrics-area').hidden = empty", JS)
+        self.assertIn('id="eco-location-summary"', HTML)
+        self.assertIn('id="eco-overview-details"', HTML)
+        self.assertIn("$('eco-location-summary').hidden = empty", JS)
+        self.assertIn("$('eco-overview-details').hidden = empty", JS)
+        self.assertIn("$('eco-overview-details').open = false", JS)
         self.assertIn("У цій локації немає EcoFlow", JS)
         self.assertIn(".eco-empty-state", CSS)
 

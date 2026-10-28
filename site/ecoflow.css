@@ -1527,3 +1527,33 @@ main > nav.tabs > button[data-tab="tomorrow"]{justify-self:end;margin-right:0;ma
   font:850 24px/1 system-ui;
 }
 .eco-shell.is-generator-tab .eco-head .eco-status{display:none}
+
+
+/* One readable location charge bar, with the detailed battery overview hidden by default. */
+.eco-location-summary{margin-top:19px;padding:15px 17px 17px;background:#192b40;border:1px solid #456481;border-radius:14px;min-width:0}
+.eco-location-summary[hidden],.eco-overview-details[hidden]{display:none!important}
+.eco-location-summary-heading{display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.eco-location-summary-heading>strong:first-child{font-size:15px;font-weight:800;color:#e4efff}
+.eco-location-summary-value{font-size:28px;font-weight:850;color:#f8fafc;line-height:1.1;font-variant-numeric:tabular-nums}
+.eco-location-charge-track{--location-charge:#94a3b8;height:27px;background:#33485f;border:1px solid #52677f;border-radius:8px;overflow:hidden}
+.eco-location-charge-track>span{display:block;height:100%;width:0;background:var(--location-charge);border-radius:6px}
+.eco-location-charge-track[data-level="high"]{--location-charge:#22c55e}
+.eco-location-charge-track[data-level="good"]{--location-charge:#84cc16}
+.eco-location-charge-track[data-level="medium"]{--location-charge:#eab308}
+.eco-location-charge-track[data-level="low"]{--location-charge:#f97316}
+.eco-location-charge-track[data-level="critical"]{--location-charge:#ef4444}
+.eco-overview-details{margin-top:10px;background:#17273b;border:1px solid #37516d;border-radius:13px;overflow:hidden;min-width:0}
+.eco-overview-details>summary{display:flex;justify-content:space-between;align-items:center;gap:12px;list-style:none;padding:14px 17px;color:#dbeafe;font-size:14px;font-weight:800;cursor:pointer}
+.eco-overview-details>summary::-webkit-details-marker{display:none}
+.eco-overview-details>summary:hover{background:#1e3249}
+.eco-overview-details>summary:focus-visible{outline:2px solid #facc15;outline-offset:-3px}
+.eco-overview-chevron{flex:none;width:9px;height:9px;border:solid #9cbbd8;border-width:0 2px 2px 0;transform:rotate(45deg);margin-right:3px}
+.eco-overview-details[open] .eco-overview-chevron{transform:rotate(225deg)}
+.eco-overview-content{padding:0 14px 15px;min-width:0}
+.eco-overview-content #eco-overview-heading{margin:4px 0 12px}
+@media(max-width:480px){
+  .eco-location-summary{padding:13px 14px 15px}
+  .eco-location-summary-value{font-size:25px}
+  .eco-overview-details>summary{padding:13px 14px}
+  .eco-overview-content{padding:0 10px 12px}
+}

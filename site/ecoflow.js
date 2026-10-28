@@ -553,9 +553,9 @@
     root.dataset.location = id;
     const empty = place.devices.length === 0;
     $('eco-select-generator').hidden = id !== 'dacha';
-    $('eco-overview-heading').hidden = empty;
-    $('eco-metrics-area').hidden = empty;
-    $('eco-capacity-map').hidden = empty;
+    $('eco-location-summary').hidden = empty;
+    $('eco-overview-details').hidden = empty;
+    $('eco-overview-details').open = false;
     // Generator is the useful default for Dacha; EcoFlow remains an available empty tab.
     selectBackupTab(id === 'dacha' ? 'generator' : 'ecoflow');
     $('eco-selected-location').textContent = place.name;
@@ -564,26 +564,18 @@
     $('eco-capacity').textContent = !packs.length ? '—' : allKnown ? niceWh(totalWh) : 'Уточнюється';
     $('eco-demo-total').textContent = weighted === null ? '—' : weighted + '%';
     $('eco-demo-total').dataset.level = weighted === null ? 'unknown' : level(weighted);
-    // Here the segment width, unlike a card's layout size, is mathematically proportional to Wh.
-    const batteries = new Map(place.devices.filter(d => d.type === 'battery' && d.parentId).map(d => [d.parentId, d]));
-    const mainIds = new Set(place.devices.map(d => d.id));
-    const systems = place.devices.flatMap(d => {
-      if (d.type === 'battery' && d.parentId && mainIds.has(d.parentId)) return [];
-      const linked = batteries.get(d.id);
-      if (!linked) return [{ name: d.name, wh: d.capacityWh, pct: d.pct }];
-      const wh = d.capacityWh + linked.capacityWh;
-      const pct = Math.round((d.capacityWh * d.pct + linked.capacityWh * linked.pct) / wh);
-      return [{ name: d.name + ' + батарея', wh, pct }];
-    });
-    $('eco-capacity-strip').innerHTML = allKnown
-      ? systems.map(system =>
-          '<span class="eco-cap-segment charge-' + level(system.pct) + '" style="flex-grow:' + system.wh +
-          '" tabindex="0" role="img" aria-label="' + system.name + ', заряд ' + system.pct + ' відсотків"' +
-          ' data-eco-tooltip="' + system.name + ' · ' + system.pct + '%">' +
-          '<i style="width:' + system.pct + '%"></i></span>'
-        ).join('')
-      : '<span class="eco-cap-unknown">Ємність цієї батареї ще не уточнена</span>';
-    hideCapacityTooltip();
+    // One bar represents the capacity-weighted average charge across physical batteries.
+    const overallTrack = $('eco-location-charge-track');
+    $('eco-location-charge-value').textContent = weighted === null ? '—' : weighted + '%';
+    overallTrack.dataset.level = weighted === null ? 'unknown' : level(weighted);
+    $('eco-location-charge-fill').style.width = weighted === null ? '0%' : weighted + '%';
+    if (weighted === null) {
+      overallTrack.removeAttribute('aria-valuenow');
+      overallTrack.setAttribute('aria-valuetext', 'Заряд невідомий');
+    } else {
+      overallTrack.setAttribute('aria-valuenow', String(weighted));
+      overallTrack.setAttribute('aria-valuetext', weighted + ' відсотків');
+    }
     $('eco-devices').innerHTML = place.devices.length ? renderDeviceGrid(place.devices) : '<div class="eco-empty-state"><strong>У цій локації немає EcoFlow</strong><span>Резервне живлення дачі забезпечує генератор. Його характеристики є в сусідній вкладці.</span></div>';
     renderBulkPanel();
   }
@@ -635,43 +627,6 @@
   });
 
   // Persistent, centered detail row. It does not reposition when the hovered bar changes.
-  const capacityStrip = $('eco-capacity-strip');
-  const capacityTooltip = $('eco-capacity-tooltip');
-  function hideCapacityTooltip() {
-    if (!capacityTooltip) return;
-    capacityTooltip.textContent = '';
-    capacityTooltip.dataset.active = 'false';
-  }
-  function showCapacityTooltip(segment) {
-    if (!segment || !capacityTooltip || !segment.dataset.ecoTooltip) return;
-    capacityTooltip.textContent = segment.dataset.ecoTooltip;
-    capacityTooltip.dataset.active = 'true';
-  }
-  if (capacityStrip && capacityTooltip) {
-    capacityStrip.addEventListener('pointerover', event => {
-      const segment = event.target.closest('.eco-cap-segment');
-      if (segment) showCapacityTooltip(segment);
-    });
-    capacityStrip.addEventListener('pointerout', event => {
-      const next = event.relatedTarget?.closest?.('.eco-cap-segment');
-      if (!next) hideCapacityTooltip();
-    });
-    capacityStrip.addEventListener('focusin', event => {
-      const segment = event.target.closest('.eco-cap-segment');
-      if (segment) showCapacityTooltip(segment);
-    });
-    capacityStrip.addEventListener('focusout', event => {
-      if (!event.relatedTarget?.closest?.('.eco-cap-segment')) hideCapacityTooltip();
-    });
-    capacityStrip.addEventListener('click', event => {
-      const segment = event.target.closest('.eco-cap-segment');
-      if (segment) showCapacityTooltip(segment);
-    });
-    document.addEventListener('pointerdown', event => {
-      if (!event.target.closest('.eco-capacity-strip')) hideCapacityTooltip();
-    });
-  }
-
   // Admin controls stay disabled pending authenticated server access.
   function setAdminMode(enabled) {
     root.classList.toggle('is-admin-mode', enabled);
