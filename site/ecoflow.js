@@ -101,35 +101,62 @@
       '</div>';
   }
 
-  const individualLimitPresets = [100, 80, 50, 5];
-  // UI-only drafts: a separate selection per physical station and location.
-  const individualChargeLimits = new Map();
+  // Draft-only settings. No API writes, credentials, or actual device configuration.
+  const reservePresets = [0, 5, 20, 50, 80, 100];
+  const individualReserves = new Map();
+  const powerOceanDraft = { reserve: 0, selfPowered: true, allDay: true, start: '00:00', end: '24:00', chargeW: 3000 };
+  const timeSteps = Array.from({ length: 24 }, (_, hour) => String(hour).padStart(2, '0') + ':00');
+
+  function reserveOptions(device, key, selected, powerOcean = false) {
+    return '<div class="eco-reserve-presets" role="group" aria-label="Резерв заряду ' + device.name + '">' +
+      reservePresets.map(percent =>
+        '<button type="button" class="eco-reserve-option' + (selected === percent ? ' is-active' : '') +
+        '" data-eco-reserve="' + percent + '" data-eco-device="' + key +
+        '" aria-pressed="' + String(selected === percent) + '">' + percent + '%</button>'
+      ).join('') + '</div>';
+  }
 
   function adminControls(device) {
     const key = activeEcoLocation + ':' + device.id;
-    const selected = individualChargeLimits.get(key) ?? 80;
-    const controls = individualLimitPresets.map(percent =>
-      '<button type="button" class="eco-limit-preset' + (selected === percent ? ' is-active' : '') +
-      '" data-eco-individual-limit="' + percent + '" data-eco-device="' + key +
-      '" aria-pressed="' + String(selected === percent) + '">' + percent + '%</button>'
-    ).join('');
+    const selected = individualReserves.has(key) ? individualReserves.get(key) : null;
     return '<div class="eco-admin-only eco-device-admin"><strong>Керування</strong>' +
       '<div class="eco-admin-controls"><div class="eco-individual-limit">' +
-      '<span class="eco-individual-label">Ліміт заряджання</span>' +
-      '<div class="eco-limit-presets" role="group" aria-label="Ліміт заряджання ' + device.name + '">' +
-      controls + '</div></div>' +
-      '<button type="button" disabled>AC-вихід</button></div>' +
-      '</div>';
+      '<span class="eco-individual-label">Резерв заряду</span>' +
+      reserveOptions(device, key, selected) + '</div>' +
+      '<button type="button" disabled>AC-вихід</button></div></div>';
+  }
+
+  function powerOceanAdmin(device) {
+    const key = activeEcoLocation + ':' + device.id;
+    const dayLabel = powerOceanDraft.allDay ? '00:00–24:00' : powerOceanDraft.start + '–' + powerOceanDraft.end;
+    const timeSelect = (field, value, list) => '<select data-eco-ocean-time="' + field + '" aria-label="' +
+      (field === 'start' ? 'Початок заряджання' : 'Кінець заряджання') + '">' +
+      list.map(time => '<option value="' + time + '"' + (value === time ? ' selected' : '') + '>' +
+      time + '</option>').join('') + '</select>';
+    return '<section class="eco-admin-only eco-ocean-admin eco-device-admin"><div class="eco-ocean-admin-heading"><strong>Керування PowerOcean</strong>' +
+      '<span>Режим: Самозабезпечення</span></div>' +
+      '<div class="eco-ocean-controls">' +
+      '<div class="eco-ocean-setting"><span>Резерв заряду</span>' +
+      reserveOptions(device, key, powerOceanDraft.reserve, true) + '</div>' +
+      '<div class="eco-ocean-setting"><span>Потужність заряджання</span>' +
+      '<div class="eco-ocean-watts"><input type="range" data-eco-ocean-watts min="100" max="3000" step="100" value="' +
+      powerOceanDraft.chargeW + '" aria-label="Потужність заряджання PowerOcean"><output>' +
+      powerOceanDraft.chargeW + ' Вт</output></div><small>100–3000 Вт</small></div>' +
+      '<div class="eco-ocean-setting"><span>Час заряджання</span><label class="eco-ocean-allday">' +
+      '<input type="checkbox" data-eco-ocean-allday' + (powerOceanDraft.allDay ? ' checked' : '') +
+      '> Цілодобово</label><div class="eco-ocean-clock">' +
+      (powerOceanDraft.allDay ? '<strong>' + dayLabel + '</strong>' :
+        timeSelect('start', powerOceanDraft.start, timeSteps) +
+        '<span>до</span>' + timeSelect('end', powerOceanDraft.end, [...timeSteps.slice(1), '24:00'])) +
+      '</div></div></div>' +
+      '</section>';
   }
 
   function deviceView(d) {
     const size = capClass(d.capacityWh);
     const charge = level(d.pct);
     const capacity = niceWh(d.capacityWh);
-    const titleNote = d.type === 'system'
-      ? 'Інвертор ' + d.inverterKw + ' кВт · система ' + d.systemPowerKw +
-        ' кВт (із другою батареєю ' + d.twoBatterySystemKw + ' кВт)'
-      : 'Зарядна станція';
+    const titleNote = 'Зарядна станція';
     return '<article class="eco-device eco-standalone ' + size + ' charge-' + charge +
       '" aria-label="' + d.name + ', заряд ' + d.pct + '%">' +
       '<div class="eco-device-head"><div class="eco-device-ident">' +
@@ -143,6 +170,23 @@
       energyStats(d, d.capacityWh, d.pct) +
       adminControls(d) +
       '</article>';
+  }
+
+  function powerOceanView(d) {
+    const cap = niceWh(d.capacityWh);
+    return '<article class="eco-powerocean charge-' + level(d.pct) + '" aria-label="PowerOcean, домашня система, заряд ' + d.pct + '%">' +
+      '<div class="eco-ocean-top"><div><span class="eco-ocean-overline">Домашня енергосистема</span>' +
+      '<h3>PowerOcean</h3><span class="eco-ocean-cap">' + d.batteryCount + ' акумулятор · ' + cap +
+      '</span></div>' + operationBadge(d) + '</div>' +
+      '<div class="eco-ocean-body"><div class="eco-ocean-battery"><span class="eco-ocean-label">Акумулятор</span>' +
+      '<div class="eco-battery"><span class="eco-battery-percent">' + d.pct + '%</span></div>' +
+      chargeTrack(d.pct, d.name) + '<span>' + cap + '</span></div>' +
+      '<div class="eco-ocean-energy"><div><span>Мережа / заряд</span><strong>' + d.inputW + ' Вт</strong></div>' +
+      '<div class="eco-ocean-flow" aria-hidden="true">→</div><div><span>Будинок</span><strong>' +
+      d.outputW + ' Вт</strong></div></div></div>' +
+      '<div class="eco-ocean-autonomy"><span>Орієнтовна автономність</span><strong>' +
+      formatAutonomy(d.capacityWh, d.pct, d.outputW) + '</strong></div>' +
+      powerOceanAdmin(d) + '</article>';
   }
 
   function systemView(main, addon) {
@@ -177,7 +221,7 @@
     return devices.map(d => {
       if (d.type === 'battery' && d.parentId && ids.has(d.parentId)) return '';
       const addon = addons.get(d.id);
-      return addon ? systemView(d, addon) : deviceView(d);
+      return addon ? systemView(d, addon) : d.type === 'system' ? powerOceanView(d) : deviceView(d);
     }).join('');
   }
 
