@@ -1146,3 +1146,27 @@ main > nav.tabs > button[data-tab="tomorrow"]{justify-self:end;margin-right:0;ma
     transform:translateX(16px);
   }
 }
+
+
+/* Keep the name/charge caption compact even when no segment is selected. */
+.eco-capacity-tooltip,
+.eco-capacity-tooltip[data-active="false"]{
+  min-height:32px;
+  height:32px;
+  margin:4px 0 0;
+  padding:3px 7px;
+  font-size:12px;
+}
+@media(max-width:650px){
+  .eco-capacity-tooltip{min-height:34px;height:34px;font-size:11px}
+  main > header .location-shell h1{
+    display:flex;
+    gap:5px;
+    width:100%;
+    max-width:100%;
+    min-width:0;
+  }
+  main > header .location-shell .head-icon{flex:0 0 30px;width:30px;height:30px}
+  main > header .location-shell .location-button{flex:1 1 0;width:0;min-width:0;max-width:none;gap:4px;padding:4px 2px}
+  main > header .location-shell .location-button #locationLabel{flex:1 1 0;min-width:0}
+}
