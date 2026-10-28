@@ -6,27 +6,25 @@
   // capacityWh contains nominal manufacturer capacity, never inverter output.
   const inventory = Object.freeze({
     dacha: {
-      name: 'Дача', space: 'Дача',
-      devices: [
-        { name: 'DELTA Pro 3', capacityWh: 4096, pct: 84, inputW: 0, outputW: 620, type: 'station', id: 'dp3', operation: 'discharging' },
-        { name: 'Додаткова батарея DELTA Pro 3', capacityWh: 4096, pct: 82, type: 'battery', parent: 'DELTA Pro 3', parentId: 'dp3', id: 'dp3eb', operation: 'discharging' },
-        { name: 'DELTA 3 Plus', capacityWh: 1024, pct: 92, inputW: 120, outputW: 38, type: 'station', id: 'd3p', operation: 'charging' },
-        { name: 'DELTA 2', capacityWh: 1024, pct: 64, inputW: 0, outputW: 75, type: 'station', id: 'd2', operation: 'discharging' },
-        { name: 'RIVER 3 Plus Wireless', capacityWh: 286, pct: 29, inputW: 0, outputW: 12, type: 'station', id: 'r3pw', operation: 'discharging' }
-      ]
+      name: 'Дача', space: 'Немає',
+      devices: []
     },
     home: {
       name: 'Дім', space: 'Квартира',
       devices: [
-        // PowerOcean: 6 kW inverter, currently one 5 kWh battery; system delivers 3 kW now, 6 kW with two batteries.
-        { name: 'PowerOcean', capacityWh: 5000, inverterKw: 6, systemPowerKw: 3, twoBatterySystemKw: 6, batteryCount: 1, pct: 67, inputW: 300, outputW: 760, type: 'system', id: 'po', operation: 'discharging' }
+        // Two PowerOcean 5 kWh modules and a 6 kW inverter; power flow values are illustrative.
+        { name: 'PowerOcean', capacityWh: 10000, inverterKw: 6, systemPowerKw: 6, batteryCount: 2, pct: 67, inputW: 300, outputW: 760, type: 'system', id: 'po', operation: 'discharging' },
+        { name: 'DELTA 3 Plus', capacityWh: 1024, pct: 92, inputW: 120, outputW: 38, type: 'station', id: 'd3p', operation: 'charging' },
+        { name: 'RIVER 3 Plus Wireless', capacityWh: 286, pct: 29, inputW: 0, outputW: 12, type: 'station', id: 'r3pw', operation: 'discharging' }
       ]
     },
     solovky: {
       name: 'Соловки', space: 'Соловки',
       devices: [
+        { name: 'DELTA Pro 3', capacityWh: 4096, pct: 84, inputW: 0, outputW: 620, type: 'station', id: 'dp3', operation: 'discharging' },
         { name: 'DELTA 2', capacityWh: 1024, pct: 54, inputW: 0, outputW: 125, type: 'station', id: 'd2', operation: 'discharging' },
         { name: 'Додаткова батарея DELTA 2', capacityWh: 1024, pct: 49, type: 'battery', parent: 'DELTA 2', parentId: 'd2', id: 'd2eb', operation: 'discharging' },
+        { name: 'DELTA 2', capacityWh: 1024, pct: 64, inputW: 0, outputW: 75, type: 'station', id: 'd2second', operation: 'discharging' },
         { name: 'RIVER 2', capacityWh: 256, pct: 18, inputW: 0, outputW: 26, type: 'station', id: 'r2', operation: 'discharging' }
       ]
     },
@@ -37,6 +35,23 @@
       ]
     }
   });
+
+  // Physical battery inventory for overview metrics (PowerOcean has two 5-kWh modules).
+  function physicalDevices(devices) {
+    return devices.flatMap(device => {
+      if (device.type !== 'system' || device.batteryCount <= 1) return [device];
+      const perModule = device.capacityWh / device.batteryCount;
+      return Array.from({ length: device.batteryCount }, (_, i) => ({
+        ...device,
+        id: device.id + '-module-' + (i + 1),
+        name: device.name + ' · акумулятор ' + (i + 1),
+        type: 'battery',
+        capacityWh: perModule,
+        pct: Array.isArray(device.modulePercentages)
+          ? (device.modulePercentages[i] ?? device.pct) : device.pct
+      }));
+    });
+  }
 
   const root = document.getElementById('ecoflow');
   const toggle = document.getElementById('ecoAdminToggle');
@@ -178,7 +193,7 @@
     const cap = niceWh(d.capacityWh);
     return '<article class="eco-powerocean charge-' + level(d.pct) + '" aria-label="PowerOcean, домашня система, заряд ' + d.pct + '%">' +
       '<div class="eco-ocean-top"><div><span class="eco-ocean-overline">Домашня енергосистема</span>' +
-      '<h3>PowerOcean</h3><span class="eco-ocean-cap">' + d.batteryCount + ' акумулятор · ' + cap +
+      '<h3>PowerOcean</h3><span class="eco-ocean-cap">' + d.batteryCount + ' акумулятори · ' + cap + ' · інвертор ' + d.inverterKw + ' кВт' +
       '</span></div>' + operationBadge(d) + '</div>' +
       '<div class="eco-ocean-body"><div class="eco-ocean-battery"><span class="eco-ocean-label">Акумулятор</span>' +
       '<div class="eco-battery"><span class="eco-battery-percent">' + d.pct + '%</span></div>' +
@@ -394,7 +409,7 @@
   let metricPinned = null;
 
   function metricBreakdown(kind) {
-    const devices = inventory[activeEcoLocation].devices;
+    const devices = physicalDevices(inventory[activeEcoLocation].devices);
     const total = devices.reduce((sum, item) => sum + item.capacityWh, 0);
     const stored = devices.reduce((sum, item) => sum + item.capacityWh * item.pct / 100, 0);
     const weighted = total ? stored / total * 100 : 0;
@@ -502,10 +517,11 @@
   function updateLocation(id) {
     if (!Object.prototype.hasOwnProperty.call(inventory, id)) return;
     const place = inventory[id];
-    const totalWh = place.devices.reduce((v, d) => v + (d.capacityWh || 0), 0);
-    const allKnown = place.devices.every(d => d.capacityWh !== null);
+    const packs = physicalDevices(place.devices);
+    const totalWh = packs.reduce((v, d) => v + (d.capacityWh || 0), 0);
+    const allKnown = packs.every(d => d.capacityWh !== null);
     const weighted = allKnown && totalWh
-      ? Math.round(place.devices.reduce((v, d) => v + d.capacityWh * d.pct, 0) / totalWh)
+      ? Math.round(packs.reduce((v, d) => v + d.capacityWh * d.pct, 0) / totalWh)
       : null;
     if (adminDraft.scope === 'current' && activeEcoLocation !== id) {
       Object.keys(adminDraft.selected).forEach(group => adminDraft.selected[group].clear());
@@ -516,7 +532,7 @@
     root.dataset.location = id;
     $('eco-selected-location').textContent = place.name;
     $('eco-space-name').textContent = place.space;
-    $('eco-count').textContent = String(place.devices.length);
+    $('eco-count').textContent = String(packs.length);
     $('eco-capacity').textContent = allKnown ? niceWh(totalWh) : 'Уточнюється';
     $('eco-demo-total').textContent = weighted === null ? '—' : weighted + '%';
     $('eco-demo-total').dataset.level = weighted === null ? 'unknown' : level(weighted);
@@ -540,7 +556,7 @@
         ).join('')
       : '<span class="eco-cap-unknown">Ємність цієї батареї ще не уточнена</span>';
     hideCapacityTooltip();
-    $('eco-devices').innerHTML = renderDeviceGrid(place.devices);
+    $('eco-devices').innerHTML = place.devices.length ? renderDeviceGrid(place.devices) : '<div class="eco-empty-state"><strong>У цій локації немає EcoFlow</strong><span>Резервне живлення дачі забезпечує генератор. Його характеристики є в сусідній вкладці.</span></div>';
     renderBulkPanel();
   }
 
