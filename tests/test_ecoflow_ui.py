@@ -477,7 +477,8 @@ class EcoFlowPreviewContract(unittest.TestCase):
         self.assertIn('role="progressbar" aria-label="Середній заряд локації"', HTML)
         self.assertLess(HTML.index('id="eco-location-summary"'), HTML.index('id="eco-overview-heading"'))
         self.assertIn('.eco-location-summary[hidden],.eco-overview-details[hidden]', CSS)
-        self.assertIn("if (!empty) displayMetric('capacity');", JS)
+        self.assertNotIn("if (!empty) displayMetric('capacity');", JS)
+        self.assertIn("    clearMetric();", JS)
         self.assertNotIn("eco-overview-details').open", JS)
         self.assertNotIn('.eco-overview-details[open]', CSS)
 
@@ -509,7 +510,10 @@ class EcoFlowPreviewContract(unittest.TestCase):
 
     def test_metric_explanations_change_only_on_explicit_click(self):
         self.assertIn("detailArea.addEventListener('click', event => {", JS)
-        self.assertIn("if (trigger) displayMetric(trigger.dataset.ecoMetric);", JS)
+        self.assertIn("if (!trigger) return;", JS)
+        self.assertIn("if (metricOpen === kind && !detailPanel.hidden) clearMetric();", JS)
+        self.assertIn("else displayMetric(kind);", JS)
+        self.assertIn('id="eco-metric-detail" aria-live="polite" hidden', HTML)
         self.assertNotIn("detailArea.addEventListener('pointerover'", JS)
         self.assertNotIn("detailArea.addEventListener('pointerleave'", JS)
         self.assertNotIn("metricPinned", JS)
@@ -572,7 +576,8 @@ class EcoFlowPreviewContract(unittest.TestCase):
         self.assertIn('id="eco-overview-details"', HTML)
         self.assertIn("$('eco-location-summary').hidden = empty", JS)
         self.assertIn("$('eco-overview-details').hidden = empty", JS)
-        self.assertIn("if (!empty) displayMetric('capacity');", JS)
+        self.assertNotIn("if (!empty) displayMetric('capacity');", JS)
+        self.assertIn("    clearMetric();", JS)
         self.assertNotIn("eco-overview-details').open", JS)
         self.assertIn("У цій локації немає EcoFlow", JS)
         self.assertIn(".eco-empty-state", CSS)
@@ -659,6 +664,18 @@ class EcoFlowPreviewContract(unittest.TestCase):
         self.assertIn("progress.setAttribute('aria-valuenow'", JS)
         self.assertIn("Очікується підключення EcoFlow", JS)
         self.assertNotIn('Демо', HTML)
+
+
+    def test_solar_footnote_removed_and_overview_details_closed_initially(self):
+        self.assertNotIn('eco-solar-footnote', HTML)
+        self.assertNotIn('не прогноз виробітку', HTML)
+        self.assertIn('id="eco-metric-detail" aria-live="polite" hidden', HTML)
+        self.assertNotIn("if (!empty) displayMetric('capacity');", JS)
+        self.assertIn("metricOpen = null;", JS)
+        self.assertIn("if (metricOpen === kind && !detailPanel.hidden) clearMetric();", JS)
+        self.assertNotIn("detailArea.addEventListener('pointerover'", JS)
+        self.assertNotIn("detailArea.addEventListener('focusin'", JS)
+
 
 
 if __name__ == "__main__":
