@@ -501,7 +501,10 @@
   if (detailArea && detailPanel) {
     detailArea.addEventListener('click', event => {
       const trigger = event.target.closest('button[data-eco-metric]');
-      if (trigger) displayMetric(trigger.dataset.ecoMetric);
+      if (!trigger) return;
+      const kind = trigger.dataset.ecoMetric;
+      if (metricOpen === kind && !detailPanel.hidden) clearMetric();
+      else displayMetric(kind);
     });
   }
 
@@ -597,7 +600,6 @@
     }
     $('eco-devices').innerHTML = place.devices.length ? renderDeviceGrid(place.devices) : '<div class="eco-empty-state"><strong>У цій локації немає EcoFlow</strong><span>Резервне живлення дачі забезпечує генератор. Його характеристики є в сусідній вкладці.</span></div>';
     renderSolar(place);
-    if (!empty) displayMetric('capacity');
     renderBulkPanel();
   }
 
