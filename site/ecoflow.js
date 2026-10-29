@@ -2,7 +2,7 @@
 (function () {
   'use strict';
 
-  // Placeholder percentages and watt values until real telemetry is connected.
+  // Initial numeric UI values are static until EcoFlow telemetry is connected; never claim they are live.
   // capacityWh contains nominal manufacturer capacity, never inverter output.
   const inventory = Object.freeze({
     dacha: {
@@ -10,7 +10,7 @@
       devices: [
         // The DELTA Pro 3 is standalone; solar input capability is separate from battery capacity.
         { name: 'DELTA Pro 3', capacityWh: 4096, pct: 84, inputW: 0, outputW: 620, type: 'station', id: 'dp3', operation: 'discharging',
-          solar: { maxW: 2600, highMaxW: 1600, lowMaxW: 1000, currentW: null, highW: null, lowW: null, todayWh: null } },
+          solar: { maxW: 2600, highMaxW: 1600, lowMaxW: 1000, currentW: 1240, highW: 820, lowW: 420, todayWh: 4800, connected: false } },
         { name: 'DELTA 3 Plus', capacityWh: 1024, pct: 92, inputW: 120, outputW: 38, type: 'station', id: 'd3p', operation: 'charging' },
         { name: 'DELTA 2', capacityWh: 1024, pct: 64, inputW: 0, outputW: 75, type: 'station', id: 'd2', operation: 'discharging' },
         { name: 'RIVER 3 Plus Wireless', capacityWh: 286, pct: 29, inputW: 0, outputW: 12, type: 'station', id: 'r3pw', operation: 'discharging' }
@@ -547,8 +547,8 @@
       progress.setAttribute('aria-valuenow', String(solarPower));
       progress.setAttribute('aria-valuetext', formatPower(solarPower));
     }
-    $('eco-solar-availability').textContent = solarPower === null
-      ? 'Очікується підключення EcoFlow' : 'Сонячний вхід DELTA Pro 3';
+    $('eco-solar-availability').textContent = pv.connected === true
+      ? 'Сонячний вхід DELTA Pro 3' : 'Очікується підключення EcoFlow';
     updateChannel('high', pv.highW, pv.highMaxW);
     updateChannel('low', pv.lowW, pv.lowMaxW);
   }
