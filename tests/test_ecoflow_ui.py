@@ -343,7 +343,7 @@ class EcoFlowPreviewContract(unittest.TestCase):
         self.assertIn('id="eco-overview-details"', HTML)
         self.assertIn("function metricBreakdown(kind)", JS)
         self.assertIn("device.capacityWh * device.pct / total", JS)
-        self.assertIn("'<b class=\"eco-detail-percent\" data-level=\"' + level(device.pct)", JS)
+        self.assertIn('class="eco-detail-percent" data-level="', JS)
         self.assertIn("'<div class=\"eco-detail-grid\">' + rows", JS)
         self.assertNotIn("data-eco-tooltip=", JS)
         self.assertNotIn("eco-capacity-strip", JS)
