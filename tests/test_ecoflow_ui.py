@@ -607,8 +607,10 @@ class EcoFlowPreviewContract(unittest.TestCase):
         self.assertIn(".eco-solar[hidden]{display:none!important}", CSS)
         self.assertIn(".eco-solar-overview{", CSS)
         self.assertIn(".eco-solar-channels{", CSS)
+        self.assertIn("watt >= 1000 ? uk.format(watt / 1000)", JS)
+        self.assertIn(".eco-device.size-large{grid-column:span 24}", CSS)
         self.assertIn("role=\"progressbar\"", HTML)
-        self.assertNotRegex(JS, r"\\bfetch\\s*\\(|XMLHttpRequest|WebSocket")
+        self.assertNotRegex(JS, r"\bfetch\s*\(|XMLHttpRequest|WebSocket")
 
 
 
