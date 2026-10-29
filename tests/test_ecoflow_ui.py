@@ -140,7 +140,9 @@ class EcoFlowPreviewContract(unittest.TestCase):
         self.assertNotIn("parentId:", dacha)
         self.assertIn("space: 'Дача'", dacha)
         self.assertIn("solar: { maxW: 2600, highMaxW: 1600, lowMaxW: 1000", dacha)
-        self.assertIn("currentW: null, highW: null, lowW: null, todayWh: null", dacha)
+        self.assertIn("currentW: 1240, highW: 820, lowW: 420, todayWh: 4800, connected: false", dacha)
+        self.assertIn("pv.connected === true", JS)
+        self.assertIn("Очікується підключення EcoFlow", JS)
         self.assertIn("name: 'PowerOcean'", home)
         self.assertNotIn("name: 'DELTA 3 Plus'", home)
         self.assertNotIn("name: 'RIVER 3 Plus Wireless'", home)
@@ -608,7 +610,12 @@ class EcoFlowPreviewContract(unittest.TestCase):
         self.assertIn('<template id="eco-solar-template">', HTML)
         self.assertIn('<details class="eco-solar-disclosure">', JS)
         self.assertIn("Сонячна генерація", JS)
-        self.assertIn("До ' + niceWh(device.solar.maxW)", JS)
+        self.assertIn("solarPowerLabel(device.solar.currentW)", JS)
+        self.assertIn("solarPowerLabel(device.solar.maxW)", JS)
+        self.assertIn("1,24 кВт", HTML)
+        self.assertIn("820 Вт / 1,6 кВт", HTML)
+        self.assertIn("420 Вт / 1 кВт", HTML)
+        self.assertIn("4,8 кВт", HTML)
         self.assertNotIn("section.hidden = !station", JS)
         self.assertIn("renderSolar(place);", JS)
         self.assertIn("Очікується підключення EcoFlow", JS)
@@ -640,6 +647,18 @@ class EcoFlowPreviewContract(unittest.TestCase):
         self.assertLess(loc.index("renderDeviceGrid(place.devices)"), loc.index("renderSolar(place);"))
         self.assertIn("if (!device.solar) return '';", JS)
         self.assertIn("source.innerHTML", JS)
+
+
+    def test_solar_values_are_visible_before_cloud_connection(self):
+        self.assertIn("currentW: 1240", JS)
+        self.assertIn("highW: 820, lowW: 420", JS)
+        self.assertIn("todayWh: 4800", JS)
+        self.assertIn("connected: false", JS)
+        self.assertIn("solarPowerLabel(device.solar.currentW)", JS)
+        self.assertIn("solarPowerLabel(device.solar.maxW)", JS)
+        self.assertIn("progress.setAttribute('aria-valuenow'", JS)
+        self.assertIn("Очікується підключення EcoFlow", JS)
+        self.assertNotIn('Демо', HTML)
 
 
 if __name__ == "__main__":
