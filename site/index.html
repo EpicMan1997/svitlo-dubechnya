@@ -486,6 +486,30 @@ h1{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
     <div class="eco-bulk-title"><strong>Спільне керування</strong></div>
     <div id="eco-bulk-content"></div>
   </section>
+  <section class="eco-solar" id="eco-solar" aria-label="Сонячна генерація DELTA Pro 3" hidden>
+    <div class="eco-solar-heading">
+      <div class="eco-solar-ident">
+        <span class="eco-solar-icon" aria-hidden="true">☀</span>
+        <div><span class="eco-solar-kicker">Сонячна генерація</span><h3>Панелі <span aria-hidden="true">→</span> DELTA Pro 3</h3></div>
+      </div>
+      <span class="eco-solar-ceiling">Максимум <strong id="eco-solar-max">2,6 кВт</strong></span>
+    </div>
+    <div class="eco-solar-overview">
+      <div class="eco-solar-now">
+        <span>Поточна генерація</span>
+        <strong id="eco-solar-current">—</strong>
+        <div class="eco-solar-track" id="eco-solar-track" role="progressbar" aria-label="Поточна сонячна потужність" aria-valuemin="0" aria-valuemax="2600" aria-valuetext="Дані недоступні"><i id="eco-solar-fill"></i></div>
+        <small id="eco-solar-availability">Очікується підключення EcoFlow</small>
+      </div>
+      <div class="eco-solar-today"><span>За сьогодні</span><strong id="eco-solar-today">—</strong><small>Вироблена енергія</small></div>
+      <div class="eco-solar-destination"><span>Надходить до</span><strong>DELTA Pro 3</strong><small>Сонячний вхід станції</small></div>
+    </div>
+    <div class="eco-solar-channels">
+      <div class="eco-solar-channel"><div><strong>HV · високовольтний</strong><span id="eco-solar-high">— / 1,6 кВт</span></div><div class="eco-solar-channel-track"><i id="eco-solar-high-fill"></i></div><small>30–150 В · до 1 600 Вт</small></div>
+      <div class="eco-solar-channel"><div><strong>LV · низьковольтний</strong><span id="eco-solar-low">— / 1 кВт</span></div><div class="eco-solar-channel-track"><i id="eco-solar-low-fill"></i></div><small>11–60 В · до 1 000 Вт</small></div>
+    </div>
+    <p class="eco-solar-footnote">2,6 кВт — максимальна потужність сонячного входу станції, не прогноз виробітку.</p>
+  </section>
   <div class="eco-section-heading"><h3>Станції та акумулятори</h3></div>
   <div class="eco-devices" id="eco-devices" aria-live="polite"></div>
   <div class="eco-location-summary" id="eco-location-summary" aria-label="Загальний заряд батарей у локації">
