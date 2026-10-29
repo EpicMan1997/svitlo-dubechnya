@@ -131,25 +131,27 @@ class EcoFlowPreviewContract(unittest.TestCase):
 
 
 
-    def test_new_device_allocation_and_no_dacha_ecoflow(self):
+    def test_device_reallocation_to_dacha_and_solar(self):
         dacha = JS.split("dacha: {", 1)[1].split("home: {", 1)[0]
         home = JS.split("home: {", 1)[1].split("solovky: {", 1)[0]
         solovky = JS.split("solovky: {", 1)[1].split("naumenky: {", 1)[0]
-        self.assertIn("devices: []", dacha)
-        self.assertIn("capacityWh: 10000", home)
-        self.assertIn("batteryCount: 2", home)
-        self.assertIn("inverterKw: 6", home)
-        self.assertIn("name: 'DELTA 3 Plus'", home)
-        self.assertIn("name: 'RIVER 3 Plus Wireless'", home)
-        self.assertIn("name: 'DELTA Pro 3'", solovky)
-        self.assertNotIn("Додаткова батарея DELTA Pro 3", JS)
+        for name in ("DELTA Pro 3", "DELTA 3 Plus", "DELTA 2", "RIVER 3 Plus Wireless"):
+            self.assertIn("name: '" + name + "'", dacha)
+        self.assertNotIn("parentId:", dacha)
+        self.assertIn("space: 'Дача'", dacha)
+        self.assertIn("solar: { maxW: 2600, highMaxW: 1600, lowMaxW: 1000", dacha)
+        self.assertIn("currentW: null, highW: null, lowW: null, todayWh: null", dacha)
+        self.assertIn("name: 'PowerOcean'", home)
+        self.assertNotIn("name: 'DELTA 3 Plus'", home)
+        self.assertNotIn("name: 'RIVER 3 Plus Wireless'", home)
+        self.assertNotIn("DELTA Pro 3", solovky)
+        self.assertIn("name: 'DELTA 2'", solovky)
         self.assertIn("name: 'Додаткова батарея DELTA 2'", solovky)
-        self.assertIn("id: 'd2second'", solovky)
-        self.assertIn("d2second: { quiet: 200, balanced: 500, fast: 1200 }", JS)
-        self.assertEqual(solovky.count("capacityWh: 1024"), 3)
+        self.assertIn("name: 'RIVER 2'", solovky)
+        self.assertNotIn("d2second", JS)
+        self.assertEqual(solovky.count("capacityWh: 1024"), 2)
+        self.assertIn("selectBackupTab('ecoflow')", JS)
         self.assertIn("function physicalDevices(devices)", JS)
-        self.assertIn("batteryCount", JS)
-        self.assertIn("selectBackupTab(id === 'dacha' ? 'generator' : 'ecoflow')", JS)
 
     def test_full_width_chart_with_inline_change_history(self):
         self.assertIn('class="card schedule-card"', HTML)
@@ -585,6 +587,29 @@ class EcoFlowPreviewContract(unittest.TestCase):
         self.assertIn("maximumFractionDigits: 2", JS)
         self.assertIn("device.capacityWh * device.pct / 100", JS)
         self.assertIn("const weighted = total ? stored / total * 100", JS)
+
+    def test_solar_generation_is_read_only_and_dacha_only(self):
+        self.assertIn('id="eco-solar"', HTML)
+        self.assertIn('aria-label="Сонячна генерація DELTA Pro 3"', HTML)
+        self.assertIn("Панелі ", HTML)
+        self.assertIn('id="eco-solar-current"', HTML)
+        self.assertIn('id="eco-solar-today"', HTML)
+        self.assertIn('id="eco-solar-high"', HTML)
+        self.assertIn('id="eco-solar-low"', HTML)
+        self.assertIn('id="eco-solar-track"', HTML)
+        self.assertIn("maxW: 2600", JS)
+        self.assertIn("highMaxW: 1600", JS)
+        self.assertIn("lowMaxW: 1000", JS)
+        self.assertIn("function renderSolar(place)", JS)
+        self.assertIn("section.hidden = !station", JS)
+        self.assertIn("renderSolar(place);", JS)
+        self.assertIn("Очікується підключення EcoFlow", JS)
+        self.assertIn(".eco-solar[hidden]{display:none!important}", CSS)
+        self.assertIn(".eco-solar-overview{", CSS)
+        self.assertIn(".eco-solar-channels{", CSS)
+        self.assertIn("role=\"progressbar\"", HTML)
+        self.assertNotRegex(JS, r"\\bfetch\\s*\\(|XMLHttpRequest|WebSocket")
+
 
 
 if __name__ == "__main__":
