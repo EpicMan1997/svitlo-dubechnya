@@ -601,17 +601,45 @@ class EcoFlowPreviewContract(unittest.TestCase):
         self.assertIn("highMaxW: 1600", JS)
         self.assertIn("lowMaxW: 1000", JS)
         self.assertIn("function renderSolar(place)", JS)
-        self.assertIn("section.hidden = !station", JS)
+        self.assertIn("if (!section || !station) return;", JS)
+        self.assertIn("function solarDisclosure(device)", JS)
+        self.assertIn("solarDisclosure(d)", JS)
+        self.assertIn("source.innerHTML + '</details>'", JS)
+        self.assertIn('<template id="eco-solar-template">', HTML)
+        self.assertIn('<details class="eco-solar-disclosure">', JS)
+        self.assertIn("Сонячна генерація", JS)
+        self.assertIn("До ' + niceWh(device.solar.maxW)", JS)
+        self.assertNotIn("section.hidden = !station", JS)
         self.assertIn("renderSolar(place);", JS)
         self.assertIn("Очікується підключення EcoFlow", JS)
         self.assertIn(".eco-solar[hidden]{display:none!important}", CSS)
         self.assertIn(".eco-solar-overview{", CSS)
         self.assertIn(".eco-solar-channels{", CSS)
+        self.assertIn(".eco-solar-disclosure > summary{", CSS)
+        self.assertIn(".eco-solar-disclosure[open]>summary", CSS)
+        self.assertIn(".eco-solar-disclosure .eco-solar{", CSS)
+        self.assertIn(".eco-solar-disclosure .eco-solar-overview", CSS)
         self.assertIn("watt >= 1000 ? uk.format(watt / 1000)", JS)
         self.assertIn(".eco-device.size-large{grid-column:span 24}", CSS)
         self.assertIn("role=\"progressbar\"", HTML)
         self.assertNotRegex(JS, r"\bfetch\s*\(|XMLHttpRequest|WebSocket")
 
+
+
+    def test_solar_is_nested_in_station_and_no_longer_an_external_panel(self):
+        template_open = HTML.index('<template id="eco-solar-template">')
+        template_close = HTML.index('</template>', template_open)
+        self.assertTrue(template_open < HTML.index('class="eco-devices" id="eco-devices"'))
+        self.assertTrue(template_open < HTML.index('id="eco-solar"') < template_close)
+        self.assertNotIn(' hidden>', HTML[template_open:template_close])
+        device_fn = JS.split("function deviceView(d) {", 1)[1].split("function powerOceanView(d)", 1)[0]
+        self.assertIn("solarDisclosure(d)", device_fn)
+        self.assertIn("adminControls(d)", device_fn)
+        self.assertLess(device_fn.index("solarDisclosure(d)"), device_fn.index("adminControls(d)"))
+        loc = JS.split("function updateLocation(id) {", 1)[1].split("// Read-only draft controls", 1)[0]
+        self.assertLess(loc.index("renderDeviceGrid(place.devices)"), loc.index("renderSolar(place);"))
+        self.assertIn("if (!device.solar) return '';", JS)
+        self.assertIn("source.innerHTML", JS)
 
 
 if __name__ == "__main__":
