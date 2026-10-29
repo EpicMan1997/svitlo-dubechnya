@@ -1747,3 +1747,87 @@ main > header .clock-view #clock{grid-column:auto;grid-row:auto;justify-self:aut
 @media(prefers-reduced-motion:reduce){
   .eco-metrics .eco-metric-arrow{transition:none}
 }
+
+
+/* Capacity share vs. charge contribution: separate visual languages in the 3 metric disclosures. */
+.eco-detail-distribution,.eco-detail-contribution-bar{
+  display:flex;
+  gap:2px;
+  width:100%;
+  height:15px;
+  overflow:hidden;
+  margin:2px 0 12px;
+  border-radius:7px;
+  background:#34495f;
+}
+.eco-detail-distribution i,.eco-detail-contribution-bar i{
+  display:block;
+  min-width:0;
+  height:100%;
+  flex:0 0 auto;
+}
+.eco-detail-distribution i:nth-child(4n+1){background:#38bdf8}
+.eco-detail-distribution i:nth-child(4n+2){background:#2dd4bf}
+.eco-detail-distribution i:nth-child(4n+3){background:#a78bfa}
+.eco-detail-distribution i:nth-child(4n+4){background:#fbbf24}
+.eco-detail-contribution-bar i[data-level="high"]{background:#22c55e}
+.eco-detail-contribution-bar i[data-level="good"]{background:#84cc16}
+.eco-detail-contribution-bar i[data-level="medium"]{background:#eab308}
+.eco-detail-contribution-bar i[data-level="low"]{background:#f97316}
+.eco-detail-contribution-bar i[data-level="critical"]{background:#ef4444}
+.eco-detail-capacity small,.eco-detail-charge small{
+  grid-column:1/-1;
+  font-size:11px;
+  color:#a9c3dd;
+  line-height:1.35;
+}
+.eco-detail-capacity .eco-detail-track i{background:#38bdf8}
+.eco-detail-device.eco-detail-capacity strong{
+  color:#7dd3fc;
+  font-size:13px;
+  text-align:right;
+}
+.eco-detail-device.eco-detail-charge .eco-detail-contribution{
+  color:#a7f3d0;
+  font-size:16px;
+  text-align:right;
+  font-variant-numeric:tabular-nums;
+}
+.eco-detail-charge .eco-detail-track i[data-level="high"]{background:#22c55e}
+.eco-detail-charge .eco-detail-track i[data-level="good"]{background:#84cc16}
+.eco-detail-charge .eco-detail-track i[data-level="medium"]{background:#eab308}
+.eco-detail-charge .eco-detail-track i[data-level="low"]{background:#f97316}
+.eco-detail-charge .eco-detail-track i[data-level="critical"]{background:#ef4444}
+.eco-detail-inventory{
+  display:flex;
+  flex-direction:column;
+  align-items:stretch;
+  justify-content:space-between;
+  gap:11px;
+  min-width:0;
+}
+.eco-detail-item-heading{display:flex;align-items:center;gap:10px;min-width:0}
+.eco-detail-inventory-stats{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:6px 12px;
+  padding-top:9px;
+  border-top:1px solid #3c5571;
+  color:#aac4de;
+  font-size:11px;
+  line-height:1.4;
+}
+.eco-detail-inventory-stats>span{white-space:normal}
+.eco-detail-inventory-stats b{color:#e2efff;font-variant-numeric:tabular-nums}
+.eco-detail-inventory-stats .eco-detail-percent[data-level="high"]{color:#4ade80}
+.eco-detail-inventory-stats .eco-detail-percent[data-level="good"]{color:#a3e635}
+.eco-detail-inventory-stats .eco-detail-percent[data-level="medium"]{color:#facc15}
+.eco-detail-inventory-stats .eco-detail-percent[data-level="low"]{color:#fb923c}
+.eco-detail-inventory-stats .eco-detail-percent[data-level="critical"]{color:#f87171}
+.eco-detail-heading span{max-width:62%;line-height:1.5;text-align:right}
+@media(max-width:650px){
+  .eco-detail-heading span{max-width:100%;text-align:left}
+  .eco-detail-device.eco-detail-charge .eco-detail-contribution{font-size:15px}
+  .eco-detail-distribution,.eco-detail-contribution-bar{height:12px}
+}
