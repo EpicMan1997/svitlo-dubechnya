@@ -486,7 +486,8 @@ h1{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
     <div class="eco-bulk-title"><strong>Спільне керування</strong></div>
     <div id="eco-bulk-content"></div>
   </section>
-  <section class="eco-solar" id="eco-solar" aria-label="Сонячна генерація DELTA Pro 3" hidden>
+  <template id="eco-solar-template">
+  <section class="eco-solar" id="eco-solar" aria-label="Сонячна генерація DELTA Pro 3">
     <div class="eco-solar-heading">
       <div class="eco-solar-ident">
         <span class="eco-solar-icon" aria-hidden="true">☀</span>
@@ -510,6 +511,7 @@ h1{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
     </div>
     <p class="eco-solar-footnote">2,6 кВт — максимальна потужність сонячного входу станції, не прогноз виробітку.</p>
   </section>
+  </template>
   <div class="eco-section-heading"><h3>Станції та акумулятори</h3></div>
   <div class="eco-devices" id="eco-devices" aria-live="polite"></div>
   <div class="eco-location-summary" id="eco-location-summary" aria-label="Загальний заряд батарей у локації">
