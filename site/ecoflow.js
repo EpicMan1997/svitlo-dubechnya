@@ -173,13 +173,17 @@
       '</section>';
   }
 
+  const solarPowerLabel = watt => Number.isFinite(watt)
+    ? (watt >= 1000 ? uk.format(watt / 1000) + ' кВт' : uk.format(watt) + ' Вт') : '—';
+
   function solarDisclosure(device) {
     if (!device.solar) return '';
     const source = $('eco-solar-template');
     if (!source) return '';
     return '<details class="eco-solar-disclosure">' +
       '<summary><span class="eco-solar-summary-label"><span class="eco-solar-summary-sun" aria-hidden="true">☀</span>' +
-      'Сонячна генерація</span><span class="eco-solar-summary-end">До ' + niceWh(device.solar.maxW) +
+      'Сонячна генерація</span><span class="eco-solar-summary-end">' + solarPowerLabel(device.solar.currentW) +
+      ' / ' + solarPowerLabel(device.solar.maxW) +
       '<span class="eco-solar-chevron" aria-hidden="true"></span></span></summary>' +
       source.innerHTML + '</details>';
   }
@@ -526,8 +530,7 @@
     const pv = station.solar;
     const solarPower = Number.isFinite(pv.currentW) ? pv.currentW
       : Number.isFinite(pv.highW) && Number.isFinite(pv.lowW) ? pv.highW + pv.lowW : null;
-    const formatPower = watt => Number.isFinite(watt)
-      ? (watt >= 1000 ? uk.format(watt / 1000) + ' кВт' : uk.format(watt) + ' Вт') : '—';
+    const formatPower = solarPowerLabel;
     const percentOf = (current, max) =>
       Number.isFinite(current) ? Math.max(0, Math.min(100, current / max * 100)) + '%' : '0%';
     const updateChannel = (kind, power, maximum) => {
