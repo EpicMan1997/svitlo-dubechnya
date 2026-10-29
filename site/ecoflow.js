@@ -516,7 +516,8 @@
     const pv = station.solar;
     const solarPower = Number.isFinite(pv.currentW) ? pv.currentW
       : Number.isFinite(pv.highW) && Number.isFinite(pv.lowW) ? pv.highW + pv.lowW : null;
-    const formatPower = watt => Number.isFinite(watt) ? niceWh(watt) : '—';
+    const formatPower = watt => Number.isFinite(watt)
+      ? (watt >= 1000 ? uk.format(watt / 1000) + ' кВт' : uk.format(watt) + ' Вт') : '—';
     const percentOf = (current, max) =>
       Number.isFinite(current) ? Math.max(0, Math.min(100, current / max * 100)) + '%' : '0%';
     const updateChannel = (kind, power, maximum) => {
