@@ -6,7 +6,7 @@
 
 ## Публікація
 
-Settings → Pages → Source → **GitHub Actions**. Потім Actions → **Update schedules and publish website** → **Run workflow**. Адреса: https://EpicMan1997.github.io/svitlo-dubechnya/
+Settings → Pages → Source → **GitHub Actions**. Потім Actions → **Наше Світло | оновлення графіків і публікація** → **Run workflow**. Адреса: https://EpicMan1997.github.io/svitlo-dubechnya/
 
 ## Тести
 
