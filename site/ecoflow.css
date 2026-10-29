@@ -1550,7 +1550,6 @@ main > nav.tabs > button[data-tab="tomorrow"]{justify-self:end;margin-right:0;ma
   .eco-location-summary-value{font-size:25px}
   .eco-overview-content{padding:13px 10px 13px}
 }
-}
  
 /* Header view switch: a single dropdown directly below the Kyiv clock. */
 main > header .clock-view{grid-column:2;grid-row:1;justify-self:center;align-self:center;min-width:0;
@@ -1579,3 +1578,32 @@ main > header .clock-view #clock{grid-column:auto;grid-row:auto;justify-self:aut
  main > header .clock-view #clock{grid-column:auto;grid-row:auto;min-height:39px;font-size:27px}
  main > header .clock-view #viewMenuToggle{min-height:35px}
 }
+
+
+/* Solar generation is tied to DELTA Pro 3; the numbers here are PV input limits, not live telemetry. */
+.eco-solar[hidden]{display:none!important}
+.eco-solar{margin:15px 0 17px;padding:18px;min-width:0;border-radius:15px;border:1px solid #667556;background:linear-gradient(110deg,#263b3d,#1b3040 55%,#1b2d42);color:#f1f6fd}
+.eco-solar-heading{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px;margin-bottom:16px}
+.eco-solar-ident{display:flex;align-items:center;gap:12px;min-width:0}
+.eco-solar-icon{flex:0 0 42px;display:grid;place-items:center;width:42px;height:42px;font-size:23px;border-radius:12px;background:#634e26;color:#ffe077}
+.eco-solar-kicker{display:block;margin-bottom:5px;color:#f7d975;font-size:11px;font-weight:820;letter-spacing:.045em;text-transform:uppercase}
+.eco-solar-heading h3{margin:0;font-size:18px;line-height:1.35;color:#fff}
+.eco-solar-ceiling{font-size:11px;font-weight:710;color:#bbd0e1;white-space:nowrap}
+.eco-solar-ceiling strong{display:block;margin-top:3px;color:#ffdd71;font-size:22px;line-height:1.1;font-weight:850;font-variant-numeric:tabular-nums}
+.eco-solar-overview{display:grid;grid-template-columns:minmax(0,1.6fr) repeat(2,minmax(0,1fr));gap:10px}
+.eco-solar-now,.eco-solar-today,.eco-solar-destination{display:flex;flex-direction:column;justify-content:space-between;gap:8px;min-width:0;min-height:125px;padding:13px 14px;border:1px solid #496478;border-radius:11px;background:#1a3042}
+.eco-solar-overview span,.eco-solar-overview small{font-size:11px;color:#a8c4da;line-height:1.4}
+.eco-solar-overview strong{font-size:26px;line-height:1.15;font-variant-numeric:tabular-nums;font-weight:850;color:#fff08c}
+.eco-solar-today strong{color:#f6f9fc}
+.eco-solar-destination strong{font-size:19px;color:#9ae6cc}
+.eco-solar-track,.eco-solar-channel-track{height:8px;overflow:hidden;border-radius:99px;background:#3a5267}
+.eco-solar-track i,.eco-solar-channel-track i{display:block;width:0;height:100%;border-radius:inherit;background:linear-gradient(90deg,#eab308,#fef08a);transition:width .2s ease}
+.eco-solar-channels{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:10px}
+.eco-solar-channel{min-width:0;padding:13px 14px;border-radius:11px;border:1px solid #425e70;background:#172d40}
+.eco-solar-channel>div:first-child{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:7px;margin-bottom:11px}
+.eco-solar-channel strong{font-size:12px;color:#e9f2fc}
+.eco-solar-channel span{font-size:12px;color:#f7d66b;font-weight:790;font-variant-numeric:tabular-nums}
+.eco-solar-channel small{display:block;margin-top:9px;font-size:10px;color:#a0b9ce}
+.eco-solar-footnote{margin:12px 0 0;font-size:11px;line-height:1.5;color:#a5bad2}
+@media(max-width:760px){.eco-solar{padding:14px}.eco-solar-overview{grid-template-columns:repeat(2,minmax(0,1fr))}.eco-solar-now{grid-column:1/-1;min-height:110px}.eco-solar-heading h3{font-size:16px}}
+@media(max-width:430px){.eco-solar{padding:12px}.eco-solar-overview{grid-template-columns:minmax(0,1fr)}.eco-solar-now{grid-column:auto}.eco-solar-now,.eco-solar-today,.eco-solar-destination{min-height:88px}.eco-solar-channels{grid-template-columns:minmax(0,1fr)}.eco-solar-heading h3{font-size:15px}.eco-solar-ceiling strong{font-size:18px}}
