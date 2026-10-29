@@ -478,6 +478,7 @@
     if (!detailArea || !detailPanel || !['capacity', 'charge', 'count'].includes(kind)) return;
     if (metricOpen !== kind) {
       detailPanel.innerHTML = metricBreakdown(kind);
+      detailPanel.scrollTop = 0;
       metricOpen = kind;
     }
     detailPanel.hidden = false;
