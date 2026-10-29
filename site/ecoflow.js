@@ -6,25 +6,27 @@
   // capacityWh contains nominal manufacturer capacity, never inverter output.
   const inventory = Object.freeze({
     dacha: {
-      name: 'Дача', space: 'Немає',
-      devices: []
+      name: 'Дача', space: 'Дача',
+      devices: [
+        // The DELTA Pro 3 is standalone; solar input capability is separate from battery capacity.
+        { name: 'DELTA Pro 3', capacityWh: 4096, pct: 84, inputW: 0, outputW: 620, type: 'station', id: 'dp3', operation: 'discharging',
+          solar: { maxW: 2600, highMaxW: 1600, lowMaxW: 1000, currentW: null, highW: null, lowW: null, todayWh: null } },
+        { name: 'DELTA 3 Plus', capacityWh: 1024, pct: 92, inputW: 120, outputW: 38, type: 'station', id: 'd3p', operation: 'charging' },
+        { name: 'DELTA 2', capacityWh: 1024, pct: 64, inputW: 0, outputW: 75, type: 'station', id: 'd2', operation: 'discharging' },
+        { name: 'RIVER 3 Plus Wireless', capacityWh: 286, pct: 29, inputW: 0, outputW: 12, type: 'station', id: 'r3pw', operation: 'discharging' }
+      ]
     },
     home: {
       name: 'Дім', space: 'Квартира',
       devices: [
-        // Two PowerOcean 5 kWh modules and a 6 kW inverter; power flow values are illustrative.
-        { name: 'PowerOcean', capacityWh: 10000, inverterKw: 6, systemPowerKw: 6, batteryCount: 2, pct: 67, inputW: 300, outputW: 760, type: 'system', id: 'po', operation: 'discharging' },
-        { name: 'DELTA 3 Plus', capacityWh: 1024, pct: 92, inputW: 120, outputW: 38, type: 'station', id: 'd3p', operation: 'charging' },
-        { name: 'RIVER 3 Plus Wireless', capacityWh: 286, pct: 29, inputW: 0, outputW: 12, type: 'station', id: 'r3pw', operation: 'discharging' }
+        { name: 'PowerOcean', capacityWh: 10000, inverterKw: 6, systemPowerKw: 6, batteryCount: 2, pct: 67, inputW: 300, outputW: 760, type: 'system', id: 'po', operation: 'discharging' }
       ]
     },
     solovky: {
       name: 'Соловки', space: 'Соловки',
       devices: [
-        { name: 'DELTA Pro 3', capacityWh: 4096, pct: 84, inputW: 0, outputW: 620, type: 'station', id: 'dp3', operation: 'discharging' },
         { name: 'DELTA 2', capacityWh: 1024, pct: 54, inputW: 0, outputW: 125, type: 'station', id: 'd2', operation: 'discharging' },
         { name: 'Додаткова батарея DELTA 2', capacityWh: 1024, pct: 49, type: 'battery', parent: 'DELTA 2', parentId: 'd2', id: 'd2eb', operation: 'discharging' },
-        { name: 'DELTA 2 №2', capacityWh: 1024, pct: 64, inputW: 0, outputW: 75, type: 'station', id: 'd2second', operation: 'discharging' },
         { name: 'RIVER 2', capacityWh: 256, pct: 18, inputW: 0, outputW: 26, type: 'station', id: 'r2', operation: 'discharging' }
       ]
     },
@@ -269,7 +271,6 @@
     dp3: { quiet: 500, balanced: 1000, fast: 2900 },
     d3p: { quiet: 200, balanced: 500, fast: 1500 },
     d2: { quiet: 200, balanced: 500, fast: 1200 },
-    d2second: { quiet: 200, balanced: 500, fast: 1200 },
     r3pw: { quiet: 80, balanced: 200, fast: 380 },
     r2: { quiet: 100, balanced: 200, fast: 360 }
   };
@@ -525,8 +526,8 @@
     $('eco-select-generator').hidden = id !== 'dacha';
     $('eco-location-summary').hidden = empty;
     $('eco-overview-details').hidden = empty;
-    // Generator is the useful default for Dacha; EcoFlow remains an available empty tab.
-    selectBackupTab(id === 'dacha' ? 'generator' : 'ecoflow');
+    // Dacha has EcoFlow stations again; keep Generator as a separate selectable tab.
+    selectBackupTab('ecoflow');
     $('eco-selected-location').textContent = place.name;
     $('eco-space-name').textContent = place.space;
     $('eco-count').textContent = String(packs.length);
