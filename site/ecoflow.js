@@ -177,7 +177,7 @@
     const size = capClass(d.capacityWh);
     const charge = level(d.pct);
     const capacity = niceWh(d.capacityWh);
-    const titleNote = 'Зарядна станція';
+    const titleNote = d.solar ? 'Сонячний вхід · до ' + niceWh(d.solar.maxW) : 'Зарядна станція';
     return '<article class="eco-device eco-standalone ' + size + ' charge-' + charge +
       '" aria-label="' + d.name + ', заряд ' + d.pct + '%">' +
       '<div class="eco-device-head"><div class="eco-device-ident">' +
@@ -507,6 +507,41 @@
     $('eco-select-' + tab).addEventListener('click', () => selectBackupTab(tab));
   });
 
+  function renderSolar(place) {
+    const section = $('eco-solar');
+    if (!section) return;
+    const station = place.devices.find(d => d.id === 'dp3' && d.solar);
+    section.hidden = !station;
+    if (!station) return;
+    const pv = station.solar;
+    const solarPower = Number.isFinite(pv.currentW) ? pv.currentW
+      : Number.isFinite(pv.highW) && Number.isFinite(pv.lowW) ? pv.highW + pv.lowW : null;
+    const formatPower = watt => Number.isFinite(watt) ? niceWh(watt) : '—';
+    const percentOf = (current, max) =>
+      Number.isFinite(current) ? Math.max(0, Math.min(100, current / max * 100)) + '%' : '0%';
+    const updateChannel = (kind, power, maximum) => {
+      $('eco-solar-' + kind).textContent = formatPower(power) + ' / ' + formatPower(maximum);
+      $('eco-solar-' + kind + '-fill').style.width = percentOf(power, maximum);
+    };
+    $('eco-solar-max').textContent = formatPower(pv.maxW);
+    $('eco-solar-current').textContent = formatPower(solarPower);
+    $('eco-solar-today').textContent = formatPower(pv.todayWh);
+    $('eco-solar-fill').style.width = percentOf(solarPower, pv.maxW);
+    const progress = $('eco-solar-track');
+    progress.setAttribute('aria-valuemax', String(pv.maxW));
+    if (solarPower === null) {
+      progress.removeAttribute('aria-valuenow');
+      progress.setAttribute('aria-valuetext', 'Дані недоступні');
+    } else {
+      progress.setAttribute('aria-valuenow', String(solarPower));
+      progress.setAttribute('aria-valuetext', formatPower(solarPower));
+    }
+    $('eco-solar-availability').textContent = solarPower === null
+      ? 'Очікується підключення EcoFlow' : 'Сонячний вхід DELTA Pro 3';
+    updateChannel('high', pv.highW, pv.highMaxW);
+    updateChannel('low', pv.lowW, pv.lowMaxW);
+  }
+
   function updateLocation(id) {
     if (!Object.prototype.hasOwnProperty.call(inventory, id)) return;
     const place = inventory[id];
@@ -528,6 +563,7 @@
     $('eco-overview-details').hidden = empty;
     // Dacha has EcoFlow stations again; keep Generator as a separate selectable tab.
     selectBackupTab('ecoflow');
+    renderSolar(place);
     $('eco-selected-location').textContent = place.name;
     $('eco-space-name').textContent = place.space;
     $('eco-count').textContent = String(packs.length);
