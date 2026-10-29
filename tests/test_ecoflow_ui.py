@@ -504,9 +504,9 @@ class EcoFlowPreviewContract(unittest.TestCase):
         self.assertIn("const stored = devices.reduce", JS)
         self.assertIn("const weighted = total ? stored / total * 100", JS)
         self.assertIn("device.capacityWh * device.pct / 100", JS)
-        self.assertIn("Σ (ємність × заряд) / Σ ємностей", JS)
+        self.assertIn("Внески в середній заряд (відсоткові пункти)", JS)
         self.assertIn("exactCapacity(total)", JS)
-        self.assertIn("devices.length + ' пристроїв'", JS)
+        self.assertIn("devices.length + '</strong></div>'", JS)
 
     def test_metric_explanations_change_only_on_explicit_click(self):
         self.assertIn("detailArea.addEventListener('click', event => {", JS)
@@ -694,6 +694,40 @@ class EcoFlowPreviewContract(unittest.TestCase):
         self.assertIn("overscroll-behavior:contain", CSS)
         self.assertIn("detailPanel.scrollTop = 0;", JS)
         self.assertIn("if (metricOpen === kind && !detailPanel.hidden) clearMetric();", JS)
+
+
+
+    def test_capacity_distribution_is_independent_of_state_of_charge(self):
+        self.assertIn("Розподіл ємності локації", JS)
+        self.assertIn("Частка від загальної номінальної ємності", JS)
+        self.assertIn("const deviceShare = device => total ? device.capacityWh / total * 100 : 0;", JS)
+        self.assertIn("fmtPercent(share) + ' від локації'", JS)
+        self.assertIn("eco-detail-distribution", JS)
+        self.assertIn("eco-detail-distribution i:nth-child", CSS)
+        self.assertIn("Загальна ємність", JS)
+
+    def test_average_charge_lists_each_station_percentage_point_contribution(self):
+        self.assertIn("Внесок станцій у середній заряд", JS)
+        self.assertIn("const chargeContribution = device => total ? device.capacityWh * device.pct / total : 0;", JS)
+        self.assertIn("eco-detail-contribution", JS)
+        self.assertIn("eco-detail-contribution-bar", JS)
+        self.assertIn("в.п.", JS)
+        self.assertIn("Заряд ' + device.pct + '% · частка ємності", JS)
+        self.assertIn("Внески в середній заряд (відсоткові пункти)", JS)
+        self.assertIn("percentValue.format(chargeContribution(device))", JS)
+        self.assertIn(".eco-detail-charge .eco-detail-track i[data-level=", CSS)
+
+    def test_physical_device_inventory_has_useful_station_details(self):
+        self.assertIn("Станції та акумулятори локації", JS)
+        self.assertIn("eco-detail-inventory", JS)
+        self.assertIn("eco-detail-inventory-stats", JS)
+        self.assertIn("Портативна зарядна станція", JS)
+        self.assertIn("Акумуляторний модуль", JS)
+        self.assertIn("Додаткова батарея до", JS)
+        self.assertIn("operationMeta[device.operation]", JS)
+        self.assertIn("Вхід ' + device.inputW + ' Вт · вихід ' + device.outputW", JS)
+        self.assertIn(".eco-detail-inventory{", CSS)
+        self.assertIn(".eco-detail-inventory-stats{", CSS)
 
 
 
