@@ -678,5 +678,24 @@ class EcoFlowPreviewContract(unittest.TestCase):
 
 
 
+    def test_three_metric_chevrons_use_fixed_height_detail_panel(self):
+        self.assertEqual(HTML.count('class="eco-metric-arrow"'), 3)
+        self.assertNotIn('Детальніше <span>ⓘ</span>', HTML)
+        self.assertIn(".eco-metrics .eco-metric-arrow{", CSS)
+        self.assertIn(".eco-metrics .eco-metric.is-selected .eco-metric-arrow{", CSS)
+        self.assertIn("transform:rotate(225deg)", CSS)
+        self.assertIn("height:114px", CSS)
+        self.assertIn("height:104px", CSS)
+        self.assertIn("height:352px", CSS)
+        self.assertIn("max-height:352px", CSS)
+        self.assertIn("height:328px", CSS)
+        self.assertIn("max-height:328px", CSS)
+        self.assertIn("overflow-y:auto", CSS)
+        self.assertIn("overscroll-behavior:contain", CSS)
+        self.assertIn("detailPanel.scrollTop = 0;", JS)
+        self.assertIn("if (metricOpen === kind && !detailPanel.hidden) clearMetric();", JS)
+
+
+
 if __name__ == "__main__":
     unittest.main()
