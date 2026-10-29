@@ -371,22 +371,44 @@
     },
     "2026-10-30": {
       "date": "2026-10-30",
-      "detail": "Графік ще не опубліковано",
-      "outages": [],
-      "source_observations": {},
+      "detail": "Зіставлено незалежні джерела",
+      "outages": [
+        [
+          "11:00",
+          "18:30"
+        ]
+      ],
+      "source_observations": {
+        "Alerts Energy": {
+          "fingerprint": "[[\"11:00\", \"18:30\"]]",
+          "first_seen": "2026-10-29T20:40+02:00"
+        },
+        "Карта світла": {
+          "fingerprint": "[[\"11:00\", \"18:30\"]]",
+          "first_seen": "2026-10-29T20:40+02:00"
+        }
+      },
       "source_reports": {
         "Alerts Energy": {
-          "fetch_failed": false,
-          "outages": null,
+          "outages": [
+            [
+              "11:00",
+              "18:30"
+            ]
+          ],
           "partial": [],
-          "status": "unavailable",
+          "status": "match",
           "url": "https://alerts.energy/kyivska-oblast"
         },
         "Карта світла": {
-          "fetch_failed": false,
-          "outages": null,
+          "outages": [
+            [
+              "11:00",
+              "18:30"
+            ]
+          ],
           "partial": [],
-          "status": "unavailable",
+          "status": "match",
           "url": "https://mapasvitla.com.ua/kyivska-oblast/dtek-krem/3.1"
         },
         "Київщина.info": {
@@ -412,8 +434,11 @@
         }
       },
       "source_updated": "",
-      "sources": [],
-      "status": "unknown",
+      "sources": [
+        "Alerts Energy",
+        "Карта світла"
+      ],
+      "status": "normal",
       "url": "https://mapasvitla.com.ua/kyivska-oblast/dtek-krem/3.1"
     }
   },
@@ -736,21 +761,69 @@
         },
         "2026-10-30": {
           "date": "2026-10-30",
-          "detail": "Графік ще не опубліковано",
+          "detail": "Зіставлено незалежні джерела",
           "group": "4.1",
-          "outages": [],
-          "source_observations": {},
+          "outages": [
+            [
+              "06:00",
+              "09:30"
+            ],
+            [
+              "14:00",
+              "17:30"
+            ],
+            [
+              "22:30",
+              "24:00"
+            ]
+          ],
+          "source_observations": {
+            "Alerts Energy": {
+              "fingerprint": "[[\"06:00\", \"09:30\"], [\"14:00\", \"17:30\"], [\"22:30\", \"24:00\"]]",
+              "first_seen": "2026-10-29T20:40+02:00"
+            },
+            "Карта світла": {
+              "fingerprint": "[[\"06:00\", \"09:30\"], [\"14:00\", \"17:30\"], [\"22:30\", \"24:00\"]]",
+              "first_seen": "2026-10-29T20:40+02:00"
+            }
+          },
           "source_reports": {
             "Alerts Energy": {
-              "outages": null,
+              "outages": [
+                [
+                  "06:00",
+                  "09:30"
+                ],
+                [
+                  "14:00",
+                  "17:30"
+                ],
+                [
+                  "22:30",
+                  "24:00"
+                ]
+              ],
               "partial": [],
-              "status": "unavailable",
+              "status": "match",
               "url": "https://alerts.energy/kyiv"
             },
             "Карта світла": {
-              "outages": null,
+              "outages": [
+                [
+                  "06:00",
+                  "09:30"
+                ],
+                [
+                  "14:00",
+                  "17:30"
+                ],
+                [
+                  "22:30",
+                  "24:00"
+                ]
+              ],
               "partial": [],
-              "status": "unavailable",
+              "status": "match",
               "url": "https://mapasvitla.com.ua/kyiv/dtek-kem/4.1"
             },
             "КолиБуде": {
@@ -767,13 +840,42 @@
             }
           },
           "source_updated": "",
-          "sources": [],
-          "status": "unknown",
+          "sources": [
+            "Alerts Energy",
+            "Карта світла"
+          ],
+          "status": "normal",
           "url": "https://mapasvitla.com.ua/kyiv/dtek-kem/4.1"
         }
       },
       "group": "4.1",
       "logs": [
+        {
+          "after": [
+            [
+              "06:00",
+              "09:30"
+            ],
+            [
+              "14:00",
+              "17:30"
+            ],
+            [
+              "22:30",
+              "24:00"
+            ]
+          ],
+          "at": "2026-10-29T20:40+02:00",
+          "before": null,
+          "date": "2026-10-30",
+          "first_observed_source": null,
+          "kind": "published",
+          "message": "Опубліковано графік: 06:00–09:30, 14:00–17:30, 22:30–24:00",
+          "sources_confirmed": [
+            "Alerts Energy",
+            "Карта світла"
+          ]
+        },
         {
           "after": [
             [
@@ -1246,25 +1348,29 @@
             ],
             [
               "18:30",
-              "21:30"
+              "20:00"
+            ],
+            [
+              "22:00",
+              "23:00"
             ]
           ],
           "source_observations": {
             "Alerts Energy": {
-              "fingerprint": "[[\"11:30\", \"15:00\"], [\"18:30\", \"21:30\"]]",
-              "first_seen": "2026-10-29T06:40+02:00"
+              "fingerprint": "[[\"11:30\", \"15:00\"], [\"18:30\", \"20:00\"], [\"22:00\", \"23:00\"]]",
+              "first_seen": "2026-10-29T20:40+02:00"
             },
             "Карта світла": {
-              "fingerprint": "[[\"11:30\", \"15:00\"], [\"18:30\", \"21:30\"]]",
-              "first_seen": "2026-10-28T21:01+02:00"
+              "fingerprint": "[[\"11:30\", \"15:00\"], [\"18:30\", \"20:00\"], [\"22:00\", \"23:00\"]]",
+              "first_seen": "2026-10-29T20:40+02:00"
             },
             "КолиБуде": {
               "fingerprint": "[[\"11:30\", \"15:00\"], [\"18:30\", \"20:00\"], [\"22:00\", \"23:00\"]]",
               "first_seen": "2026-10-29T20:31+02:00"
             },
             "КолиСвітло": {
-              "fingerprint": "[[\"11:30\", \"15:00\"], [\"18:30\", \"21:30\"]]",
-              "first_seen": "2026-10-29T00:01+02:00"
+              "fingerprint": "[[\"11:30\", \"15:00\"], [\"18:30\", \"20:00\"], [\"22:00\", \"23:00\"]]",
+              "first_seen": "2026-10-29T20:40+02:00"
             }
           },
           "source_reports": {
@@ -1276,7 +1382,11 @@
                 ],
                 [
                   "18:30",
-                  "21:30"
+                  "20:00"
+                ],
+                [
+                  "22:00",
+                  "23:00"
                 ]
               ],
               "partial": [],
@@ -1291,7 +1401,11 @@
                 ],
                 [
                   "18:30",
-                  "21:30"
+                  "20:00"
+                ],
+                [
+                  "22:00",
+                  "23:00"
                 ]
               ],
               "partial": [],
@@ -1314,7 +1428,7 @@
                 ]
               ],
               "partial": [],
-              "status": "diff",
+              "status": "match",
               "url": "https://kolybude.com/kyiv"
             },
             "КолиСвітло": {
@@ -1325,7 +1439,11 @@
                 ],
                 [
                   "18:30",
-                  "21:30"
+                  "20:00"
+                ],
+                [
+                  "22:00",
+                  "23:00"
                 ]
               ],
               "partial": [],
@@ -1337,6 +1455,7 @@
           "sources": [
             "Alerts Energy",
             "Карта світла",
+            "КолиБуде",
             "КолиСвітло"
           ],
           "status": "normal",
@@ -1344,21 +1463,57 @@
         },
         "2026-10-30": {
           "date": "2026-10-30",
-          "detail": "Графік ще не опубліковано",
+          "detail": "Зіставлено незалежні джерела",
           "group": "10.1",
-          "outages": [],
-          "source_observations": {},
+          "outages": [
+            [
+              "10:30",
+              "14:00"
+            ],
+            [
+              "17:30",
+              "21:00"
+            ]
+          ],
+          "source_observations": {
+            "Alerts Energy": {
+              "fingerprint": "[[\"10:30\", \"14:00\"], [\"17:30\", \"21:00\"]]",
+              "first_seen": "2026-10-29T20:40+02:00"
+            },
+            "Карта світла": {
+              "fingerprint": "[[\"10:30\", \"14:00\"], [\"17:30\", \"21:00\"]]",
+              "first_seen": "2026-10-29T20:40+02:00"
+            }
+          },
           "source_reports": {
             "Alerts Energy": {
-              "outages": null,
+              "outages": [
+                [
+                  "10:30",
+                  "14:00"
+                ],
+                [
+                  "17:30",
+                  "21:00"
+                ]
+              ],
               "partial": [],
-              "status": "unavailable",
+              "status": "match",
               "url": "https://alerts.energy/kyiv"
             },
             "Карта світла": {
-              "outages": null,
+              "outages": [
+                [
+                  "10:30",
+                  "14:00"
+                ],
+                [
+                  "17:30",
+                  "21:00"
+                ]
+              ],
               "partial": [],
-              "status": "unavailable",
+              "status": "match",
               "url": "https://mapasvitla.com.ua/kyiv/dtek-kem/10.1"
             },
             "КолиБуде": {
@@ -1375,13 +1530,75 @@
             }
           },
           "source_updated": "",
-          "sources": [],
-          "status": "unknown",
+          "sources": [
+            "Alerts Energy",
+            "Карта світла"
+          ],
+          "status": "normal",
           "url": "https://mapasvitla.com.ua/kyiv/dtek-kem/10.1"
         }
       },
       "group": "10.1",
       "logs": [
+        {
+          "after": [
+            [
+              "10:30",
+              "14:00"
+            ],
+            [
+              "17:30",
+              "21:00"
+            ]
+          ],
+          "at": "2026-10-29T20:40+02:00",
+          "before": null,
+          "date": "2026-10-30",
+          "first_observed_source": null,
+          "kind": "published",
+          "message": "Опубліковано графік: 10:30–14:00, 17:30–21:00",
+          "sources_confirmed": [
+            "Alerts Energy",
+            "Карта світла"
+          ]
+        },
+        {
+          "after": [
+            [
+              "11:30",
+              "15:00"
+            ],
+            [
+              "18:30",
+              "20:00"
+            ],
+            [
+              "22:00",
+              "23:00"
+            ]
+          ],
+          "at": "2026-10-29T20:40+02:00",
+          "before": [
+            [
+              "11:30",
+              "15:00"
+            ],
+            [
+              "18:30",
+              "21:30"
+            ]
+          ],
+          "date": "2026-10-29",
+          "first_observed_source": "КолиБуде",
+          "kind": "changed",
+          "message": "Змінено графік: 11:30–15:00, 18:30–21:30 → 11:30–15:00, 18:30–20:00, 22:00–23:00",
+          "sources_confirmed": [
+            "Alerts Energy",
+            "Карта світла",
+            "КолиБуде",
+            "КолиСвітло"
+          ]
+        },
         {
           "after": [
             [
@@ -1978,21 +2195,69 @@
         },
         "2026-10-30": {
           "date": "2026-10-30",
-          "detail": "Графік ще не опубліковано",
+          "detail": "Зіставлено незалежні джерела",
           "group": "4.1",
-          "outages": [],
-          "source_observations": {},
+          "outages": [
+            [
+              "06:00",
+              "09:30"
+            ],
+            [
+              "14:00",
+              "17:30"
+            ],
+            [
+              "22:30",
+              "24:00"
+            ]
+          ],
+          "source_observations": {
+            "Alerts Energy": {
+              "fingerprint": "[[\"06:00\", \"09:30\"], [\"14:00\", \"17:30\"], [\"22:30\", \"24:00\"]]",
+              "first_seen": "2026-10-29T20:40+02:00"
+            },
+            "Карта світла": {
+              "fingerprint": "[[\"06:00\", \"09:30\"], [\"14:00\", \"17:30\"], [\"22:30\", \"24:00\"]]",
+              "first_seen": "2026-10-29T20:40+02:00"
+            }
+          },
           "source_reports": {
             "Alerts Energy": {
-              "outages": null,
+              "outages": [
+                [
+                  "06:00",
+                  "09:30"
+                ],
+                [
+                  "14:00",
+                  "17:30"
+                ],
+                [
+                  "22:30",
+                  "24:00"
+                ]
+              ],
               "partial": [],
-              "status": "unavailable",
+              "status": "match",
               "url": "https://alerts.energy/kyiv"
             },
             "Карта світла": {
-              "outages": null,
+              "outages": [
+                [
+                  "06:00",
+                  "09:30"
+                ],
+                [
+                  "14:00",
+                  "17:30"
+                ],
+                [
+                  "22:30",
+                  "24:00"
+                ]
+              ],
               "partial": [],
-              "status": "unavailable",
+              "status": "match",
               "url": "https://mapasvitla.com.ua/kyiv/dtek-kem/4.1"
             },
             "КолиБуде": {
@@ -2009,13 +2274,42 @@
             }
           },
           "source_updated": "",
-          "sources": [],
-          "status": "unknown",
+          "sources": [
+            "Alerts Energy",
+            "Карта світла"
+          ],
+          "status": "normal",
           "url": "https://mapasvitla.com.ua/kyiv/dtek-kem/4.1"
         }
       },
       "group": "4.1",
       "logs": [
+        {
+          "after": [
+            [
+              "06:00",
+              "09:30"
+            ],
+            [
+              "14:00",
+              "17:30"
+            ],
+            [
+              "22:30",
+              "24:00"
+            ]
+          ],
+          "at": "2026-10-29T20:40+02:00",
+          "before": null,
+          "date": "2026-10-30",
+          "first_observed_source": null,
+          "kind": "published",
+          "message": "Опубліковано графік: 06:00–09:30, 14:00–17:30, 22:30–24:00",
+          "sources_confirmed": [
+            "Alerts Energy",
+            "Карта світла"
+          ]
+        },
         {
           "after": [
             [
@@ -2228,6 +2522,24 @@
     }
   },
   "logs": [
+    {
+      "after": [
+        [
+          "11:00",
+          "18:30"
+        ]
+      ],
+      "at": "2026-10-29T20:40+02:00",
+      "before": null,
+      "date": "2026-10-30",
+      "first_observed_source": null,
+      "kind": "published",
+      "message": "Опубліковано графік: 11:00–18:30",
+      "sources_confirmed": [
+        "Alerts Energy",
+        "Карта світла"
+      ]
+    },
     {
       "after": [
         [
