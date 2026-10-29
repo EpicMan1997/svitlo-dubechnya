@@ -1,4 +1,4 @@
-name: Update schedules and publish website
+name: Наше Світло | оновлення графіків і публікація
 on:
   push:
     branches: [main]
