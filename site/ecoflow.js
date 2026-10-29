@@ -173,11 +173,22 @@
       '</section>';
   }
 
+  function solarDisclosure(device) {
+    if (!device.solar) return '';
+    const source = $('eco-solar-template');
+    if (!source) return '';
+    return '<details class="eco-solar-disclosure">' +
+      '<summary><span class="eco-solar-summary-label"><span class="eco-solar-summary-sun" aria-hidden="true">☀</span>' +
+      'Сонячна генерація</span><span class="eco-solar-summary-end">До ' + niceWh(device.solar.maxW) +
+      '<span class="eco-solar-chevron" aria-hidden="true"></span></span></summary>' +
+      source.innerHTML + '</details>';
+  }
+
   function deviceView(d) {
     const size = capClass(d.capacityWh);
     const charge = level(d.pct);
     const capacity = niceWh(d.capacityWh);
-    const titleNote = d.solar ? 'Сонячний вхід · до ' + niceWh(d.solar.maxW) : 'Зарядна станція';
+    const titleNote = 'Зарядна станція';
     return '<article class="eco-device eco-standalone ' + size + ' charge-' + charge +
       '" aria-label="' + d.name + ', заряд ' + d.pct + '%">' +
       '<div class="eco-device-head"><div class="eco-device-ident">' +
@@ -189,6 +200,7 @@
       chargeTrack(d.pct, d.name) +
       '<div class="eco-capacity-line"><strong>' + capacity + '</strong></div>' +
       energyStats(d, d.capacityWh, d.pct) +
+      solarDisclosure(d) +
       adminControls(d) +
       '</article>';
   }
@@ -509,10 +521,8 @@
 
   function renderSolar(place) {
     const section = $('eco-solar');
-    if (!section) return;
     const station = place.devices.find(d => d.id === 'dp3' && d.solar);
-    section.hidden = !station;
-    if (!station) return;
+    if (!section || !station) return;
     const pv = station.solar;
     const solarPower = Number.isFinite(pv.currentW) ? pv.currentW
       : Number.isFinite(pv.highW) && Number.isFinite(pv.lowW) ? pv.highW + pv.lowW : null;
@@ -564,7 +574,6 @@
     $('eco-overview-details').hidden = empty;
     // Dacha has EcoFlow stations again; keep Generator as a separate selectable tab.
     selectBackupTab('ecoflow');
-    renderSolar(place);
     $('eco-selected-location').textContent = place.name;
     $('eco-space-name').textContent = place.space;
     $('eco-count').textContent = String(packs.length);
@@ -584,6 +593,7 @@
       overallTrack.setAttribute('aria-valuetext', weighted + ' відсотків');
     }
     $('eco-devices').innerHTML = place.devices.length ? renderDeviceGrid(place.devices) : '<div class="eco-empty-state"><strong>У цій локації немає EcoFlow</strong><span>Резервне живлення дачі забезпечує генератор. Його характеристики є в сусідній вкладці.</span></div>';
+    renderSolar(place);
     if (!empty) displayMetric('capacity');
     renderBulkPanel();
   }
