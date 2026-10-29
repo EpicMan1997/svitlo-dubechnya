@@ -342,8 +342,8 @@ class EcoFlowPreviewContract(unittest.TestCase):
     def test_expanded_overview_retains_per_battery_charge_and_capacity(self):
         self.assertIn('id="eco-overview-details"', HTML)
         self.assertIn("function metricBreakdown(kind)", JS)
-        self.assertIn("device.capacityWh * device.pct / 100", JS)
-        self.assertIn("'<strong class=\"eco-detail-percent\" data-level=\"' + level(device.pct)", JS)
+        self.assertIn("device.capacityWh * device.pct / total", JS)
+        self.assertIn("'<b class=\"eco-detail-percent\" data-level=\"' + level(device.pct)", JS)
         self.assertIn("'<div class=\"eco-detail-grid\">' + rows", JS)
         self.assertNotIn("data-eco-tooltip=", JS)
         self.assertNotIn("eco-capacity-strip", JS)
@@ -503,7 +503,7 @@ class EcoFlowPreviewContract(unittest.TestCase):
         self.assertIn("kind === 'count'", JS)
         self.assertIn("const stored = devices.reduce", JS)
         self.assertIn("const weighted = total ? stored / total * 100", JS)
-        self.assertIn("device.capacityWh * device.pct / 100", JS)
+        self.assertIn("device.capacityWh * device.pct / total", JS)
         self.assertIn("Внески в середній заряд (відсоткові пункти)", JS)
         self.assertIn("exactCapacity(total)", JS)
         self.assertIn("devices.length + '</strong></div>'", JS)
@@ -592,7 +592,7 @@ class EcoFlowPreviewContract(unittest.TestCase):
         self.assertNotIn("кВт·год", JS)
         self.assertNotIn("Вт·год", JS)
         self.assertIn("maximumFractionDigits: 2", JS)
-        self.assertIn("device.capacityWh * device.pct / 100", JS)
+        self.assertIn("device.capacityWh * device.pct / total", JS)
         self.assertIn("const weighted = total ? stored / total * 100", JS)
 
     def test_solar_generation_is_read_only_and_dacha_only(self):
@@ -701,7 +701,7 @@ class EcoFlowPreviewContract(unittest.TestCase):
         self.assertIn("Розподіл ємності локації", JS)
         self.assertIn("Частка від загальної номінальної ємності", JS)
         self.assertIn("const deviceShare = device => total ? device.capacityWh / total * 100 : 0;", JS)
-        self.assertIn("fmtPercent(share) + ' від локації'", JS)
+        self.assertIn("fmtPercent(share) + ' від локації</strong>'", JS)
         self.assertIn("eco-detail-distribution", JS)
         self.assertIn("eco-detail-distribution i:nth-child", CSS)
         self.assertIn("Загальна ємність", JS)
