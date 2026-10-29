@@ -1691,3 +1691,59 @@ main > header .clock-view #clock{grid-column:auto;grid-row:auto;justify-self:aut
   .eco-solar-disclosure .eco-solar-today,
   .eco-solar-disclosure .eco-solar-destination{min-height:78px}
 }
+
+
+/* Three matched metric disclosures: identical tiles, rotating chevrons, fixed detail viewport. */
+.eco-metrics .eco-metric{
+  height:114px;
+  min-height:114px;
+  justify-content:space-between;
+}
+.eco-metrics .eco-metric-more{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  width:100%;
+  min-height:17px;
+  margin-top:6px;
+}
+.eco-metrics .eco-metric-arrow{
+  display:block;
+  width:9px;
+  height:9px;
+  flex:0 0 9px;
+  border:solid #a8d2f6;
+  border-width:0 2px 2px 0;
+  transform:rotate(45deg);
+  transform-origin:center;
+  margin-right:4px;
+  margin-top:-4px;
+  transition:transform .15s ease;
+}
+.eco-metrics .eco-metric.is-selected .eco-metric-arrow{
+  transform:rotate(225deg);
+  margin-top:4px;
+}
+.eco-metric-detail{
+  height:352px;
+  min-height:352px;
+  max-height:352px;
+  overflow-x:hidden;
+  overflow-y:auto;
+  overscroll-behavior:contain;
+  scrollbar-gutter:stable;
+}
+@media(max-width:650px){
+  .eco-metrics .eco-metric{
+    height:104px;
+    min-height:104px;
+  }
+  .eco-metric-detail{
+    height:328px;
+    min-height:328px;
+    max-height:328px;
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  .eco-metrics .eco-metric-arrow{transition:none}
+}
