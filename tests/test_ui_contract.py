@@ -56,6 +56,23 @@ class VisualStatusContract(unittest.TestCase):
         self.assertEqual(len(set(colors[name] for name in names)), 5)
         self.assertEqual(colors['ДТЕК'], colors['Київщина.info'])
 
+    def test_current_outage_has_a_live_countdown_until_scheduled_restoration(self):
+        self.assertIn('id="powerRemaining" class="power-remaining"', HTML.replace('class="power-remaining" id="powerRemaining"', 'id="powerRemaining" class="power-remaining"'))
+        self.assertIn('id="powerRemainingNote"', HTML)
+        self.assertIn('function currentOutageEnd(outages,minuteNow){', HTML)
+        self.assertIn('function remainingOutageLabel(seconds){', HTML)
+        self.assertIn('const outageEnd=canPredict?currentOutageEnd(outages,minuteNow):null;', HTML)
+        self.assertIn("remaining.textContent='Ще без світла: '+remainingOutageLabel(seconds);", HTML)
+        self.assertIn("'За графіком до '+String(Math.floor(outageEnd/60))", HTML)
+        self.assertIn("'До кінця доби за графіком'", HTML)
+        self.assertIn('remaining.hidden=note.hidden=!isOut;', HTML)
+        self.assertIn("currentStatus(selectedEntry)==='normal'", HTML)
+        self.assertIn('&&isFresh;', HTML)
+        self.assertIn('if(!chip||tab!==\'today\')return;', HTML)
+        self.assertIn('setInterval(tick,1000)', HTML)
+        self.assertIn('updateCurrentPower(n)}', HTML)
+        self.assertIn('.power-remaining[hidden],.power-remaining-note[hidden]{display:none!important}', HTML)
+
     def test_yesterday_archive_and_comparison(self):
         refresh = ROOT.joinpath("scripts/refresh.py").read_text(encoding="utf-8")
         self.assertIn("'days':visible_days", refresh)
