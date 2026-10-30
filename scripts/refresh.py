@@ -4,6 +4,7 @@ import json
 import re
 import sys
 from collections import defaultdict
+from concurrent.futures import ThreadPoolExecutor
 from datetime import date, datetime, timedelta
 from pathlib import Path
 from zoneinfo import ZoneInfo
@@ -249,8 +250,8 @@ def source_reports(result,bez,koly,bude,region,live,old,alerts=None):
                           'url':entry['url'], 'fetch_failed': False}
         else:
             outage_list=[list(x) for x in ranges]
-            matches=(result['status']=='normal' and target==ranges and not part)
-            output[name]={'status':'match' if matches else 'partial' if part else 'diff',
+            matches=(result['status'] in ('normal','preliminary') and target==ranges and not part)
+            output[name]={'status':('match' if result['status']=='normal' else 'preliminary') if matches else 'partial' if part else 'diff',
                           'outages':outage_list,'partial':part,'url':entry['url']}
     return output
 
@@ -264,7 +265,7 @@ def fetch(url, label, errors):
         errors.append(label+': '+type(exc).__name__+(f' HTTP {code}' if code is not None else ''))
         return None
 
-def choose(day,bez,koly,bude,old,additional=None,primary_source='БезСвітла'):
+def choose(day,bez,koly,bude,old,additional=None,primary_source='БезСвітла',allow_early=False):
     votes=defaultdict(set)
     if koly is not None:votes[koly].add('КолиСвітло')
     if bude is not None:votes[bude].add('КолиБуде')
@@ -280,6 +281,27 @@ def choose(day,bez,koly,bude,old,additional=None,primary_source='БезСвіт�
     why='Графік ще не опубліковано' if bez['unpublished'] else 'Суперечливі джерела' if confirmed else 'Очікуємо незалежне підтвердження' if votes else 'Немає підтверджених даних'
     if old.get('date')==day.isoformat() and old.get('status') in ('normal','stale') and 'outages' in old:
         return {**base,'status':'stale','outages':old['outages'],'sources':old.get('sources',[]),'detail':why}
+    # Show fresh, date-scoped first reports for tomorrow instead of hiding them
+    # while a second independent provider has not caught up.
+    # An ambiguous alternating BeZ/map page must not be trusted on its own.
+    provisional_votes={off:set(srcs) for off,srcs in votes.items()}
+    if len(bez.get('candidates',[]))!=1:
+        for srcs in provisional_votes.values():srcs.discard(primary_source)
+    provisional_votes={off:srcs for off,srcs in provisional_votes.items() if srcs}
+    if allow_early and provisional_votes:
+        preferred=['Alerts Energy','Карта світла','КолиСвітло','КолиБуде','Київщина.info','БезСвітла']
+        def rank(item):
+            off,srcs=item
+            first=min((preferred.index(src) if src in preferred else len(preferred)) for src in srcs)
+            return (-len(srcs),first,str(off))
+        ordered=sorted(provisional_votes.items(),key=rank)
+        selected,sources=ordered[0]
+        alternatives=[{'sources':sorted(srcs),'outages':[list(x) for x in off]}
+                      for off,srcs in ordered[1:]]
+        detail=('Джерела показують різні години. Потрібне підтвердження.'
+                if alternatives else 'Перші дані з одного джерела. Потрібне підтвердження.')
+        return {**base,'status':'preliminary','outages':[list(x) for x in selected],
+                'sources':sorted(sources),'alternatives':alternatives,'detail':detail}
     return {**base,'status':'unknown','outages':[],'sources':[],'detail':why}
 
 def change(old,new):
@@ -315,6 +337,15 @@ def earliest_observed_source(entry):
     best=min(t for t,_ in candidates)
     leaders=[name for stamp,name in candidates if stamp==best]
     return leaders[0] if len(leaders)==1 else None
+
+def preliminary_event(now,target,entry):
+    """Record that tomorrow's first date-scoped report was seen, not confirmed."""
+    ranges=', '.join(a+'–'+b for a,b in entry.get('outages',[])) or 'без відключень'
+    return {'at':now.isoformat(timespec='minutes'),'date':target.isoformat(),
+            'kind':'preliminary','before':None,'after':entry['outages'],
+            'message':'Попередній графік: '+ranges,
+            'sources_confirmed':[],
+            'first_observed_source':earliest_observed_source(entry)}
 
 def make_log_event(now,target,old,new,message):
     """Log the time this checker DETECTED a change, not an inferred source publish time."""
@@ -406,7 +437,7 @@ def city_sources(entry,bez,koly,bude,street,prev,alerts=None):
     for name,url in targets.items():
         value=data[name]
         if value is not None:
-            out[name]={'status':'match' if entry['status']=='normal' and value==compare else 'diff',
+            out[name]={'status':('match' if entry['status']=='normal' else 'preliminary') if entry['status'] in ('normal','preliminary') and value==compare else 'diff',
                        'outages':[list(x) for x in value],'url':url,'partial':[]}
         else:
             older=previous.get(name,{})
@@ -416,11 +447,16 @@ def city_sources(entry,bez,koly,bude,street,prev,alerts=None):
 
 def update_city_locations(now,today,old,errors):
     """Separate city operator, street address, queue, and history; never reuse dacha data."""
-    city_koly=fetch(CITY_KOLY,'КолиСвітло Київ',errors)
-    city_bude=fetch(CITY_BUDE,'КолиБуде Київ',errors)
-    city_alerts=fetch(ALERTS_CITY,'Alerts Energy Київ',errors)
-    city_map_pages={group:fetch(MAP_CITY_PREFIX+group,'Карта світла Київ '+group,errors)
-                    for group in {config['group'] for config in CITY_LOCATIONS.values()}}
+    groups={config['group'] for config in CITY_LOCATIONS.values()}
+    urls={'koly':(CITY_KOLY,'КолиСвітло Київ'),
+          'bude':(CITY_BUDE,'КолиБуде Київ'),
+          'alerts':(ALERTS_CITY,'Alerts Energy Київ')}
+    urls.update({group:(MAP_CITY_PREFIX+group,'Карта світла Київ '+group) for group in groups})
+    with ThreadPoolExecutor(max_workers=len(urls)) as pool:
+        jobs={key:pool.submit(fetch,url,label,errors) for key,(url,label) in urls.items()}
+        pages={key:job.result() for key,job in jobs.items()}
+    city_koly,city_bude,city_alerts=pages['koly'],pages['bude'],pages['alerts']
+    city_map_pages={group:pages[group] for group in groups}
     result={}
     old_locations=old.get('locations',{})
     for key,config in CITY_LOCATIONS.items():
@@ -437,7 +473,7 @@ def update_city_locations(now,today,old,errors):
             prev=old_loc.get('days',{}).get(target.isoformat(),{})
             # Uses same two-source quorum as the dacha, but the city sources are distinct.
             alerts=parse_alerts(city_alerts,target,config['group'],'kyiv_oblenergo')
-            entry=choose(target,bez,koly,bude,prev,{'Alerts Energy':alerts},primary_source='Карта світла')
+            entry=choose(target,bez,koly,bude,prev,{'Alerts Energy':alerts},primary_source='Карта світла',allow_early=target>today)
             entry['url']=url
             entry['source_reports']=city_sources(entry,bez,koly,bude,url,prev,alerts)
             record_source_observations(now,prev,entry)
@@ -445,6 +481,8 @@ def update_city_locations(now,today,old,errors):
             days[target.isoformat()]=entry
             msg=change(prev,entry)
             if msg:logs.insert(0,make_log_event(now,target,prev,entry,msg))
+            elif entry['status']=='preliminary' and (prev.get('status')!='preliminary' or prev.get('outages')!=entry['outages']):
+                logs.insert(0,preliminary_event(now,target,entry))
         logs=[x for x in logs if x.get('date','0000')>=(today-timedelta(days=6)).isoformat()][:60]
         result[key]={'name':config['name'],'group':config['group'],'address_verified':config['address_verified'],
                      'days':days,'logs':logs,'operator':'ДТЕК Київські електромережі'}
@@ -455,13 +493,22 @@ def main():
     try: old=json.loads(STATE.read_text(encoding='utf-8'))
     except (FileNotFoundError,ValueError): old={'days':{},'logs':[]}
     errors=[]
-    koly=fetch(KOLY,'КолиСвітло',errors)
-    bude=fetch(KOLBUDE,'КолиБуде',errors)
-    official=fetch(DTEK,'ДТЕК',errors)
-    region_html=fetch(KYIVSHCHYNA,'Київщина.info',errors)
-    region_alerts=fetch(ALERTS_REGION,'Alerts Energy Київська область',errors)
-    map_region_html=fetch(MAP_REGION,'Карта світла Київська область 3.1',errors)
-    city=update_city_locations(now,today,old,errors)
+    sources={
+        'koly':(KOLY,'КолиСвітло'),
+        'bude':(KOLBUDE,'КолиБуде'),
+        'official':(DTEK,'ДТЕК'),
+        'region_html':(KYIVSHCHYNA,'Київщина.info'),
+        'region_alerts':(ALERTS_REGION,'Alerts Energy Київська область'),
+        'map_region_html':(MAP_REGION,'Карта світла Київська область 3.1'),
+    }
+    with ThreadPoolExecutor(max_workers=len(sources)+1) as pool:
+        jobs={key:pool.submit(fetch,url,label,errors) for key,(url,label) in sources.items()}
+        city_job=pool.submit(update_city_locations,now,today,old,errors)
+        results={key:job.result() for key,job in jobs.items()}
+        city=city_job.result()
+    koly,bude,official=results['koly'],results['bude'],results['official']
+    region_html=results['region_html']
+    region_alerts,map_region_html=results['region_alerts'],results['map_region_html']
     days={};logs=list(old.get('logs',[]))
     for target in (today,tomorrow):
         bez=parse_mapasvitla(map_region_html,target,today,'3.1')
@@ -473,12 +520,14 @@ def main():
         live=None  # Svitlo.live is no longer treated as a current reference
         previous=old.get('days',{}).get(target.isoformat(),{})
         alerts=parse_alerts(region_alerts,target,'3.1','kyivska_oblast_oblenergo')
-        entry=choose(target,bez,a,b,previous,{'Київщина.info':region,'Alerts Energy':alerts},primary_source='Карта світла')
+        entry=choose(target,bez,a,b,previous,{'Київщина.info':region,'Alerts Energy':alerts},primary_source='Карта світла',allow_early=target>today)
         entry['source_reports']=source_reports(entry,bez,a,b,region,live,previous,alerts)
         record_source_observations(now,previous,entry)
         days[target.isoformat()]=entry
         event=change(previous,entry)
         if event:logs.insert(0,make_log_event(now,target,previous,entry,event))
+        elif entry['status']=='preliminary' and (previous.get('status')!='preliminary' or previous.get('outages')!=entry['outages']):
+            logs.insert(0,preliminary_event(now,target,entry))
     logs=[x for x in logs if x.get('date','0000')>=(today-timedelta(days=6)).isoformat()][:60]
     save={'days':{k:v for k,v in old.get('days',{}).items() if k>=(today-timedelta(days=2)).isoformat()},'logs':logs}
     save['days'].update(days)
