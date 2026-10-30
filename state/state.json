@@ -735,12 +735,26 @@
           "detail": "Графік ще не опубліковано",
           "group": "4.1",
           "outages": [],
-          "source_observations": {},
+          "source_observations": {
+            "Alerts Energy": {
+              "fingerprint": "[[\"11:30\", \"14:30\"], [\"18:00\", \"21:30\"]]",
+              "first_seen": "2026-10-30T20:31+02:00"
+            }
+          },
           "source_reports": {
             "Alerts Energy": {
-              "outages": null,
+              "outages": [
+                [
+                  "11:30",
+                  "14:30"
+                ],
+                [
+                  "18:00",
+                  "21:30"
+                ]
+              ],
               "partial": [],
-              "status": "unavailable",
+              "status": "diff",
               "url": "https://alerts.energy/kyiv"
             },
             "Карта світла": {
@@ -1399,12 +1413,26 @@
           "detail": "Графік ще не опубліковано",
           "group": "10.1",
           "outages": [],
-          "source_observations": {},
+          "source_observations": {
+            "Alerts Energy": {
+              "fingerprint": "[[\"06:00\", \"09:30\"], [\"14:30\", \"18:00\"]]",
+              "first_seen": "2026-10-30T20:31+02:00"
+            }
+          },
           "source_reports": {
             "Alerts Energy": {
-              "outages": null,
+              "outages": [
+                [
+                  "06:00",
+                  "09:30"
+                ],
+                [
+                  "14:30",
+                  "18:00"
+                ]
+              ],
               "partial": [],
-              "status": "unavailable",
+              "status": "diff",
               "url": "https://alerts.energy/kyiv"
             },
             "Карта світла": {
@@ -2185,12 +2213,26 @@
           "detail": "Графік ще не опубліковано",
           "group": "4.1",
           "outages": [],
-          "source_observations": {},
+          "source_observations": {
+            "Alerts Energy": {
+              "fingerprint": "[[\"11:30\", \"14:30\"], [\"18:00\", \"21:30\"]]",
+              "first_seen": "2026-10-30T20:31+02:00"
+            }
+          },
           "source_reports": {
             "Alerts Energy": {
-              "outages": null,
+              "outages": [
+                [
+                  "11:30",
+                  "14:30"
+                ],
+                [
+                  "18:00",
+                  "21:30"
+                ]
+              ],
               "partial": [],
-              "status": "unavailable",
+              "status": "diff",
               "url": "https://alerts.energy/kyiv"
             },
             "Карта світла": {
