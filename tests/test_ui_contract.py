@@ -69,7 +69,7 @@ class VisualStatusContract(unittest.TestCase):
         self.assertIn('remaining.hidden=!isOut;', HTML)
         self.assertIn("currentStatus(selectedEntry)==='normal'", HTML)
         self.assertIn('&&isFresh;', HTML)
-        self.assertIn('if(!chip||tab!==\\'today\\')return;', HTML)
+        self.assertIn("if(!chip||tab!=='today')return;", HTML)
         self.assertIn('setInterval(tick,1000)', HTML)
         self.assertIn('updateCurrentPower(n)}', HTML)
         self.assertIn('.power-remaining[hidden]{display:none!important}', HTML)
