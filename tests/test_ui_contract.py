@@ -96,7 +96,7 @@ class VisualStatusContract(unittest.TestCase):
 
     def test_open_tomorrow_tab_marks_every_new_version_as_seen(self):
         self.assertIn("if(tab==='tomorrow'&&tomorrowFingerprint()){markTomorrowSeen();updateTomorrowTab()}", HTML)
-        self.assertIn("setInterval(reload,30000)", HTML)
+        self.assertIn("setInterval(reload,15000)", HTML)
 
     def test_public_location_aliases_do_not_disclose_private_addresses(self):
         for key, label in [('dacha','Дача'),('home','Дім'),('solovky','Соловки'),('naumenky','Науменки')]:
