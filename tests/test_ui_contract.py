@@ -58,20 +58,21 @@ class VisualStatusContract(unittest.TestCase):
 
     def test_current_outage_has_a_live_countdown_until_scheduled_restoration(self):
         self.assertIn('class="power-remaining" id="powerRemaining"', HTML)
-        self.assertIn('id="powerRemainingNote"', HTML)
+        self.assertNotIn('id="powerRemainingNote"', HTML)
         self.assertIn('function currentOutageEnd(outages,minuteNow){', HTML)
         self.assertIn('function remainingOutageLabel(seconds){', HTML)
         self.assertIn('const outageEnd=canPredict?currentOutageEnd(outages,minuteNow):null;', HTML)
-        self.assertIn("remaining.textContent='Ще без світла: '+remainingOutageLabel(seconds);", HTML)
-        self.assertIn("'За графіком до '+String(Math.floor(outageEnd/60))", HTML)
-        self.assertIn("'До кінця доби за графіком'", HTML)
-        self.assertIn('remaining.hidden=note.hidden=!isOut;', HTML)
+        self.assertIn("remaining.textContent='Ще '+remainingOutageLabel(seconds);", HTML)
+        self.assertNotIn("remaining.textContent='Ще без світла: '", HTML)
+        self.assertNotIn("'За графіком до '+String(Math.floor(outageEnd/60))", HTML)
+        self.assertNotIn("'До кінця доби за графіком'", HTML)
+        self.assertIn('remaining.hidden=!isOut;', HTML)
         self.assertIn("currentStatus(selectedEntry)==='normal'", HTML)
         self.assertIn('&&isFresh;', HTML)
-        self.assertIn('if(!chip||tab!==\'today\')return;', HTML)
+        self.assertIn('if(!chip||tab!==\\'today\\')return;', HTML)
         self.assertIn('setInterval(tick,1000)', HTML)
         self.assertIn('updateCurrentPower(n)}', HTML)
-        self.assertIn('.power-remaining[hidden],.power-remaining-note[hidden]{display:none!important}', HTML)
+        self.assertIn('.power-remaining[hidden]{display:none!important}', HTML)
 
     def test_yesterday_archive_and_comparison(self):
         refresh = ROOT.joinpath("scripts/refresh.py").read_text(encoding="utf-8")
