@@ -57,7 +57,7 @@ class VisualStatusContract(unittest.TestCase):
         self.assertEqual(colors['ДТЕК'], colors['Київщина.info'])
 
     def test_current_outage_has_a_live_countdown_until_scheduled_restoration(self):
-        self.assertIn('id="powerRemaining" class="power-remaining"', HTML.replace('class="power-remaining" id="powerRemaining"', 'id="powerRemaining" class="power-remaining"'))
+        self.assertIn('class="power-remaining" id="powerRemaining"', HTML)
         self.assertIn('id="powerRemainingNote"', HTML)
         self.assertIn('function currentOutageEnd(outages,minuteNow){', HTML)
         self.assertIn('function remainingOutageLabel(seconds){', HTML)
