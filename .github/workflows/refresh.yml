@@ -2,7 +2,12 @@ name: Наше Світло | оновлення графіків і публі�
 on:
   push:
     branches: [main]
-  # Regular checks are triggered externally every 10 minutes via workflow_dispatch.
+  # Reliable primary: external workflow_dispatch roughly every 10 minutes.
+  # Best-effort evening fallback: check for newly released tomorrow schedules.
+  # GitHub's native scheduler can be delayed; do not rely on it alone.
+  schedule:
+    - cron: '3,8,13,18,23,28,33,38,43,48,53,58 16-23 * * *'
+      timezone: "Europe/Kyiv"
   workflow_dispatch:
 permissions:
   contents: write
@@ -10,7 +15,8 @@ permissions:
   id-token: write
 concurrency:
   group: dubechnya-pages-v2
-  cancel-in-progress: true
+  # Never cancel a publish already running when scheduled checks overlap.
+  cancel-in-progress: false
 jobs:
   refresh:
     runs-on: ubuntu-latest
