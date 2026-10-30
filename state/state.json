@@ -349,13 +349,26 @@
       "date": "2026-10-31",
       "detail": "Графік ще не опубліковано",
       "outages": [],
-      "source_observations": {},
+      "source_observations": {
+        "Alerts Energy": {
+          "fingerprint": "[[\"08:00\", \"11:30\"], [\"18:30\", \"22:00\"]]",
+          "first_seen": "2026-10-30T20:50+02:00"
+        }
+      },
       "source_reports": {
         "Alerts Energy": {
-          "fetch_failed": false,
-          "outages": null,
+          "outages": [
+            [
+              "08:00",
+              "11:30"
+            ],
+            [
+              "18:30",
+              "22:00"
+            ]
+          ],
           "partial": [],
-          "status": "unavailable",
+          "status": "diff",
           "url": "https://alerts.energy/kyivska-oblast"
         },
         "Карта світла": {
