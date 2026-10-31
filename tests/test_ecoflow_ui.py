@@ -56,8 +56,8 @@ class EcoFlowPreviewContract(unittest.TestCase):
         self.assertIn("new CustomEvent('svitlo:location-change'", HTML)
         self.assertNotIn('href="#ecoflow"', HTML)
         self.assertIn('<section class="eco-shell"', HTML)
-        self.assertIn('"./ecoflow.css?v=39"', SW)
-        self.assertIn('"./ecoflow.js?v=39"', SW)
+        self.assertIn('"./ecoflow.css?v=40"', SW)
+        self.assertIn('"./ecoflow.js?v=40"', SW)
 
 
     def test_device_section_first_and_header_rearranged(self):
@@ -345,10 +345,10 @@ class EcoFlowPreviewContract(unittest.TestCase):
         self.assertIn('eco-title-monogram', HTML)
         self.assertIn('<path d="M14 20H26" stroke="currentColor"', HTML)
         self.assertNotIn('stroke="#67E8F9"', HTML)
-        self.assertIn('href="./ecoflow.css?v=39"', HTML)
-        self.assertIn('src="./ecoflow.js?v=39"', HTML)
+        self.assertIn('href="./ecoflow.css?v=40"', HTML)
+        self.assertIn('src="./ecoflow.js?v=40"', HTML)
         self.assertIn("updateViaCache:'none'", HTML)
-        self.assertIn('nashe-svitlo-static-v39', SW)
+        self.assertIn('nashe-svitlo-static-v40', SW)
         self.assertIn('url.pathname.endsWith("/ecoflow.css")', SW)
         self.assertIn('url.pathname.endsWith("/ecoflow.js")', SW)
         self.assertIn('fetch(request, {cache: "no-store"})', SW)
@@ -602,14 +602,16 @@ class EcoFlowPreviewContract(unittest.TestCase):
 
 
     def test_consistent_w_display_units_without_mutating_capacity_calculations(self):
-        self.assertIn("return Number.isFinite(wh) ? uk.format(wh) + ' W' : '—';", JS)
-        self.assertIn("preciseWh.format(wh) + ' W'", JS)
+        self.assertIn("return Number.isFinite(wh) ? uk.format(wh) + ' Wh' : '—';", JS)
+        self.assertIn("preciseWh.format(wh) + ' Wh'", JS)
         self.assertIn("uk.format(d.inverterKw * 1000) + ' W'", JS)
+        self.assertIn("const solarUiEnabled = false;", JS)
+        self.assertIn("'<div class=\"eco-device-stat\"><span>Вхід</span><strong>' + d.inputW + ' W", JS)
         self.assertNotIn("кВт", JS)
         self.assertNotIn("кВт", HTML)
         self.assertNotIn("Вт", JS)
         self.assertNotIn("Вт", HTML)
-        self.assertIn("4 800 W", HTML)
+        self.assertIn("4 800 Wh", HTML)
         self.assertIn("maximumFractionDigits: 2", JS)
         self.assertIn("device.capacityWh * device.pct / total", JS)
         self.assertIn("const weighted = total ? stored / total * 100", JS)
@@ -639,7 +641,7 @@ class EcoFlowPreviewContract(unittest.TestCase):
         self.assertIn("1 240 W", HTML)
         self.assertIn("820 W / 1 600 W", HTML)
         self.assertIn("420 W / 1 000 W", HTML)
-        self.assertIn("4 800 W", HTML)
+        self.assertIn("4 800 Wh", HTML)
         self.assertNotIn("section.hidden = !station", JS)
         self.assertIn("renderSolar(place);", JS)
         self.assertIn("Очікується підключення EcoFlow", JS)
