@@ -442,8 +442,9 @@
     const weighted = total ? stored / total * 100 : 0;
     const fmtPercent = value => percentValue.format(value) + '%';
     const deviceShare = device => total ? device.capacityWh / total * 100 : 0;
-    // Percentage points added to the whole location's charge (not the battery's own SOC).
+    // Percent contribution to the location-wide weighted charge, not device SOC.
     const chargeContribution = device => total ? device.capacityWh * device.pct / total : 0;
+    const storedEnergyWh = device => device.capacityWh * device.pct / 100;
     const title = kind === 'capacity' ? 'Розподіл ємності локації'
       : kind === 'charge' ? 'Внесок станцій у середній заряд'
       : 'Станції та акумулятори локації';
@@ -453,6 +454,7 @@
       const capacity = exactCapacity(device.capacityWh);
       const share = deviceShare(device);
       const contribution = chargeContribution(device);
+      const savedEnergy = storedEnergyWh(device);
       if (kind === 'count') {
         const type = device.type === 'battery' ? (device.parent
           ? 'Додаткова батарея до ' + textEscape(device.parent) : 'Акумуляторний модуль')
@@ -478,12 +480,13 @@
       }
       return '<div class="eco-detail-device eco-detail-charge">' +
         '<span class="eco-detail-device-name">' + name + '</span>' +
-        '<strong class="eco-detail-contribution">+' + percentValue.format(contribution) + ' в.п.</strong>' +
+        '<strong class="eco-detail-contribution">+' + fmtPercent(contribution) + '</strong>' +
         '<div class="eco-detail-track"><i style="width:' + contribution +
         '%" data-level="' + level(device.pct) + '"></i></div>' +
         '<small>Заряд ' + device.pct + '% · частка ємності ' + fmtPercent(share) +
-        '</small><small>' + fmtPercent(share) + ' × ' + device.pct + '% = +' +
-        percentValue.format(contribution) + ' в.п.</small></div>';
+        '</small><small><strong class="eco-detail-stored">Запасено ' + exactCapacity(savedEnergy) + '</strong></small>' +
+        '<small>' + fmtPercent(share) + ' × ' + device.pct + '% = +' +
+        fmtPercent(contribution) + ' загального заряду</small></div>';
     }).join('');
 
     const capacityDistribution = kind === 'capacity' && total
@@ -496,13 +499,13 @@
         fmtPercent(weighted) + '">' + devices.map(device =>
           '<i data-level="' + level(device.pct) + '" style="width:' +
           chargeContribution(device) + '%" title="' + textEscape(device.name) + ': +' +
-          percentValue.format(chargeContribution(device)) + ' в.п."></i>').join('') + '</div>' : '';
+          fmtPercent(chargeContribution(device)) + ' середнього заряду"></i>').join('') + '</div>' : '';
     const formula = kind === 'capacity'
       ? '<div class="eco-detail-total"><span>Загальна ємність</span><strong>' +
         exactCapacity(total) + ' = 100%</strong></div>'
       : kind === 'charge'
-        ? '<div class="eco-detail-formula"><span>Внески в середній заряд (відсоткові пункти)</span>' +
-          '<strong>' + devices.map(device => percentValue.format(chargeContribution(device))).join(' + ') +
+        ? '<div class="eco-detail-formula"><span>Внески в середній заряд</span>' +
+          '<strong>' + devices.map(device => fmtPercent(chargeContribution(device))).join(' + ') +
           ' = ' + fmtPercent(weighted) + ' ≈ ' + Math.round(weighted) + '%</strong></div>'
         : '<div class="eco-detail-total"><span>Усього акумуляторів і станцій</span><strong>' +
           devices.length + '</strong></div>';
