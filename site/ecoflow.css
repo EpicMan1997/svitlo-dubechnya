@@ -1413,6 +1413,7 @@ main > nav.tabs > button[data-tab="tomorrow"]{justify-self:end;margin-right:0;ma
 .eco-detail-percent[data-level="low"]{color:#fb923c}
 .eco-detail-percent[data-level="critical"]{color:#f87171}
 .eco-detail-charge small{grid-column:1/-1;color:#acc4de;font-size:11px;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.eco-detail-stored{color:#d0fce7;font-weight:750;font-variant-numeric:tabular-nums}
 .eco-detail-total,.eco-detail-formula{
   display:flex;
   gap:10px;
