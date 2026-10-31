@@ -522,7 +522,7 @@ class EcoFlowPreviewContract(unittest.TestCase):
         self.assertIn("const stored = devices.reduce", JS)
         self.assertIn("const weighted = total ? stored / total * 100", JS)
         self.assertIn("device.capacityWh * device.pct / total", JS)
-        self.assertIn("Внески в середній заряд (відсоткові пункти)", JS)
+        self.assertIn("Внески в середній заряд</span>", JS)
         self.assertIn("exactCapacity(total)", JS)
         self.assertIn("devices.length + '</strong></div>'", JS)
 
