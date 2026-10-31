@@ -42,7 +42,7 @@
     }
   });
 
-  // Physical battery inventory for overview metrics (PowerOcean has two 5-kWh modules).
+  // Physical battery inventory for overview metrics (PowerOcean has two 5000 Wh modules).
   function physicalDevices(devices) {
     return devices.flatMap(device => {
       if (device.type !== 'system' || device.batteryCount <= 1) return [device];
@@ -64,11 +64,11 @@
   if (!root || !toggle) return;
 
   const $ = id => document.getElementById(id);
-  // Power: watts (W). Battery capacity and energy: watt-hours (W).
+  // Power uses W; battery capacity and energy use Wh. Internal capacityWh values stay in watt-hours.
   // Never scale values to kilowatts; capacityWh always stores physical watt-hours.
   const uk = new Intl.NumberFormat('uk-UA', { maximumFractionDigits: 2 });
   function niceWh(wh) {
-    return Number.isFinite(wh) ? uk.format(wh) + ' W' : '—';
+    return Number.isFinite(wh) ? uk.format(wh) + ' Wh' : '—';
   }
   function capClass(wh) {
     if (wh === null) return 'size-unknown';
@@ -432,7 +432,7 @@
   const textEscape = value => String(value).replace(/[&<>"']/g, char =>
     ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]);
   const exactCapacity = wh => Number.isFinite(wh)
-    ? preciseWh.format(wh) + ' W' : '—';
+    ? preciseWh.format(wh) + ' Wh' : '—';
   let metricOpen = null;
 
   function metricBreakdown(kind) {
