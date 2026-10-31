@@ -15,9 +15,9 @@ class EcoFlowPreviewContract(unittest.TestCase):
         for key in ("dacha:", "home:", "solovky:", "naumenky:"):
             self.assertIn(key, JS)
         for name in ("DELTA Pro 3", "DELTA 3 Plus", "RIVER 3 Plus Wireless",
-                     "PowerOcean", "RIVER 2", "Додаткова батарея DELTA 2"):
+                     "PowerOcean", "RIVER 2", "Додаткова батарея DELTA 2", "Smart Extra Battery DELTA Pro 3"):
             self.assertIn(name, JS)
-        self.assertEqual(JS.count("capacityWh: 4096"), 1)
+        self.assertEqual(JS.count("capacityWh: 4096"), 2)
         self.assertEqual(JS.count("capacityWh: 1024"), 5)
         self.assertEqual(JS.count("capacityWh: 286"), 1)
         self.assertEqual(JS.count("capacityWh: 256"), 1)
@@ -81,7 +81,7 @@ class EcoFlowPreviewContract(unittest.TestCase):
         self.assertIn(".eco-admin-toggle[aria-checked=\"true\"]", CSS)
 
     def test_expansion_batteries_are_one_system_card(self):
-        self.assertNotIn("parentId: 'dp3'", JS)
+        self.assertIn("parentId: 'dp3'", JS)
         self.assertIn("parentId: 'd2'", JS)
         self.assertIn("function renderDeviceGrid(devices)", JS)
         self.assertIn("const addons = new Map(", JS)
@@ -95,6 +95,24 @@ class EcoFlowPreviewContract(unittest.TestCase):
         self.assertIn(".eco-system-parts{display:grid", CSS)
         self.assertIn("formatAutonomy(capacityWh, chargePct, outputW)", JS)
         self.assertIn("energyStats(main, capacityWh, weighted)", JS)
+        self.assertIn("solarDisclosure(main)", JS)
+        self.assertIn("Smart Extra Battery", JS)
+
+    def test_delta_pro_3_expansion_capacity_and_location_totals(self):
+        # Exactly one physical 4096 Wh expansion attached to DELTA Pro 3.
+        dacha = JS.split("dacha: {", 1)[1].split("home: {", 1)[0]
+        self.assertEqual(dacha.count("parentId: 'dp3'"), 1)
+        self.assertIn("id: 'dp3eb'", dacha)
+        self.assertIn("name: 'Smart Extra Battery DELTA Pro 3'", dacha)
+        self.assertEqual(dacha.count("capacityWh: 4096"), 2)
+        capacities = [int(v) for v in re.findall(r"capacityWh:\\s*(\\d+)", dacha)]
+        self.assertEqual(sum(capacities), 10526)  # 8.192 kWh DP3 system + other dacha stations
+        self.assertEqual(len(capacities), 5)
+        self.assertIn("const capacityWh = main.capacityWh + addon.capacityWh;", JS)
+        self.assertIn("const packs = physicalDevices(place.devices);", JS)
+        self.assertIn("renderDeviceGrid(place.devices)", JS)
+        # PV controls must survive the change from standalone to paired system.
+        self.assertIn("solarDisclosure(main)", JS)
 
     def test_header_alignment_and_tabs_reach_graph_end(self):
         self.assertIn("main > header .location-shell,\nmain > header #clock,\nmain > header .header-time{min-height:58px}", CSS)
@@ -137,7 +155,7 @@ class EcoFlowPreviewContract(unittest.TestCase):
         solovky = JS.split("solovky: {", 1)[1].split("naumenky: {", 1)[0]
         for name in ("DELTA Pro 3", "DELTA 3 Plus", "DELTA 2", "RIVER 3 Plus Wireless"):
             self.assertIn("name: '" + name + "'", dacha)
-        self.assertNotIn("parentId:", dacha)
+        self.assertIn("parentId: 'dp3'", dacha)
         self.assertIn("space: 'Дача'", dacha)
         self.assertIn("solar: { maxW: 2600, highMaxW: 1600, lowMaxW: 1000", dacha)
         self.assertIn("currentW: 1240, highW: 820, lowW: 420, todayWh: 4800, connected: false", dacha)
