@@ -8,9 +8,13 @@
     dacha: {
       name: 'Дача', space: 'Дача',
       devices: [
-        // The DELTA Pro 3 is standalone; solar input capability is separate from battery capacity.
+        // DELTA Pro 3 + one compatible 4096 Wh Smart Extra Battery; solar input rating is separate from capacity.
         { name: 'DELTA Pro 3', capacityWh: 4096, pct: 84, inputW: 0, outputW: 620, type: 'station', id: 'dp3', operation: 'discharging',
           solar: { maxW: 2600, highMaxW: 1600, lowMaxW: 1000, currentW: 1240, highW: 820, lowW: 420, todayWh: 4800, connected: false } },
+        // Same stationary backup system, but a distinct physical battery for location-level totals.
+        // Percentage mirrors the main station as a placeholder until real EcoFlow telemetry exists.
+        { name: 'Smart Extra Battery DELTA Pro 3', capacityWh: 4096, pct: 84, type: 'battery',
+          parent: 'DELTA Pro 3', parentId: 'dp3', id: 'dp3eb', operation: 'discharging' },
         { name: 'DELTA 3 Plus', capacityWh: 1024, pct: 92, inputW: 120, outputW: 38, type: 'station', id: 'd3p', operation: 'charging' },
         { name: 'DELTA 2', capacityWh: 1024, pct: 64, inputW: 0, outputW: 75, type: 'station', id: 'd2', operation: 'discharging' },
         { name: 'RIVER 3 Plus Wireless', capacityWh: 286, pct: 29, inputW: 0, outputW: 12, type: 'station', id: 'r3pw', operation: 'discharging' }
@@ -234,6 +238,8 @@
       return '<div class="eco-system-part charge-' + level(d.pct) + '">' +
         '<div class="eco-system-part-top"><span class="eco-system-part-label">' + role + '</span>' +
         '<strong class="eco-system-percent">' + d.pct + '%</strong></div>' +
+        (role === 'Додаткова' && main.id === 'dp3'
+          ? '<span class="eco-system-part-model">Smart Extra Battery</span>' : '') +
         operationBadge(d) +
         chargeTrack(d.pct, name) +
         '<span class="eco-system-part-cap">' + niceWh(d.capacityWh) + '</span>' +
@@ -242,11 +248,12 @@
     return '<article class="eco-system eco-system-paired charge-' + level(weighted) +
       '" aria-label="' + main.name + ' із додатковою батареєю, загалом ' + niceWh(capacityWh) + '">' +
       '<div class="eco-system-head"><div class="eco-system-title"><strong>' + main.name +
-      '</strong><span class="eco-system-tag">+ додаткова батарея</span></div>' +
+      '</strong><span class="eco-system-tag">' + (main.id === 'dp3' ? '+ Smart Extra Battery' : '+ додаткова батарея') + '</span></div>' +
       '<div class="eco-system-total"><strong>' + niceWh(capacityWh) + '</strong>' +
       '<span>' + weighted + '% загалом</span></div></div>' +
       '<div class="eco-system-parts">' + batteryPart(main, 'Основна') + batteryPart(addon, 'Додаткова') + '</div>' +
       energyStats(main, capacityWh, weighted) +
+      solarDisclosure(main) +
       adminControls(main) +
       '</article>';
   }
@@ -415,7 +422,7 @@
   }
 
 
-  // Location metrics use the five physical battery packs, including expansions.
+  // Location metrics use all physical battery packs, including expansion batteries.
   const detailArea = $('eco-metrics-area');
   const detailPanel = $('eco-metric-detail');
   const preciseWh = new Intl.NumberFormat('uk-UA', { maximumFractionDigits: 3 });
