@@ -316,7 +316,7 @@ class EcoFlowPreviewContract(unittest.TestCase):
 
     def test_river_three_plus_quiet_is_eighty_watts(self):
         self.assertIn("r3pw: { quiet: 80, balanced: 200, fast: 380 }", JS)
-        self.assertIn("mode.key === 'quiet' ? 'до 80 Вт'", JS)
+        self.assertIn("mode.key === 'quiet' ? 'до 80 W'", JS)
         self.assertIn("'</select>'", JS)
 
 
@@ -574,8 +574,8 @@ class EcoFlowPreviewContract(unittest.TestCase):
         self.assertIn('id="eco-tab-ecoflow"', HTML)
         self.assertIn('id="eco-tab-generator"', HTML)
         self.assertIn('EDON PT-3000', HTML)
-        self.assertIn('2 800 Вт', HTML)
-        self.assertIn('3 000 Вт', HTML)
+        self.assertIn('2 800 W', HTML)
+        self.assertIn('3 000 W', HTML)
         self.assertIn('15 л', HTML)
         self.assertIn('Ручний', HTML)
         self.assertIn('Без онлайн-моніторингу', HTML)
@@ -601,14 +601,15 @@ class EcoFlowPreviewContract(unittest.TestCase):
         self.assertIn(".eco-empty-state", CSS)
 
 
-    def test_power_in_watts_and_energy_in_watt_hours_without_scaling(self):
-        self.assertIn("return Number.isFinite(wh) ? uk.format(wh) + ' Вт·год' : '—';", JS)
-        self.assertIn("preciseWh.format(wh) + ' Вт·год'", JS)
-        self.assertIn("uk.format(d.inverterKw * 1000) + ' Вт'", JS)
+    def test_consistent_w_display_units_without_mutating_capacity_calculations(self):
+        self.assertIn("return Number.isFinite(wh) ? uk.format(wh) + ' W' : '—';", JS)
+        self.assertIn("preciseWh.format(wh) + ' W'", JS)
+        self.assertIn("uk.format(d.inverterKw * 1000) + ' W'", JS)
         self.assertNotIn("кВт", JS)
         self.assertNotIn("кВт", HTML)
-        self.assertIn("Вт·год", JS)
-        self.assertIn("4 800 Вт·год", HTML)
+        self.assertNotIn("Вт", JS)
+        self.assertNotIn("Вт", HTML)
+        self.assertIn("4 800 W", HTML)
         self.assertIn("maximumFractionDigits: 2", JS)
         self.assertIn("device.capacityWh * device.pct / total", JS)
         self.assertIn("const weighted = total ? stored / total * 100", JS)
@@ -635,10 +636,10 @@ class EcoFlowPreviewContract(unittest.TestCase):
         self.assertIn("Сонячна генерація", JS)
         self.assertIn("solarPowerLabel(device.solar.currentW)", JS)
         self.assertIn("solarPowerLabel(device.solar.maxW)", JS)
-        self.assertIn("1 240 Вт", HTML)
-        self.assertIn("820 Вт / 1 600 Вт", HTML)
-        self.assertIn("420 Вт / 1 000 Вт", HTML)
-        self.assertIn("4 800 Вт·год", HTML)
+        self.assertIn("1 240 W", HTML)
+        self.assertIn("820 W / 1 600 W", HTML)
+        self.assertIn("420 W / 1 000 W", HTML)
+        self.assertIn("4 800 W", HTML)
         self.assertNotIn("section.hidden = !station", JS)
         self.assertIn("renderSolar(place);", JS)
         self.assertIn("Очікується підключення EcoFlow", JS)
@@ -649,7 +650,7 @@ class EcoFlowPreviewContract(unittest.TestCase):
         self.assertIn(".eco-solar-disclosure[open]>summary", CSS)
         self.assertIn(".eco-solar-disclosure .eco-solar{", CSS)
         self.assertIn(".eco-solar-disclosure .eco-solar-overview", CSS)
-        self.assertIn("uk.format(watt) + ' Вт'", JS)
+        self.assertIn("uk.format(watt) + ' W'", JS)
         self.assertIn(".eco-device.size-large{grid-column:span 24}", CSS)
         self.assertIn("role=\"progressbar\"", HTML)
         self.assertNotRegex(JS, r"\bfetch\s*\(|XMLHttpRequest|WebSocket")
@@ -668,7 +669,7 @@ class EcoFlowPreviewContract(unittest.TestCase):
         self.assertLess(device_fn.index("solarDisclosure(d)"), device_fn.index("adminControls(d)"))
         loc = JS.split("function updateLocation(id) {", 1)[1].split("// Read-only draft controls", 1)[0]
         self.assertLess(loc.index("renderDeviceGrid(place.devices)"), loc.index("renderSolar(place);"))
-        self.assertIn("if (!device.solar) return '';", JS)
+        self.assertIn("if (!solarUiEnabled || !device.solar) return '';", JS)
         self.assertIn("source.innerHTML", JS)
 
 
@@ -745,7 +746,7 @@ class EcoFlowPreviewContract(unittest.TestCase):
         self.assertIn("Акумуляторний модуль", JS)
         self.assertIn("Додаткова батарея до", JS)
         self.assertIn("operationMeta[device.operation]", JS)
-        self.assertIn("Вхід ' + device.inputW + ' Вт · вихід ' + device.outputW", JS)
+        self.assertIn("Вхід ' + device.inputW + ' W · вихід ' + device.outputW", JS)
         self.assertIn(".eco-detail-inventory{", CSS)
         self.assertIn(".eco-detail-inventory-stats{", CSS)
 
