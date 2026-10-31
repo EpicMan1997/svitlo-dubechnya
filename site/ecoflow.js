@@ -607,6 +607,120 @@
     updateChannel('low', pv.lowW, pv.lowMaxW);
   }
 
+  // Generator planning is local-only and never sends any control commands.
+  // The initial SOC values are sample EcoFlow inventory numbers, NOT live readings.
+  const generatorPlan = {
+    chargeW: 1800, otherLoadW: 150, targetPct: 100, fuelLph: null,
+    soc: new Map()
+  };
+  const generatorRatedW = 2800;
+  const generatorSuggestedFraction = 0.8; // conservative planning headroom, not a manufacturer operating limit
+  const generatorChargeEfficiency = 0.85; // illustrative average, charging tapers near 100%
+  const generatorNum = new Intl.NumberFormat('uk-UA', { maximumFractionDigits: 1 });
+
+  function generatorBatteryPacks() {
+    return inventory.dacha.devices.filter(device =>
+      device.type === 'station' || device.type === 'battery');
+  }
+  function generatorSOC(device) {
+    const stored = generatorPlan.soc.get(device.id);
+    const fallback = Number(device.pct);
+    return Math.max(0, Math.min(100, Number.isFinite(stored) ? stored : fallback));
+  }
+  function generatorMissingWh(devices) {
+    return devices.reduce((total, d) =>
+      total + d.capacityWh * Math.max(0, generatorPlan.targetPct - generatorSOC(d)) / 100, 0);
+  }
+  function generatorDuration(energyWh, availableW) {
+    return energyWh <= 0 ? 0 :
+      availableW > 0 ? energyWh / (availableW * generatorChargeEfficiency) : Infinity;
+  }
+  function generatorTime(hours) {
+    if (!Number.isFinite(hours)) return 'Недостатньо W';
+    if (hours <= 0) return 'Заряджено до цілі';
+    const minutes = Math.max(1, Math.ceil(hours * 60));
+    const wholeHours = Math.floor(minutes / 60);
+    const rem = minutes % 60;
+    return wholeHours ? wholeHours + ' год' + (rem ? ' ' + rem + ' хв' : '') : rem + ' хв';
+  }
+  function renderGeneratorPlanner() {
+    const area = $('eco-generator-planner');
+    if (!area) return;
+    const packs = generatorBatteryPacks();
+    const dp3 = packs.filter(d => d.id === 'dp3' || d.parentId === 'dp3');
+    if (!area.dataset.initialized) {
+      $('eco-gen-soc-fields').innerHTML = packs.map(device =>
+        '<label class="eco-generator-soc-item"><span>' + textEscape(device.name) +
+        '<small>' + niceWh(device.capacityWh) + '</small></span>' +
+        '<span class="eco-generator-soc-input"><input type="number" min="0" max="100" step="1" ' +
+        'data-eco-gen-soc="' + textEscape(device.id) + '" value="' + generatorSOC(device) +
+        '" aria-label="Заряд ' + textEscape(device.name) + '"><span>%</span></span></label>'
+      ).join('');
+      area.dataset.initialized = 'true';
+    }
+    const allowedW = Math.max(0, Math.floor(generatorRatedW * generatorSuggestedFraction) - generatorPlan.otherLoadW);
+    const actualW = Math.min(generatorPlan.chargeW, allowedW);
+    const dp3Missing = generatorMissingWh(dp3);
+    const allMissing = generatorMissingWh(packs);
+    const dp3Hours = generatorDuration(dp3Missing, actualW);
+    const allHours = generatorDuration(allMissing, actualW);
+    $('eco-gen-dp3-time').textContent = '≈ ' + generatorTime(dp3Hours);
+    $('eco-gen-all-time').textContent = '≈ ' + generatorTime(allHours);
+    $('eco-gen-dp3-energy').textContent = 'Дозарядити ' + niceWh(Math.ceil(dp3Missing)) + ' із ' +
+      niceWh(dp3.reduce((sum, d) => sum + d.capacityWh, 0));
+    $('eco-gen-all-energy').textContent = 'Дозарядити ' + niceWh(Math.ceil(allMissing)) + ' із ' +
+      niceWh(packs.reduce((sum, d) => sum + d.capacityWh, 0));
+    $('eco-gen-charge-value').textContent = generatorNum.format(generatorPlan.chargeW) + ' W';
+    $('eco-gen-house-value').textContent = generatorNum.format(generatorPlan.otherLoadW) + ' W';
+    area.querySelectorAll('[data-eco-gen-target]').forEach(button => {
+      const active = Number(button.dataset.ecoGenTarget) === generatorPlan.targetPct;
+      button.classList.toggle('is-active', active);
+      button.setAttribute('aria-pressed', String(active));
+    });
+    const limited = actualW < generatorPlan.chargeW;
+    $('eco-gen-budget').textContent =
+      'Доступно на заряджання: ' + generatorNum.format(actualW) + ' W · інші прилади: ' +
+      generatorNum.format(generatorPlan.otherLoadW) + ' W · резерв потужності: ' +
+      generatorNum.format(generatorRatedW * (1 - generatorSuggestedFraction)) + ' W' +
+      (limited ? '. Потужність заряджання обмежена з урахуванням інших приладів.' : '.');
+    $('eco-gen-budget').classList.toggle('is-limited', limited);
+    const rate = generatorPlan.fuelLph;
+    const fuelDisplay = $('eco-gen-fuel-result');
+    fuelDisplay.hidden = !(Number.isFinite(rate) && rate > 0);
+    if (!fuelDisplay.hidden) {
+      const fuelDp3 = Number.isFinite(dp3Hours) ? generatorNum.format(dp3Hours * rate) + ' л' : '—';
+      const fuelAll = Number.isFinite(allHours) ? generatorNum.format(allHours * rate) + ' л' : '—';
+      fuelDisplay.textContent = 'Орієнтир пального: ' + fuelDp3 +
+        ' для DELTA Pro 3 · ' + fuelAll + ' для всіх EcoFlow. Розраховано з введеної витрати.';
+    }
+  }
+  root.addEventListener('click', event => {
+    const target = event.target.closest('button[data-eco-gen-target]');
+    if (!target || !root.contains(target)) return;
+    const value = Number(target.dataset.ecoGenTarget);
+    if (![80, 90, 100].includes(value)) return;
+    generatorPlan.targetPct = value;
+    renderGeneratorPlanner();
+  });
+  root.addEventListener('input', event => {
+    const input = event.target;
+    if (input.id === 'eco-gen-charge-w') {
+      generatorPlan.chargeW = Math.min(2200, Math.max(400, Number(input.value) || 1800));
+    } else if (input.id === 'eco-gen-house-w') {
+      generatorPlan.otherLoadW = Math.min(1200, Math.max(0, Number(input.value) || 0));
+    } else if (input.id === 'eco-gen-fuel') {
+      const rate = Number(input.value);
+      generatorPlan.fuelLph = input.value.trim() && rate > 0 ? rate : null;
+    } else if (input.matches?.('[data-eco-gen-soc]')) {
+      const pack = generatorBatteryPacks().find(d => d.id === input.dataset.ecoGenSoc);
+      if (!pack || input.value === '') return;
+      const value = Number(input.value);
+      if (!Number.isFinite(value)) return;
+      generatorPlan.soc.set(pack.id, Math.max(0, Math.min(100, value)));
+    } else return;
+    renderGeneratorPlanner();
+  });
+
   function updateLocation(id) {
     if (!Object.prototype.hasOwnProperty.call(inventory, id)) return;
     const place = inventory[id];
@@ -649,6 +763,7 @@
     $('eco-devices').innerHTML = place.devices.length ? renderDeviceGrid(place.devices) : '<div class="eco-empty-state"><strong>У цій локації немає EcoFlow</strong><span>Резервне живлення дачі забезпечує генератор. Його характеристики є в сусідній вкладці.</span></div>';
     renderSolar(place);
     renderBulkPanel();
+    if (id === 'dacha') renderGeneratorPlanner();
   }
 
   // Read-only draft controls; no configuration reaches any EcoFlow device.
