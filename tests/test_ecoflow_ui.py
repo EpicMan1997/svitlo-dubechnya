@@ -105,7 +105,7 @@ class EcoFlowPreviewContract(unittest.TestCase):
         self.assertIn("id: 'dp3eb'", dacha)
         self.assertIn("name: 'Smart Extra Battery DELTA Pro 3'", dacha)
         self.assertEqual(dacha.count("capacityWh: 4096"), 2)
-        capacities = [int(v) for v in re.findall(r"capacityWh:\\s*(\\d+)", dacha)]
+        capacities = [int(v) for v in re.findall(r"capacityWh:\s*(\d+)", dacha)]
         self.assertEqual(sum(capacities), 10526)  # 8.192 kWh DP3 system + other dacha stations
         self.assertEqual(len(capacities), 5)
         self.assertIn("const capacityWh = main.capacityWh + addon.capacityWh;", JS)
@@ -270,7 +270,7 @@ class EcoFlowPreviewContract(unittest.TestCase):
         self.assertIn("grid-column:span 12", CSS)
 
     def test_every_battery_has_explicit_operation_state(self):
-        self.assertEqual(JS.count("operation: 'discharging'"), 7)
+        self.assertEqual(JS.count("operation: 'discharging'"), 8)
         self.assertEqual(JS.count("operation: 'charging'"), 1)
         self.assertEqual(JS.count("operation: 'holding'"), 1)
         self.assertIn("charging: { label: 'Заряджається'", JS)
