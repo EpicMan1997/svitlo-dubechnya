@@ -64,11 +64,11 @@
   if (!root || !toggle) return;
 
   const $ = id => document.getElementById(id);
-  // Display convention requested for UI: small values as Вт, large as кВт.
-  // Underlying capacityWh remains in watt-hours for accurate capacity arithmetic.
+  // Power: watts (Вт). Battery capacity and energy: watt-hours (Вт·год).
+  // Never scale values to kilowatts; capacityWh always stores physical watt-hours.
   const uk = new Intl.NumberFormat('uk-UA', { maximumFractionDigits: 2 });
   function niceWh(wh) {
-    return wh >= 2000 ? uk.format(wh / 1000) + ' кВт' : uk.format(wh) + ' Вт';
+    return Number.isFinite(wh) ? uk.format(wh) + ' Вт·год' : '—';
   }
   function capClass(wh) {
     if (wh === null) return 'size-unknown';
@@ -177,11 +177,13 @@
       '</section>';
   }
 
+  // The solar component is retained for later, but hidden until panels actually exist.
+  const solarUiEnabled = false;
   const solarPowerLabel = watt => Number.isFinite(watt)
-    ? (watt >= 1000 ? uk.format(watt / 1000) + ' кВт' : uk.format(watt) + ' Вт') : '—';
+    ? uk.format(watt) + ' Вт' : '—';
 
   function solarDisclosure(device) {
-    if (!device.solar) return '';
+    if (!solarUiEnabled || !device.solar) return '';
     const source = $('eco-solar-template');
     if (!source) return '';
     return '<details class="eco-solar-disclosure">' +
@@ -217,7 +219,7 @@
     const cap = niceWh(d.capacityWh);
     return '<article class="eco-powerocean charge-' + level(d.pct) + '" aria-label="PowerOcean, домашня система, заряд ' + d.pct + '%">' +
       '<div class="eco-ocean-top"><div><span class="eco-ocean-overline">Домашня енергосистема</span>' +
-      '<h3>PowerOcean</h3><span class="eco-ocean-cap">' + d.batteryCount + ' акумулятори · ' + cap + ' · інвертор ' + d.inverterKw + ' кВт' +
+      '<h3>PowerOcean</h3><span class="eco-ocean-cap">' + d.batteryCount + ' акумулятори · ' + cap + ' · інвертор ' + uk.format(d.inverterKw * 1000) + ' Вт' +
       '</span></div>' + operationBadge(d) + '</div>' +
       '<div class="eco-ocean-body"><div class="eco-ocean-battery"><span class="eco-ocean-label">Акумулятор</span>' +
       '<div class="eco-battery"><span class="eco-battery-percent">' + d.pct + '%</span></div>' +
@@ -429,9 +431,8 @@
   const percentValue = new Intl.NumberFormat('uk-UA', { maximumFractionDigits: 2 });
   const textEscape = value => String(value).replace(/[&<>"']/g, char =>
     ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]);
-  const exactCapacity = wh => wh >= 2000
-    ? preciseWh.format(wh / 1000) + ' кВт'
-    : preciseWh.format(wh) + ' Вт';
+  const exactCapacity = wh => Number.isFinite(wh)
+    ? preciseWh.format(wh) + ' Вт·год' : '—';
   let metricOpen = null;
 
   function metricBreakdown(kind) {
@@ -586,7 +587,7 @@
     };
     $('eco-solar-max').textContent = formatPower(pv.maxW);
     $('eco-solar-current').textContent = formatPower(solarPower);
-    $('eco-solar-today').textContent = formatPower(pv.todayWh);
+    $('eco-solar-today').textContent = niceWh(pv.todayWh);
     $('eco-solar-fill').style.width = percentOf(solarPower, pv.maxW);
     const progress = $('eco-solar-track');
     progress.setAttribute('aria-valuemax', String(pv.maxW));
