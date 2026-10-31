@@ -455,7 +455,7 @@ h1{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 @media(max-width:430px){.season-extra-kpis{gap:7px}}
 @media(max-width:700px){.season-grid{grid-template-columns:minmax(0,1fr)}}
 @media(max-width:430px){.season-panel{padding:12px}.season-location{padding:11px}.season-kpis{gap:7px}.season-kpi{padding:9px}.season-kpi strong{font-size:16px}}
-</style><link rel="stylesheet" href="./ecoflow.css?v=40">
+</style><link rel="stylesheet" href="./ecoflow.css?v=41">
 <div id="pullRefresh" class="pull-refresh" role="status" aria-live="polite"><span class="pull-refresh-icon" aria-hidden="true"></span><span id="pullRefreshText">Потягни вниз для оновлення</span></div><main><header><div class="location-shell"><h1><img class="head-icon" src="./favicon.svg" alt="" aria-hidden="true"><button class="location-button" id="locationButton" type="button" aria-expanded="false"><span id="locationLabel">Дача</span><span class="location-chevron" aria-hidden="true"></span></button></h1><div class="location-menu" id="locationMenu" hidden><button type="button" data-location="dacha">Дача <small class="location-group-hint" hidden></small></button><button type="button" data-location="home">Дім <small class="location-group-hint" hidden></small></button><button type="button" data-location="solovky">Соловки <small class="location-group-hint" hidden></small></button><button type="button" data-location="naumenky">Науменки <small class="location-group-hint" hidden></small></button></div></div><div class="clock-view">
   <div class="site-clock" id="clock" aria-label="Час у Києві">--:--:--</div>
   <div class="view-switch">
@@ -508,8 +508,8 @@ h1{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
       <div class="eco-solar-destination"><span>Надходить до</span><strong>DELTA Pro 3</strong><small>Сонячний вхід станції</small></div>
     </div>
     <div class="eco-solar-channels">
-      <div class="eco-solar-channel"><div><strong>HV · високовольтний</strong><span id="eco-solar-high">820 W / 1 600 W</span></div><div class="eco-solar-channel-track"><i id="eco-solar-high-fill"></i></div><small>30–150 В · до 1 600 W</small></div>
-      <div class="eco-solar-channel"><div><strong>LV · низьковольтний</strong><span id="eco-solar-low">420 W / 1 000 W</span></div><div class="eco-solar-channel-track"><i id="eco-solar-low-fill"></i></div><small>11–60 В · до 1 000 W</small></div>
+      <div class="eco-solar-channel"><div><strong>HV · високовольтний</strong><span id="eco-solar-high">820 W / 1 600 W</span></div><div class="eco-solar-channel-track"><i id="eco-solar-high-fill"></i></div><small>30–150 V · до 1 600 W</small></div>
+      <div class="eco-solar-channel"><div><strong>LV · низьковольтний</strong><span id="eco-solar-low">420 W / 1 000 W</span></div><div class="eco-solar-channel-track"><i id="eco-solar-low-fill"></i></div><small>11–60 V · до 1 000 W</small></div>
     </div>
   </section>
   </template>
@@ -551,7 +551,7 @@ h1{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
         <div><span>Паливо</span><strong>Бензин</strong></div>
         <div><span>Паливний бак</span><strong>15 л</strong></div>
         <div><span>Запуск</span><strong>Ручний</strong></div>
-        <div><span>Вихід</span><strong>220 В · 50 Гц</strong></div>
+        <div><span>Вихід</span><strong>220 V · 50 Hz</strong></div>
       </div>
       <p class="eco-generator-note">Статус роботи, залишок пального та споживання не відстежуються автоматично.</p>
       <a class="eco-generator-source" href="https://edon.in.ua/benzoinstrument/benzinovij-generator-edon-pt-3000" target="_blank" rel="noopener noreferrer">Характеристики EDON PT-3000 ↗</a>
@@ -1200,4 +1200,4 @@ document.addEventListener('keydown',e=>{
   options[(options.indexOf(e.target)+(e.key==='ArrowDown'?1:options.length-1))%options.length].focus();
  }
 });
-$('locationButton').onclick=()=>{const menu=$('locationMenu');menu.hidden=!menu.hidden;$('locationButton').setAttribute('aria-expanded',String(!menu.hidden))};document.querySelectorAll('[data-location]').forEach(b=>b.onclick=()=>selectLocation(b.dataset.location));document.addEventListener('click',e=>{if(!e.target.closest('.location-shell'))closeLocationMenu()});document.addEventListener('keydown',e=>{if(e.key==='Escape')closeLocationMenu()});const restored=remembered('dubechnya-selected-location');if(['dacha','home','solovky','naumenky'].includes(restored))locationId=restored;document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{tab=b.dataset.tab;if(tab==='tomorrow')markTomorrowSeen();paint();events()});dayShown=now().iso;if(remembered('nashe-svitlo-active-view')==='statistics')switchSiteView('statistics');tick();reload();installPullToRefresh();installDailyCounterTooltip();installMetricInfoTooltip();setInterval(tick,1000);setInterval(reload,15000);document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'){reload()}else{remember('dubechnya-selected-location',locationId)}});window.addEventListener('pagehide',()=>remember('dubechnya-selected-location',locationId));if('serviceWorker' in navigator){navigator.serviceWorker.register('./sw.js',{updateViaCache:'none'}).then(r=>r.update()).catch(e=>console.warn('Offline shell unavailable',e))}})();</script><script src="./ecoflow.js?v=40" defer></script></html>
+$('locationButton').onclick=()=>{const menu=$('locationMenu');menu.hidden=!menu.hidden;$('locationButton').setAttribute('aria-expanded',String(!menu.hidden))};document.querySelectorAll('[data-location]').forEach(b=>b.onclick=()=>selectLocation(b.dataset.location));document.addEventListener('click',e=>{if(!e.target.closest('.location-shell'))closeLocationMenu()});document.addEventListener('keydown',e=>{if(e.key==='Escape')closeLocationMenu()});const restored=remembered('dubechnya-selected-location');if(['dacha','home','solovky','naumenky'].includes(restored))locationId=restored;document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{tab=b.dataset.tab;if(tab==='tomorrow')markTomorrowSeen();paint();events()});dayShown=now().iso;if(remembered('nashe-svitlo-active-view')==='statistics')switchSiteView('statistics');tick();reload();installPullToRefresh();installDailyCounterTooltip();installMetricInfoTooltip();setInterval(tick,1000);setInterval(reload,15000);document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'){reload()}else{remember('dubechnya-selected-location',locationId)}});window.addEventListener('pagehide',()=>remember('dubechnya-selected-location',locationId));if('serviceWorker' in navigator){navigator.serviceWorker.register('./sw.js',{updateViaCache:'none'}).then(r=>r.update()).catch(e=>console.warn('Offline shell unavailable',e))}})();</script><script src="./ecoflow.js?v=41" defer></script></html>
