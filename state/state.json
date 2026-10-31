@@ -346,16 +346,31 @@
       "url": "https://mapasvitla.com.ua/kyivska-oblast/dtek-krem/3.1"
     },
     "2026-11-01": {
+      "alternatives": [],
       "date": "2026-11-01",
-      "detail": "Графік ще не опубліковано",
-      "outages": [],
-      "source_observations": {},
+      "detail": "Перші дані з одного джерела. Потрібне підтвердження.",
+      "outages": [
+        [
+          "15:30",
+          "21:00"
+        ]
+      ],
+      "source_observations": {
+        "Alerts Energy": {
+          "fingerprint": "[[\"15:30\", \"21:00\"]]",
+          "first_seen": "2026-10-31T18:50+02:00"
+        }
+      },
       "source_reports": {
         "Alerts Energy": {
-          "fetch_failed": false,
-          "outages": null,
+          "outages": [
+            [
+              "15:30",
+              "21:00"
+            ]
+          ],
           "partial": [],
-          "status": "unavailable",
+          "status": "preliminary",
           "url": "https://alerts.energy/kyivska-oblast"
         },
         "Карта світла": {
@@ -388,8 +403,10 @@
         }
       },
       "source_updated": "",
-      "sources": [],
-      "status": "unknown",
+      "sources": [
+        "Alerts Energy"
+      ],
+      "status": "preliminary",
       "url": "https://mapasvitla.com.ua/kyivska-oblast/dtek-krem/3.1"
     }
   },
@@ -2923,6 +2940,21 @@
     }
   },
   "logs": [
+    {
+      "after": [
+        [
+          "15:30",
+          "21:00"
+        ]
+      ],
+      "at": "2026-10-31T18:50+02:00",
+      "before": null,
+      "date": "2026-11-01",
+      "first_observed_source": "Alerts Energy",
+      "kind": "preliminary",
+      "message": "Попередній графік: 15:30–21:00",
+      "sources_confirmed": []
+    },
     {
       "after": [
         [
