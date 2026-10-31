@@ -56,8 +56,8 @@ class EcoFlowPreviewContract(unittest.TestCase):
         self.assertIn("new CustomEvent('svitlo:location-change'", HTML)
         self.assertNotIn('href="#ecoflow"', HTML)
         self.assertIn('<section class="eco-shell"', HTML)
-        self.assertIn('"./ecoflow.css?v=40"', SW)
-        self.assertIn('"./ecoflow.js?v=40"', SW)
+        self.assertIn('"./ecoflow.css?v=41"', SW)
+        self.assertIn('"./ecoflow.js?v=41"', SW)
 
 
     def test_device_section_first_and_header_rearranged(self):
@@ -345,10 +345,10 @@ class EcoFlowPreviewContract(unittest.TestCase):
         self.assertIn('eco-title-monogram', HTML)
         self.assertIn('<path d="M14 20H26" stroke="currentColor"', HTML)
         self.assertNotIn('stroke="#67E8F9"', HTML)
-        self.assertIn('href="./ecoflow.css?v=40"', HTML)
-        self.assertIn('src="./ecoflow.js?v=40"', HTML)
+        self.assertIn('href="./ecoflow.css?v=41"', HTML)
+        self.assertIn('src="./ecoflow.js?v=41"', HTML)
         self.assertIn("updateViaCache:'none'", HTML)
-        self.assertIn('nashe-svitlo-static-v40', SW)
+        self.assertIn('nashe-svitlo-static-v41', SW)
         self.assertIn('url.pathname.endsWith("/ecoflow.css")', SW)
         self.assertIn('url.pathname.endsWith("/ecoflow.js")', SW)
         self.assertIn('fetch(request, {cache: "no-store"})', SW)
@@ -729,15 +729,21 @@ class EcoFlowPreviewContract(unittest.TestCase):
         self.assertIn("eco-detail-distribution i:nth-child", CSS)
         self.assertIn("Загальна ємність", JS)
 
-    def test_average_charge_lists_each_station_percentage_point_contribution(self):
+    def test_average_charge_uses_percent_contributions_and_real_energy_units(self):
         self.assertIn("Внесок станцій у середній заряд", JS)
         self.assertIn("const chargeContribution = device => total ? device.capacityWh * device.pct / total : 0;", JS)
+        self.assertIn("const storedEnergyWh = device => device.capacityWh * device.pct / 100;", JS)
+        self.assertIn("const savedEnergy = storedEnergyWh(device);", JS)
         self.assertIn("eco-detail-contribution", JS)
         self.assertIn("eco-detail-contribution-bar", JS)
-        self.assertIn("в.п.", JS)
+        self.assertIn("eco-detail-stored", JS)
+        self.assertIn("niceWh(Math.round(savedEnergy))", JS)
+        self.assertIn("fmtPercent(contribution) + '</strong>'", JS)
+        self.assertIn("fmtPercent(contribution) + ' загального заряду", JS)
         self.assertIn("Заряд ' + device.pct + '% · частка ємності", JS)
-        self.assertIn("Внески в середній заряд (відсоткові пункти)", JS)
-        self.assertIn("percentValue.format(chargeContribution(device))", JS)
+        self.assertIn("Внески в середній заряд</span>", JS)
+        self.assertIn("devices.map(device => fmtPercent(chargeContribution(device)))", JS)
+        self.assertNotIn("в.п.", JS)
         self.assertIn(".eco-detail-charge .eco-detail-track i[data-level=", CSS)
 
     def test_physical_device_inventory_has_useful_station_details(self):
