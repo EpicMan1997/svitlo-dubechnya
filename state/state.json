@@ -346,9 +346,8 @@
       "url": "https://mapasvitla.com.ua/kyivska-oblast/dtek-krem/3.1"
     },
     "2026-11-01": {
-      "alternatives": [],
       "date": "2026-11-01",
-      "detail": "Перші дані з одного джерела. Потрібне підтвердження.",
+      "detail": "Зіставлено незалежні джерела",
       "outages": [
         [
           "15:30",
@@ -359,6 +358,10 @@
         "Alerts Energy": {
           "fingerprint": "[[\"15:30\", \"21:00\"]]",
           "first_seen": "2026-10-31T18:50+02:00"
+        },
+        "Карта світла": {
+          "fingerprint": "[[\"15:30\", \"21:00\"]]",
+          "first_seen": "2026-10-31T19:01+02:00"
         }
       },
       "source_reports": {
@@ -370,14 +373,18 @@
             ]
           ],
           "partial": [],
-          "status": "preliminary",
+          "status": "match",
           "url": "https://alerts.energy/kyivska-oblast"
         },
         "Карта світла": {
-          "fetch_failed": false,
-          "outages": null,
+          "outages": [
+            [
+              "15:30",
+              "21:00"
+            ]
+          ],
           "partial": [],
-          "status": "unavailable",
+          "status": "match",
           "url": "https://mapasvitla.com.ua/kyivska-oblast/dtek-krem/3.1"
         },
         "Київщина.info": {
@@ -404,9 +411,10 @@
       },
       "source_updated": "",
       "sources": [
-        "Alerts Energy"
+        "Alerts Energy",
+        "Карта світла"
       ],
-      "status": "preliminary",
+      "status": "normal",
       "url": "https://mapasvitla.com.ua/kyivska-oblast/dtek-krem/3.1"
     }
   },
@@ -2940,6 +2948,24 @@
     }
   },
   "logs": [
+    {
+      "after": [
+        [
+          "15:30",
+          "21:00"
+        ]
+      ],
+      "at": "2026-10-31T19:01+02:00",
+      "before": null,
+      "date": "2026-11-01",
+      "first_observed_source": "Alerts Energy",
+      "kind": "published",
+      "message": "Змінено графік: 15:30–21:00 → 15:30–21:00",
+      "sources_confirmed": [
+        "Alerts Energy",
+        "Карта світла"
+      ]
+    },
     {
       "after": [
         [
