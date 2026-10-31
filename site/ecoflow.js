@@ -64,11 +64,11 @@
   if (!root || !toggle) return;
 
   const $ = id => document.getElementById(id);
-  // Power: watts (Вт). Battery capacity and energy: watt-hours (Вт·год).
+  // Power: watts (W). Battery capacity and energy: watt-hours (W).
   // Never scale values to kilowatts; capacityWh always stores physical watt-hours.
   const uk = new Intl.NumberFormat('uk-UA', { maximumFractionDigits: 2 });
   function niceWh(wh) {
-    return Number.isFinite(wh) ? uk.format(wh) + ' Вт·год' : '—';
+    return Number.isFinite(wh) ? uk.format(wh) + ' W' : '—';
   }
   function capClass(wh) {
     if (wh === null) return 'size-unknown';
@@ -118,8 +118,8 @@
     const output = Number.isFinite(d.outputW) ? d.outputW : 0;
     const autonomy = formatAutonomy(capWh, pct, output);
     return '<div class="eco-device-stats eco-common-stats">' +
-      '<div class="eco-device-stat"><span>Вхід</span><strong>' + d.inputW + ' Вт</strong></div>' +
-      '<div class="eco-device-stat"><span>Вихід</span><strong>' + output + ' Вт</strong></div>' +
+      '<div class="eco-device-stat"><span>Вхід</span><strong>' + d.inputW + ' W</strong></div>' +
+      '<div class="eco-device-stat"><span>Вихід</span><strong>' + output + ' W</strong></div>' +
       '<div class="eco-device-stat eco-autonomy"><span>Автономність</span><strong>' + autonomy + '</strong></div>' +
       '</div>';
   }
@@ -166,7 +166,7 @@
       '<div class="eco-ocean-setting"><span>Потужність заряджання</span>' +
       '<div class="eco-ocean-watts"><input type="range" data-eco-ocean-watts min="100" max="3000" step="100" value="' +
       powerOceanDraft.chargeW + '" aria-label="Потужність заряджання PowerOcean"><output>' +
-      powerOceanDraft.chargeW + ' Вт</output></div><small>100–3000 Вт</small></div>' +
+      powerOceanDraft.chargeW + ' W</output></div><small>100–3000 W</small></div>' +
       '<div class="eco-ocean-setting"><span>Час заряджання</span><label class="eco-ocean-allday">' +
       '<input type="checkbox" data-eco-ocean-allday' + (powerOceanDraft.allDay ? ' checked' : '') +
       '> Цілодобово</label><div class="eco-ocean-clock">' +
@@ -180,7 +180,7 @@
   // The solar component is retained for later, but hidden until panels actually exist.
   const solarUiEnabled = false;
   const solarPowerLabel = watt => Number.isFinite(watt)
-    ? uk.format(watt) + ' Вт' : '—';
+    ? uk.format(watt) + ' W' : '—';
 
   function solarDisclosure(device) {
     if (!solarUiEnabled || !device.solar) return '';
@@ -219,14 +219,14 @@
     const cap = niceWh(d.capacityWh);
     return '<article class="eco-powerocean charge-' + level(d.pct) + '" aria-label="PowerOcean, домашня система, заряд ' + d.pct + '%">' +
       '<div class="eco-ocean-top"><div><span class="eco-ocean-overline">Домашня енергосистема</span>' +
-      '<h3>PowerOcean</h3><span class="eco-ocean-cap">' + d.batteryCount + ' акумулятори · ' + cap + ' · інвертор ' + uk.format(d.inverterKw * 1000) + ' Вт' +
+      '<h3>PowerOcean</h3><span class="eco-ocean-cap">' + d.batteryCount + ' акумулятори · ' + cap + ' · інвертор ' + uk.format(d.inverterKw * 1000) + ' W' +
       '</span></div>' + operationBadge(d) + '</div>' +
       '<div class="eco-ocean-body"><div class="eco-ocean-battery"><span class="eco-ocean-label">Акумулятор</span>' +
       '<div class="eco-battery"><span class="eco-battery-percent">' + d.pct + '%</span></div>' +
       chargeTrack(d.pct, d.name) + '<span>' + cap + '</span></div>' +
-      '<div class="eco-ocean-energy"><div><span>Мережа / заряд</span><strong>' + d.inputW + ' Вт</strong></div>' +
+      '<div class="eco-ocean-energy"><div><span>Мережа / заряд</span><strong>' + d.inputW + ' W</strong></div>' +
       '<div class="eco-ocean-flow" aria-hidden="true">→</div><div><span>Будинок</span><strong>' +
-      d.outputW + ' Вт</strong></div></div></div>' +
+      d.outputW + ' W</strong></div></div></div>' +
       '<div class="eco-ocean-autonomy"><span>Орієнтовна автономність</span><strong>' +
       formatAutonomy(d.capacityWh, d.pct, d.outputW) + '</strong></div>' +
       powerOceanAdmin(d) + '</article>';
@@ -311,7 +311,7 @@
       '" aria-label="Режим заряджання ' + station.name + '">' +
       speedModes.map(mode => '<option value="' + mode.key + '"' +
         (selected === mode.key ? ' selected' : '') + '>' + mode.label +
-        ' · ' + (station.id === 'r3pw' && mode.key === 'quiet' ? 'до 80 Вт' : profile[mode.key] + ' Вт') + '</option>').join('') + '</select>';
+        ' · ' + (station.id === 'r3pw' && mode.key === 'quiet' ? 'до 80 W' : profile[mode.key] + ' W') + '</option>').join('') + '</select>';
   }
 
   function targetRows(group, withSpeed) {
@@ -432,7 +432,7 @@
   const textEscape = value => String(value).replace(/[&<>"']/g, char =>
     ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]);
   const exactCapacity = wh => Number.isFinite(wh)
-    ? preciseWh.format(wh) + ' Вт·год' : '—';
+    ? preciseWh.format(wh) + ' W' : '—';
   let metricOpen = null;
 
   function metricBreakdown(kind) {
@@ -459,7 +459,7 @@
           : device.type === 'system' ? 'Домашня система' : 'Портативна зарядна станція';
         const operation = operationMeta[device.operation] || operationMeta.unknown;
         const powerLine = device.type === 'station' && Number.isFinite(device.inputW) && Number.isFinite(device.outputW)
-          ? '<span>Вхід ' + device.inputW + ' Вт · вихід ' + device.outputW + ' Вт</span>'
+          ? '<span>Вхід ' + device.inputW + ' W · вихід ' + device.outputW + ' W</span>'
           : '';
         return '<div class="eco-detail-device eco-detail-inventory">' +
           '<div class="eco-detail-item-heading"><span class="eco-detail-index">' + (i + 1) +
@@ -676,7 +676,7 @@
     const watts = Math.max(100, Math.min(3000, Math.round(Number(target.value) / 100) * 100 || 100));
     powerOceanDraft.chargeW = watts;
     const output = target.closest('.eco-ocean-watts')?.querySelector('output');
-    if (output) output.textContent = watts + ' Вт';
+    if (output) output.textContent = watts + ' W';
   });
   root.addEventListener('change', event => {
     const target = event.target;
