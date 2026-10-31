@@ -484,7 +484,7 @@
         '<div class="eco-detail-track"><i style="width:' + contribution +
         '%" data-level="' + level(device.pct) + '"></i></div>' +
         '<small>Заряд ' + device.pct + '% · частка ємності ' + fmtPercent(share) +
-        '</small><small><strong class="eco-detail-stored">Запасено ' + exactCapacity(savedEnergy) + '</strong></small>' +
+        '</small><small><strong class="eco-detail-stored">≈ ' + niceWh(Math.round(savedEnergy)) + ' запасено</strong></small>' +
         '<small>' + fmtPercent(share) + ' × ' + device.pct + '% = +' +
         fmtPercent(contribution) + ' загального заряду</small></div>';
     }).join('');
